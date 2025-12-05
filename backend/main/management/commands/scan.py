@@ -20,36 +20,42 @@ from mutagen.id3 import ID3
 OUTPUT_JSON = "scan_results.json"            # opcional: para depuración
 INDENT_SIZE = 2
 PATH_SEP = '\\' #os.pathsep
-IGNORE_FOLDERS = [
-    '$RECYCLE.BIN',
-    '.android_secure',
-    '.album',
-    '.artist',
-    '.binaural',
-    '.casette-eps',
-    '.chiptune',
-    '.genre',
-    '.mini_vinyls',
-    '.ost',
-    '.podcast',
-    '.rip',
-    '.scripts',
-    '.sessions',
-    '.source',
-    '.trash',
-    '.video',
-    '_Serato_',
-    '_Serato_Backup',
-    'Android',
-    'LOST_DIR',
-    'System Volume Information',
-    'sorted',
-    'unsorted',
-]
+
+
+def load_array(file):
+    payload = []
+    with open(file, "r") as file:
+        payload = file.read().split('\n')
+        return payload
+    
+FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
+FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
+FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
+CODENAME_PREFIXES   = load_array('codename_prefixes.lst')
+
+EMOJI_REPLACEMENT = {
+    '♥' : '❤',
+    '♥' : '❤️',
+}
 
 def get_sanitized_year(year : str):
     year = year.split('-')[0]
     return year
+
+def get_hash(path : str):
+    """Devuelve un hash de 128 caracteres ASCII (SHA-512 en hex) para un fichero MP3."""
+    sha = hashlib.sha512()
+    with open(path, "rb") as f:
+        # Leer en bloques para archivos grandes
+        for chunk in iter(lambda: f.read(8192), b""):
+            sha.update(chunk)
+    return sha.hexdigest()  # 128 caracteres ASCII
+
+def is_codename(tag: str) -> bool:
+    """Devuelve True si la tag es un codename."""
+    for prefix in CODENAME_PREFIXES:
+        if tag.startswith(prefix) : return True
+    return False
 
 def is_ignored_path(path: str) -> bool:
     """Devuelve True si la ruta está dentro de alguna carpeta ignorada."""
@@ -57,19 +63,108 @@ def is_ignored_path(path: str) -> bool:
 
     # Comprobamos cada parte del path
     for part in p.parts:
-        if part in IGNORE_FOLDERS:
-            return True
+        for folder in FORBIDDEN_FOLDERS:
+            if part.startswith(folder):return True
 
     return False
 
+def is_comment_tag(tag: str) -> bool:
+    """Devuelve True si la tag tiene espacios"""
+    return " " in tag
+
+def is_forbidden_tag(tag: str) -> bool:
+    """Devuelve True si la tag está prohibida."""
+    for fb in FORBIDDEN_TAGS:
+        if fb == tag: return True
+    for fb in FORBIDDEN_PREFIXES:
+        if fb.startswith(tag): return True
+    return False
+  
+def is_number(var):
+    try:
+        test = int(var)
+        return True
+    except:
+        return False
+
+def is_timestamp(tag):
+    if len(tag) == 4:
+        # YYYY
+        if is_number(tag):
+            return f'{tag}0101'
+    if len(tag) == 7:
+        # YYYY-MM
+        if is_number(tag[0:4]):
+            if is_number(tag[5:7]):
+                return f'{tag[0:4]}{tag[5:7]}01'
+        # MM-YYYY
+        else:
+            if is_number(tag[0:2]):
+                if is_number(tag[3:7]):
+                    return f'{tag[3:7]}{tag[0:2]}01'
+        return ''
+    if len(tag) == 8:
+        if is_number(tag[0:6]):
+            # YYYYMMXX
+            if not is_number(tag[6:8]):
+                return f'{tag[0:4]}{tag[4:6]}01'
+            # YYYYMMDD
+            else:
+                return f'{tag[0:4]}{tag[4:6]}{tag[6:8]}'
+        # YYYYXXXX
+        else:
+            if is_number(tag[0:4]):
+                return f'{tag[0:4]}0101'
+
+        # DD-MM-YY
+        if is_number(tag[0:2]):
+            if is_number(tag[3:5]):
+                if is_number(tag[6:8]):
+                    return f'20{tag[0:3]}{tag[3:5]}{tag[6:8]}'
+        return ''
+    if len(tag) == 10:
+        # 0000-00-00
+        if is_number(tag[0:4]):
+            if is_number(tag[5:7]):
+                if is_number(tag[8:10]):
+                    return f'{tag[0:4]}{tag[5:7]}{tag[8:10]}'
+        # 00-00-0000
+        if is_number(tag[0:2]):
+            if is_number(tag[3:5]):
+                if is_number(tag[6:10]):
+                    return f'{tag[6:10]}{tag[3:5]}{tag[0:2]}'
+        return ''
+    return ''
+
+def sanitize_tag(tag, song):
+    if is_forbidden_tag(tag): 
+        return ""
+    if is_codename(tag):
+        song.codename = tag
+        return ""
+    if is_comment_tag(tag):
+        song.comment += tag
+        return ""
+    
+    timestamp = is_timestamp(tag)
+    if len(timestamp) > 0:
+        song.timestamp = datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8]))
+        return ""
+    if is_number(tag):
+        return ""
+    tag = tag.replace(' - ', ', ')
+    for emoji,key in EMOJI_REPLACEMENT.items():
+        tag = tag.replace(key, emoji)
+    
+    tag = tag.rstrip()
+    tag = tag.rstrip('.')
+    return tag
+    
 def extract_id3_tags(filepath):
     """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
     try:
         audio = MP3(filepath)
         tags = ID3(filepath)
-        # print(tags )
-        # quit()
-
         def get_comments():
             target_tags = [
                 'COMM::eng',
@@ -79,13 +174,14 @@ def extract_id3_tags(filepath):
             ]
             comments = []
             for t in target_tags:
-                for comment in get_all(t): comments.append(comment)
+                for comment in get_all(t):
+                    comments.append(comment)
             comments = ", ".join(comments)
             return comments
 
         def get(tag):
             return tags[tag].text[0] if tag in tags else None
-        
+
         def get_all(tag):
             return tags[tag].text if tag in tags else []
 
@@ -96,41 +192,28 @@ def extract_id3_tags(filepath):
             date = str(date) if date else None
 
         return {
-            "file": filepath,
-            "title": get("TIT2"),
-            "artist": get("TPE1"),
-            "album": get("TALB"),
-            "track_number": get("TRCK"),
-            "comments": get_comments(),
-            "genre": get("TCON"),
-            "rating": tags["POPM:Windows Media Player 9 Series"].rating if "POPM:Windows Media Player 9 Series" in tags else None,
-            "key": get("TKEY"),
-            "year": date,
-            "bpm": get("TBPM"),
-            "composer": get("TCOM"),
-            "disc_number": get("TPOS"),
+            "file"          : filepath,
+            "title"         : get("TIT2"),
+            "artist"        : get("TPE1"),
+            "album"         : get("TALB"),
+            "track_number"  : get("TRCK"),
+            "comments"      : get_comments(),
+            "genre"         : get("TCON"),
+            "rating"        : tags["POPM:Windows Media Player 9 Series"].rating if "POPM:Windows Media Player 9 Series" in tags else None,
+            "key"           : get("TKEY"),
+            "year"          : date,
+            "bpm"           : get("TBPM"),
+            "composer"      : get("TCOM"),
+            "disc_number"   : get("TPOS"),
             "length_seconds": int(audio.info.length) if audio.info else None,
-            "bitrate": audio.info.bitrate if audio.info else None,
+            "bitrate"       : audio.info.bitrate if audio.info else None,
         }
     except Exception as e:
         return {
             "file": filepath,
             "error": str(e)
         }
-
-
-def get_hash(path : str):
-    """Devuelve un hash de 128 caracteres ASCII (SHA-512 en hex) para un fichero MP3."""
-    sha = hashlib.sha512()
-
-    with open(path, "rb") as f:
-        # Leer en bloques para archivos grandes
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha.update(chunk)
-
-    return sha.hexdigest()  # 128 caracteres ASCII
-
-
+  
 
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
@@ -146,21 +229,23 @@ class Command(BaseCommand):
             return Song.objects.filter(filename=path).get()
         except Exception:
             return None
-        
+
     def get_song_artists( self, info ):
         artist_name = info.get('artist')
         results = []
         try:
             results.append( Artist.objects.filter( name=artist_name ).get() )
-        except: 
+        except:
             try:
-                results.append( Artist.objects.filter( aliases__icontains=artist_name.lower() ).get()) 
+                results.append( Artist.objects.filter( aliases__icontains=artist_name.lower() ).get())
             except:
                 pass
         return results
-    
+
     def get_or_create_artist(self, artist_name, info):
         if artist_name is None: return None
+        artist_name = artist_name.lstrip(' ')
+        if len(artist_name)==0: return None
         try:
             artist = Artist.objects.filter( name=artist_name ).get()
             return artist
@@ -191,25 +276,18 @@ class Command(BaseCommand):
             self.echo(f'Created genre "{ genre_name }"')
             return genre
 
-    def get_or_create_tags(self, tags_text):
+    def get_or_create_tags(self, tags_text, song=None):
         tags = []
         if tags_text is None: return tags
-        for tag_token in tags_text.split(', '):
+        tag_list = tags_text.split(', ')
+        # tag_list = dict.fromkeys(tag_list).keys() #this line removes duplicates, but also removes numeric values...
+        res = []
+        [res.append(val) for val in tag_list if val not in res]
+        tag_list = res
+        for tag_token in tag_list:
             tag = None
-            # Skip empty tags
-            if len(tag_token) == 0: continue 
-            # Skip tags with more than a word
-            if " " in tag_token: continue
-            # Skip tags refering to URL's
-            if "http://" in tag_token: continue
-            if "www." in tag_token: continue
-            # Skip strictly numeric tags
-            try:
-                i = int(tag_token)
-                continue
-            except:
-                pass
-            # If tests passed, its a valid tag
+            tag_token = sanitize_tag( tag_token, song )
+            if len(tag_token) == 0: continue
             try:
                 tag = Tag.objects.filter( name=tag_token ).get()
             except Exception as e:
@@ -219,7 +297,7 @@ class Command(BaseCommand):
                 self.echo(f"Created tag {tag_token}", indent=1)
             tags.append(tag)
         return tags
-    
+
     def get_or_create_album(self, album_name, info):
         if album_name is None: return None
         try:
@@ -240,18 +318,18 @@ class Command(BaseCommand):
             album.save()
             self.echo(f'Created album "{album_name}"')
             return album
-    
+
     def add_song_error(self, song, exception, error=True):
         song.errors = song.errors + str(exception) + '\n'
-        if error: 
-            song.error = error    
+        if error:
+            song.error = error
 
     def setup_song(self, song, info : dict, hash : str):
-        song.hash  = hash
-        song.errors = ''
-        song.error = False
-
-        try:            
+        song.hash    = hash
+        song.errors  = ''
+        song.error   = False
+        song.comment = ''
+        try:
             song.title = info.get('title')
             if song.title is None:
                 song.error = True
@@ -264,7 +342,7 @@ class Command(BaseCommand):
             self.add_song_error(song, f"TITLE:{str(e)}")
 
         try:
-            song.track_number   = int(info.get('track_number')) 
+            song.track_number   = int(info.get('track_number'))
         except Exception as e:
             self.add_song_error(song, f"TRACK:{str(e)}", error=False)
 
@@ -272,7 +350,7 @@ class Command(BaseCommand):
             song.timestamp = timezone.make_aware(datetime(int(get_sanitized_year(info.get('year') or "1900")), 1, 1))
         except Exception as e:
             self.add_song_error(song, f"TRACK:{str(e)}")
-            
+
         try:
             song.album = self.get_or_create_album(info.get('album'), info)
         except Exception as e:
@@ -282,23 +360,17 @@ class Command(BaseCommand):
             song.artist = self.get_or_create_artist( info.get('artist'), info)
         except Exception as e:
             self.add_song_error(song, f"ARTIST:{str(e)}")
-        
+
         try:
             song.genre = self.get_or_create_genre( info.get('genre'), info)
         except Exception as e:
             self.add_song_error(song, f"GENRE:{str(e)}")
 
-        for tag in self.get_or_create_tags( info.get('comments')):
-            try:
-                song.tags.append(tag)
-            except Exception as e:
-                self.add_song_error(song, f"TAGS:{str(e)}")
-
         try:
             song.bpm = info.get('bpm')
         except Exception as e:
             self.add_song_error(song, f"BPM:{str(e)}")
-        
+
         try:
             song.key = info.get('key')
         except Exception as e:
@@ -306,17 +378,25 @@ class Command(BaseCommand):
 
         song.save()
 
+        for tag in self.get_or_create_tags( info.get('comments'), song):
+            try:
+                song.tags.add(tag)
+            except Exception as e:
+                self.add_song_error(song, f"TAGS:{str(e)}")
+
+        song.save()
+
     def update_song(self, path : str, info : dict, hash : str):
         song = Song.objects.filter(filename=path).get()
         self.setup_song( song, info , hash)
         self.echo(f'Updated song {path}', indent=1)
-        
+
     def create_song(self, path : str, info : dict, hash : str):
         song = Song()
         song.filename = path
         self.setup_song( song, info , hash)
         self.echo(f'Created song "{path}"', indent=1)
-        
+
     def scan(self, folder):
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
@@ -324,39 +404,33 @@ class Command(BaseCommand):
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
-            # self.echo(root.strip(folder))
             print(("  "*50)+"\r"+root.split(folder)[1].lstrip('\\').lstrip('/'))
             for f in files:
                 if f.lower().endswith(".mp3"):
-                    # self.echo(f, indent=1)
                     print(("  "*50)+"\r"+f, end="\r")
                     path = os.path.join(root, f)
                     hash = get_hash(path)
                     # check whether or not the song object exists
                     id = os.path.join(root, f)
-                    song = self.get_song(id) 
-                    if (song is not None) and song.hash == hash and not song.error: 
+                    song = self.get_song(id)
+                    if (song is not None) and song.hash == hash and not song.error:
                         continue
                     info = extract_id3_tags(path)
-                    if song is None: 
+                    if song is None:
                         self.create_song(id , info, hash)
-                    else:                        
-                        # if not song.error:
-                        #     self.echo(hash)
-                        #     self.echo(song.hash)
+                    else:
                         self.update_song(id, info, hash)
                     results.append(info)
         return results
 
     def handle(self, *args, **options):
-        
+
         MUSIC_FOLDER = options["scan_path"][0] or "/mnt/c/Users/smiker/Music/"   # <-- cámbialo
 
         self.echo("Scanning media...")
         self.echo(f"Folder: {MUSIC_FOLDER}")
         results = self.scan(MUSIC_FOLDER)
 
-        # Puedes guardar resultados o procesarlos aquí
         with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
 

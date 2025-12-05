@@ -62,7 +62,8 @@ class Song(models.Model):
     filename = models.FileField(upload_to="songs/")
     artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
-
+    comment = models.TextField(blank=True)
+    
     track_number = models.PositiveIntegerField(default=1, null=True, blank=True)
     lyrics = models.TextField(blank=True)
     picture = models.ImageField(upload_to="songs/", blank=True, null=True)
