@@ -42,7 +42,7 @@ class Album(models.Model):
     name    = models.CharField(max_length=200)
     codename= models.CharField(max_length=200, unique=True, null=True, blank=True)
     brief   = models.TextField(blank=True)
-    picture = models.ImageField(upload_to="albums/", blank=True, null=True)
+    picture = models.CharField(max_length=512, default="", null=True, blank=True)
     booklet = models.FileField(upload_to="booklets/", blank=True, null=True)
     edition = models.CharField(max_length=200, blank=True, default="Vanila")
     limited = models.BooleanField(default=False)
@@ -67,14 +67,14 @@ class Album(models.Model):
 # ============
 class Song(models.Model):
     title        = models.CharField(max_length=200, default="Untitled")
-    filename     = models.FileField(upload_to="songs/")
+    filename     = models.CharField(max_length=255, default="untitled.mp3")
     artist       = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
     genre        = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
     comment      = models.TextField(blank=True)
     
     track_number = models.PositiveIntegerField(default=1, null=True, blank=True)
     lyrics       = models.TextField(blank=True)
-    picture      = models.ImageField(upload_to="songs/", blank=True, null=True)
+    picture      = models.CharField(max_length=512, default="", null=True, blank=True)
 
     times_played = models.PositiveIntegerField(default=0)
     times_skipped= models.PositiveIntegerField(default=0)

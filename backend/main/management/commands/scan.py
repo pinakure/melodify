@@ -27,7 +27,7 @@ def load_array(file):
     with open(file, "r") as file:
         payload = file.read().split('\n')
         return payload
-    
+
 FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
 FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
 FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
@@ -83,7 +83,7 @@ def is_forbidden_tag(tag: str) -> bool:
         if len(fb)==0:continue
         if tag.startswith(fb): return True
     return False
-  
+
 def is_number(var):
     try:
         test = int(var)
@@ -141,7 +141,7 @@ def is_timestamp(tag):
     return ''
 
 def sanitize_tag(tag, song):
-    if is_forbidden_tag(tag): 
+    if is_forbidden_tag(tag):
         return ""
     if is_codename(tag):
         song.codename = tag
@@ -149,7 +149,7 @@ def sanitize_tag(tag, song):
     if is_comment_tag(tag):
         song.comment += tag
         return ""
-    
+
     timestamp = is_timestamp(tag)
     if len(timestamp) > 0:
         print("\n")
@@ -162,11 +162,11 @@ def sanitize_tag(tag, song):
     tag = tag.replace(' - ', ', ')
     for emoji,key in EMOJI_REPLACEMENT.items():
         tag = tag.replace(key, emoji)
-    
+
     tag = tag.rstrip()
     tag = tag.rstrip('.')
     return tag
-    
+
 def extract_id3_tags(filepath):
     """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
     try:
@@ -189,6 +189,9 @@ def extract_id3_tags(filepath):
         def get(tag):
             return tags[tag].text[0] if tag in tags else None
 
+        def get_picture():
+            return tags.get("APIC:").data if 'APIC:' in tags else None,
+
         def get_all(tag):
             return tags[tag].text if tag in tags else []
 
@@ -204,6 +207,7 @@ def extract_id3_tags(filepath):
             "artist"        : get("TPE1"),
             "album"         : get("TALB"),
             "track_number"  : get("TRCK"),
+            "picture"       : get_picture(),
             "comments"      : get_comments(),
             "genre"         : get("TCON"),
             "rating"        : tags["POPM:Windows Media Player 9 Series"].rating if "POPM:Windows Media Player 9 Series" in tags else None,
@@ -216,11 +220,16 @@ def extract_id3_tags(filepath):
             "bitrate"       : audio.info.bitrate if audio.info else None,
         }
     except Exception as e:
+        print("ID3:"+str(e))
         return {
             "file": filepath,
             "error": str(e)
         }
-  
+
+def dump_picture(filename, data):
+    # Guarda los datos binarios de la imagen en un archivo
+    with open(filename, 'wb') as img_file:
+        img_file.write(data)
 
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
@@ -369,7 +378,7 @@ class Command(BaseCommand):
                 song.album.save()
         except Exception as e:
             self.add_song_error(song, f"ARTIST:{str(e)}")
-        
+
         try:
             song.genre = self.get_or_create_genre( info.get('genre'), info)
             if song.album:
@@ -387,6 +396,35 @@ class Command(BaseCommand):
             song.key = info.get('key')
         except Exception as e:
             self.add_song_error(song, f"KEY:{str(e)}")
+
+        picture = info.get('picture')[0] if 'picture' in info.keys() else None
+        if picture is not None:
+            try:
+                if song.picture == '':
+                    sha = hashlib.sha512()
+                    sha.update(picture)
+                    filename = sha.hexdigest()  # 128 caracteres ASCII
+                    path = os.path.join('.', "media", "songs", f'{filename}.png')
+                    dump_picture(path, picture)
+                    song.picture = f'/media/songs/{filename}.png'
+            except Exception as e:
+                print(picture)
+                print("SETUPSONGPIC:" + str(e))
+                quit()
+                self.add_song_error(song, f"PICTURE:{str(e)}")
+
+            try:
+                if song.album is not None:
+                    if song.album.picture is None:
+                        filename = song.album.name.strip('/').strip('?').strip('*').strip('\\')
+                        path = os.path.join('.', "media", "albums", f'{filename}.png')
+                        dump_picture(path, picture)
+                        song.album.picture = f'/media/albums/{filename}.png'
+                        song.album.save()
+            except Exception as e:
+                print("SETUPALBUMPIC:" + str(e))
+                quit()
+                self.add_song_error(song, f"PICTURE:{str(e)}")
 
         song.save()
 
@@ -412,6 +450,7 @@ class Command(BaseCommand):
     def scan(self, folder):
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
+        self.folder = folder
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
