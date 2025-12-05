@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% endblock %}
+{% block content %}
+<div class="artist-profile">
+    <h1>{{ artist.name }}</h1>
+    
+    {% if artist.bio %}
+        <div class="bio">
+            <h3>Biografía:</h3>
+            <p>{{ artist.bio|linebreaksbr }}</p>
+        </div>
+    {% endif %}
+
+    <h2>Discografía ({{ albums_list.count }} álbumes)</h2>
+
+    <div class="album-grid">
+        {% for album in albums_list %}
+            <div class="album-item">
+                <a href="{% url 'album-detail' album.pk %}">
+                    {% if album.cover_image %}
+                        <img src="{{ album.cover_image.url }}" alt="{{ album.title }} cover">
+                    {% else %}
+                        <div class="placeholder-image">Sin Imagen</div>
+                    {% endif %}
+                    <h4>{{ album.title }}</h4>
+                    <p>{{ album.release_date|date:"Y" }}</p>
+                </a>
+            </div>
+        {% empty %}
+            <p>Este artista aún no tiene álbumes registrados.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* Estilos CSS básicos para la discografía */
+    .album-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    .album-item {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .album-item img, .placeholder-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+        margin-bottom: 10px;
+    }
+    .placeholder-image {
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+{% endblock %}

@@ -24,7 +24,9 @@
             {% else %}
                 <span>
                 {% for artist in album.artists.all %}
-                    {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                    <a href="{% url 'artist-detail' artist.pk %}">
+                        {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                    </a>
                 {% endfor %}
                 </span>
             {% endif %}

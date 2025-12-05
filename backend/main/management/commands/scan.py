@@ -38,6 +38,20 @@ EMOJI_REPLACEMENT = {
     '♥' : '❤️',
 }
 
+FORBIDEN_CHARACTERS = [
+    '/',
+    '\\',
+    '?',
+    '!',
+    '*',
+    '~',
+]
+
+def sanitize_filename(text):
+    for target in FORBIDEN_CHARACTERS:
+        text = text.replace(target, '')
+    return text                        
+
 def get_sanitized_year(year : str):
     year = year.split('-')[0]
     if int(year)<1000: return "1000"
@@ -416,7 +430,7 @@ class Command(BaseCommand):
             try:
                 if song.album is not None:
                     if song.album.picture is None:
-                        filename = song.album.name.strip('/').strip('?').strip('*').strip('\\')
+                        filename = sanitize_filename(song.album.name)
                         path = os.path.join('.', "media", "albums", f'{filename}.png')
                         dump_picture(path, picture)
                         song.album.picture = f'/media/albums/{filename}.png'
@@ -454,7 +468,10 @@ class Command(BaseCommand):
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
-            print(("  "*50)+"\r"+root.split(folder)[1].lstrip('\\').lstrip('/'))
+            tabs = "  " * len(root.split(folder)[1].split("\\"))
+            last = root.split(folder)[1].split("\\")[-1]
+            # print(("  "*50)+"\r"+tabs+root.split(folder)[1].lstrip('\\').lstrip('/'))
+            print(("  "*50)+"\r"+tabs+last.lstrip('\\').lstrip('/'))
             for f in files:
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
@@ -481,7 +498,7 @@ class Command(BaseCommand):
         self.echo(f"Folder: {MUSIC_FOLDER}")
         results = self.scan(MUSIC_FOLDER)
 
-        with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-            json.dump(results, f, indent=2, ensure_ascii=False)
+        # with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+        #     json.dump(results, f, indent=2, ensure_ascii=False)
 
-        self.echo(f"Scan complete: {len(results)} files.")
+        self.echo("\n"+f"Scan complete: {len(results)} files.")

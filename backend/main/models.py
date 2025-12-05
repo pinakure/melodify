@@ -46,6 +46,7 @@ class Album(models.Model):
     booklet = models.FileField(upload_to="booklets/", blank=True, null=True)
     edition = models.CharField(max_length=200, blank=True, default="Vanila")
     limited = models.BooleanField(default=False)
+    release = models.DateField(null=True, blank=True)
 
     artists = models.ManyToManyField(Artist, blank=True)
     genres  = models.ManyToManyField(Genre, blank=True)
