@@ -54,6 +54,7 @@ def get_hash(path : str):
 def is_codename(tag: str) -> bool:
     """Devuelve True si la tag es un codename."""
     for prefix in CODENAME_PREFIXES:
+        if len(prefix)==0:continue
         if tag.startswith(prefix) : return True
     return False
 
@@ -64,6 +65,7 @@ def is_ignored_path(path: str) -> bool:
     # Comprobamos cada parte del path
     for part in p.parts:
         for folder in FORBIDDEN_FOLDERS:
+            if len(folder)==0:continue
             if part.startswith(folder):return True
 
     return False
@@ -77,7 +79,8 @@ def is_forbidden_tag(tag: str) -> bool:
     for fb in FORBIDDEN_TAGS:
         if fb == tag: return True
     for fb in FORBIDDEN_PREFIXES:
-        if fb.startswith(tag): return True
+        if len(fb)==0:continue
+        if tag.startswith(fb): return True
     return False
   
 def is_number(var):
@@ -246,6 +249,7 @@ class Command(BaseCommand):
         return results
 
     def get_or_create_artist(self, artist_name, info):
+        artist_name = artist_name.rstrip().lstrip()
         if artist_name is None: return None
         artist_name = artist_name.lstrip(' ')
         if len(artist_name)==0: return None
