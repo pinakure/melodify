@@ -1,0 +1,9 @@
+plugins {
+    id 'com.chaquo.python'
+}
+
+python {
+    pip {
+        install "django"
+    }
+}

@@ -1,0 +1,53 @@
+~~~~~~~~~~~~~~~~~
+Script Duties
+~~~~~~~~~~~~~~~~~
+·Generate and Display Discrepance List
+·Inspect Tags, Create Song/Artist/Album Objects automatically
+·Journalkeep scan status, ability restore scanning from last scanned item
+·Playlist downloader (ytdl) integration
+~~~~~~~~~~~~~~~~~
+Data Models
+~~~~~~~~~~~~~~~~~
+ .  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/!\  NOTE: Fields tagged with * symbol means those are virtual attributes
+¨¨¨ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Artist:
+	Aliases
+	Name
+	Bio
+	Picture
+	Genres*
+Album:
+	Name
+	Codename
+	Brief
+	Picture
+	Booklet
+	Edition
+	Limited
+	Artists*
+	Genres*
+Song:
+	Title
+	Filename
+	Artists
+	Genre
+	Track Number
+	Lyrics
+	Picture
+	TimesPlayed
+	TimesSkipped
+	Bookmarked
+	Album
+	Codename
+	Tags
+	Timestamp
+	Hash
+	Bpm
+	Tone
+Playlist:
+	Title
+	Songs
+	Artists*
+	Picture*
+	Genres*

@@ -1,0 +1,9 @@
+/backend/backend/__pycache__
+/backend/main/__pycache__
+/backend/main/management/commands/__pycache__
+/backend/main/management/__pycache__
+/backend/main/migrations
+/backend/virtualenv
+backend/scripts/scan_results.json
+backend/scan_results.json
+backend/db.sqlite3
