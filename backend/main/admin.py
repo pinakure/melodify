@@ -9,8 +9,8 @@ from .models import Artist, Genre, Tag, Album, Song, Playlist
 class ArtistAdmin(admin.ModelAdmin):
     list_display = ("name", "aliases")
     search_fields = ("name", "aliases")
-    list_filter = ("genres",)
     filter_horizontal = ("genres",)
+    #list_filter = ("genres",)
 
 
 # ============
@@ -38,8 +38,8 @@ class TagAdmin(admin.ModelAdmin):
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ("name", "codename", "edition", "limited")
     search_fields = ("name", "codename")
-    list_filter = ("limited", "genres")
     filter_horizontal = ("artists", "genres")
+    #list_filter = ("limited", "genres")
 
 
 # ============
@@ -47,9 +47,20 @@ class AlbumAdmin(admin.ModelAdmin):
 # ============
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ("title", "artist", "album", "timestamp", "error")
+    list_display = ("title", "artist", "album", "genre", "comment", "timestamp", "codename", "bpm", "all_tags", "favorite", "status")
     search_fields = ("title", "codename", "album__name")
-    list_filter = ("genre", "artist", "album", "bookmarked", "tags")
+    #list_filter = ("genre", "artist", "album", "bookmarked", "tags")
+    
+    def all_tags(self, obj):
+        return obj.get_tags()
+
+    @admin.display(boolean=True, description='✔')
+    def status(self, obj):
+        return not obj.error 
+    
+    @admin.display(boolean=False, description='💛')
+    def favorite(self, obj):
+        return "🤍" if not obj.bookmarked else "💛" 
 
 
 # ============

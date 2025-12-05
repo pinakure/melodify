@@ -85,6 +85,10 @@ class Song(models.Model):
     bpm          = models.FloatField(null=True, blank=True)
     tone         = models.CharField(max_length=50, blank=True)
 
+    def get_tags(self):
+        tags = [ x.name for x in self.tags.all()]
+        return ", ".join(tags)
+
     def __str__(self):
         return self.title
 
