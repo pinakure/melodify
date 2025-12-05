@@ -52,7 +52,7 @@ class AlbumAdmin(admin.ModelAdmin):
         return format_html('<div style="width: 250px;">{}</div>', obj.get_genres())
     
     def pic(self, obj):
-        return "" if obj.picture == "" else "✔"
+        return "" if obj.picture is None else "✔"
      
     def book(self, obj):
         return "✔" if obj.booklet.name != "" else ""
