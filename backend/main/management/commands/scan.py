@@ -40,6 +40,7 @@ EMOJI_REPLACEMENT = {
 
 def get_sanitized_year(year : str):
     year = year.split('-')[0]
+    if int(year)<1000: return "1000"
     return year
 
 def get_hash(path : str):
@@ -320,8 +321,6 @@ class Command(BaseCommand):
             album.edition = None
             album.limited = False
             album.edition = 'Vanila'
-            # album.artists = None
-            # album.genres = None
             album.save()
             self.echo(f'Created album "{album_name}"')
             return album
@@ -354,10 +353,10 @@ class Command(BaseCommand):
             self.add_song_error(song, f"TRACK:{str(e)}", error=False)
 
         try:
-            song.timestamp = timezone.make_aware(datetime(int(get_sanitized_year(info.get('year') or "1900")), 1, 1))
+            song.timestamp = timezone.make_aware(datetime(int(get_sanitized_year(info.get('year') or "1000")), 1, 1))
+            if song.timestamp.year == 1000: song.timestamp = None
         except Exception as e:
             self.add_song_error(song, f"TRACK:{str(e)}")
-
         try:
             song.album = self.get_or_create_album(info.get('album'), info)
         except Exception as e:
@@ -365,11 +364,17 @@ class Command(BaseCommand):
 
         try:
             song.artist = self.get_or_create_artist( info.get('artist'), info)
+            if song.album:
+                song.album.artists.add(song.artist)
+                song.album.save()
         except Exception as e:
             self.add_song_error(song, f"ARTIST:{str(e)}")
-
+        
         try:
             song.genre = self.get_or_create_genre( info.get('genre'), info)
+            if song.album:
+                song.album.genres.add(song.genre)
+                song.album.save()
         except Exception as e:
             self.add_song_error(song, f"GENRE:{str(e)}")
 

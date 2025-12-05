@@ -50,6 +50,14 @@ class Album(models.Model):
     artists = models.ManyToManyField(Artist, blank=True)
     genres  = models.ManyToManyField(Genre, blank=True)
 
+    def get_artists(self):
+        artists = [ x.name for x in self.artists.all()]
+        return ", ".join(artists)
+
+    def get_genres(self):
+        genres = [ x.name for x in self.genres.all()]
+        return ", ".join(genres)
+
     def __str__(self):
         return self.name
 
@@ -80,7 +88,7 @@ class Song(models.Model):
     error        = models.BooleanField(default=False)
     errors       = models.TextField(blank=True, null=True)
 
-    timestamp    = models.DateTimeField(auto_now_add=True)
+    timestamp    = models.DateTimeField(null=True, blank=True)
     hash         = models.CharField(max_length=128, blank=True)
     bpm          = models.FloatField(null=True, blank=True)
     tone         = models.CharField(max_length=50, blank=True)
