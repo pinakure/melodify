@@ -191,6 +191,35 @@ class Command(BaseCommand):
             self.echo(f'Created genre "{ genre_name }"')
             return genre
 
+    def get_or_create_tags(self, tags_text):
+        tags = []
+        if tags_text is None: return tags
+        for tag_token in tags_text.split(', '):
+            tag = None
+            # Skip empty tags
+            if len(tag_token) == 0: continue 
+            # Skip tags with more than a word
+            if " " in tag_token: continue
+            # Skip tags refering to URL's
+            if "http://" in tag_token: continue
+            if "www." in tag_token: continue
+            # Skip strictly numeric tags
+            try:
+                i = int(tag_token)
+                continue
+            except:
+                pass
+            # If tests passed, its a valid tag
+            try:
+                tag = Tag.objects.filter( name=tag_token ).get()
+            except Exception as e:
+                tag = Tag()
+                tag.name = tag_token
+                tag.save()
+                self.echo(f"Created tag {tag_token}", indent=1)
+            tags.append(tag)
+        return tags
+    
     def get_or_create_album(self, album_name, info):
         if album_name is None: return None
         try:
@@ -259,11 +288,21 @@ class Command(BaseCommand):
         except Exception as e:
             self.add_song_error(song, f"GENRE:{str(e)}")
 
-        # try:
-        #     song.tags = self.get_or_create_genre( info.get('genre'), info)
-        # except Exception as e:
-        #     self.add_song_error(song, f"GENRE:{str(e)}")
+        for tag in self.get_or_create_tags( info.get('comments')):
+            try:
+                song.tags.append(tag)
+            except Exception as e:
+                self.add_song_error(song, f"TAGS:{str(e)}")
 
+        try:
+            song.bpm = info.get('bpm')
+        except Exception as e:
+            self.add_song_error(song, f"BPM:{str(e)}")
+        
+        try:
+            song.key = info.get('key')
+        except Exception as e:
+            self.add_song_error(song, f"KEY:{str(e)}")
 
         song.save()
 

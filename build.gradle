@@ -4,6 +4,8 @@ plugins {
 
 python {
     pip {
-        install "django"
+        install "django",
+        install "Pillow",
+        install "mutagen",
     }
 }
