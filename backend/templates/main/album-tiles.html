@@ -2,88 +2,81 @@
 
 {% block header %}
 <style>
-body {
-    font-size: 10px;
-    font-family: "Consolas";
-}
+    .tile-container {
+        display: grid;
+        /* Define 4 columnas de ancho igual (1fr), con un espacio de 20px entre ellas */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
 
-.tile-container {
-    display: grid;
-    /* Define 4 columnas de ancho igual (1fr), con un espacio de 20px entre ellas */
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
+    .tile-item {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+        text-align: center;
+    }
 
-.tile-item {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-    text-align: center;
-}
+    .tile-item:hover {
+        transform: translateY(-5px);
+    }
 
-.tile-item:hover {
-    transform: translateY(-5px);
-}
+    .tile-item img {
+        width: 100%;
+        height: 200px; /* Altura fija para que todas las imágenes se vean uniformes */
+        object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+        display: block;
+    }
 
-.tile-item img {
-    width: 100%;
-    height: 200px; /* Altura fija para que todas las imágenes se vean uniformes */
-    object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
-    display: block;
-}
+    .placeholder-image {
+        width: 100%;
+        height: 200px;
+        background-color: #eee;
+        display: flex;
+        align-items: center;
+        font-size: 128px;
+        /* filter: opacity(0.5); */
+        justify-content: center;
+        color: #888;
+    }
 
-.placeholder-image {
-    width: 100%;
-    height: 200px;
-    background-color: #eee;
-    display: flex;
-    align-items: center;
-    font-size: 128px;
-    /* filter: opacity(0.5); */
-    justify-content: center;
-    color: #888;
-}
+    .tile-info {
+        padding: 15px 10px;
+        background-color: #f9f9f9;
+    }
 
-.tile-info {
-    padding: 15px 10px;
-    background-color: #f9f9f9;
-}
+    .tile-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.1em;
+    }
 
-.tile-info h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.1em;
-}
+    .tile-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+    }
 
-.tile-info p {
-    margin: 0;
-    color: #666;
-    font-size: 0.9em;
-}
+    .tile-item a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
 
-.tile-item a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-}
-
-.album-image{
-    width: 100%;
-    height: 200px;
-    background-size: contain;
-    background-position: center;
-    
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
+    .album-image{
+        width: 100%;
+        height: 200px;
+        background-size: contain;
+        background-position: center;
+        
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 </style>
 {% endblock %}
-
 
 {% block content %}
 <h2>Álbumes ({{ albums.count  }})</h2>

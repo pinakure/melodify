@@ -1,5 +1,46 @@
 {% extends 'base.html' %}
 
+{% block header %}
+<style>
+    .album-detail-container {
+        display: flex;
+        gap: 40px;
+        padding: 40px;
+        max-width: 900px;
+        margin: auto;
+    }
+    .cover-art img {
+        max-width: 300px;
+        height: auto;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        border-radius: 8px;
+    }
+    .placeholder-detail-image {
+        width: 300px;
+        height: 300px;
+        background-color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+    .album-info h1 {
+        margin-top: 0;
+        font-size: 2.5em;
+    }
+    .artist-list {
+        margin-bottom: 20px;
+    }
+    .back-link {
+        margin-top: 20px;
+        display: inline-block;
+        color: #007bff;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="album-detail-container">
     <div class="cover-art">
@@ -44,7 +85,9 @@
         </p>
         <ul>            
             {% for song in songs %}
-                <li>{{ song.title }}</li>
+                <a href="{% url 'song-detail' album_pk=album.pk pk=song.pk %}">
+                    <li>{{ song.title }}</li>
+                </a>
             {% endfor %}
         </ul>
         <a href="{% url 'album-tiles' %}" class="back-link">
@@ -53,43 +96,4 @@
     </div>
 </div>
 
-<style>
-    /* Estilos CSS simples para esta vista */
-    .album-detail-container {
-        display: flex;
-        gap: 40px;
-        padding: 40px;
-        max-width: 900px;
-        margin: auto;
-    }
-    .cover-art img {
-        max-width: 300px;
-        height: auto;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        border-radius: 8px;
-    }
-    .placeholder-detail-image {
-        width: 300px;
-        height: 300px;
-        background-color: #eee;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-    }
-    .album-info h1 {
-        margin-top: 0;
-        font-size: 2.5em;
-    }
-    .artist-list {
-        margin-bottom: 20px;
-    }
-    .back-link {
-        margin-top: 20px;
-        display: inline-block;
-        color: #007bff;
-        text-decoration: none;
-    }
-</style>
 {% endblock %}

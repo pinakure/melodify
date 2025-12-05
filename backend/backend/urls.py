@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from main.views import AlbumTileView, AlbumDetailView, ArtistDetailView
+from main.views import AlbumTileView, AlbumDetailView, ArtistDetailView, SongDetailView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -9,6 +9,7 @@ urlpatterns = [
     path('albums/', AlbumTileView.as_view(), name='album-tiles'),
     path('albums/<int:pk>/', AlbumDetailView.as_view(), name='album-detail'),
     path('artist/<int:pk>/', ArtistDetailView.as_view(), name='artist-detail'),
+    path('albums/<int:album_pk>/song/<int:pk>/', SongDetailView.as_view(), name='song-detail'),
 ]
 
 if settings.DEBUG:

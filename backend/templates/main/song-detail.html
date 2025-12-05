@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block content %}
+<div class="song-detail-container">
+    <h1>{{ cancion.title }}</h1>
+    
+    <p>
+        <strong>Duración:</strong> 
+        <!-- Formatea la duración si usas DurationField. Si usas CharField, omite el filtro time -->
+        {{ cancion.duration|time:"H:i:s" }} 
+    </p>
+
+    <div class="album-info-section">
+        <h3>Perteneciente al Álbum:</h3>
+        
+        <!-- Accedemos al objeto Album relacionado directamente -->
+        <a href="{% url 'album-detail' song.album.pk %}">
+            <img src="{{ song.album.picture }}" alt="Portada de {{ song.album.name }}" style="width: 150px;">
+            <h4>{{ cancion.album.title }}</h4>
+        </a>
+
+        <!-- Accedemos a los artistas del álbum relacionado -->
+        <p>
+            <strong>Artistas Principales:</strong>
+            {% for artist in song.album.artists.all %}
+                <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+
+    <a href="{% url 'album-detail' song.album.pk %}" class="back-link">
+        ← Volver al listado del álbum
+    </a>
+</div>
+
+{% endblock %}

@@ -1,41 +1,7 @@
 {% extends 'base.html' %}
 
-{% block content %}
-{% endblock %}
-{% block content %}
-<div class="artist-profile">
-    <h1>{{ artist.name }}</h1>
-    
-    {% if artist.bio %}
-        <div class="bio">
-            <h3>Biografía:</h3>
-            <p>{{ artist.bio|linebreaksbr }}</p>
-        </div>
-    {% endif %}
-
-    <h2>Discografía ({{ albums_list.count }} álbumes)</h2>
-
-    <div class="album-grid">
-        {% for album in albums_list %}
-            <div class="album-item">
-                <a href="{% url 'album-detail' album.pk %}">
-                    {% if album.cover_image %}
-                        <img src="{{ album.cover_image.url }}" alt="{{ album.title }} cover">
-                    {% else %}
-                        <div class="placeholder-image">Sin Imagen</div>
-                    {% endif %}
-                    <h4>{{ album.title }}</h4>
-                    <p>{{ album.release_date|date:"Y" }}</p>
-                </a>
-            </div>
-        {% empty %}
-            <p>Este artista aún no tiene álbumes registrados.</p>
-        {% endfor %}
-    </div>
-</div>
-
+{% block header %}
 <style>
-    /* Estilos CSS básicos para la discografía */
     .album-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -61,5 +27,37 @@
         justify-content: center;
     }
 </style>
+{% endblock %}
 
+{% block content %}
+<div class="artist-profile">
+    <h1>{{ artist.name }}</h1>
+    
+    {% if artist.bio %}
+        <div class="bio">
+            <h3>Biografía:</h3>
+            <p>{{ artist.bio|linebreaksbr }}</p>
+        </div>
+    {% endif %}
+
+    <h2>{{ albums_list.count }} Álbumes</h2>
+
+    <div class="album-grid">
+        {% for album in albums_list %}
+            <div class="album-item">
+                <a href="{% url 'album-detail' album.pk %}">
+                    {% if album.picture %}
+                        <img src="{{ album.picture }}" alt="{{ album.name }} cover">
+                    {% else %}
+                        <div class="placeholder-image">Sin Imagen</div>
+                    {% endif %}
+                    <h4>{{ album.name }}</h4>
+                    <p>{{ album.release|date:"Y" }}</p>
+                </a>
+            </div>
+        {% empty %}
+            <p>Este artista aún no tiene álbumes registrados.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

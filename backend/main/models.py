@@ -14,7 +14,6 @@ class Artist(models.Model):
     def __str__(self):
         return self.name
 
-
 # ============
 #   GENRE
 # ============
@@ -24,7 +23,6 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
-
 # ============
 #   TAG
 # ============
@@ -33,7 +31,6 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-
 
 # ============
 #   ALBUM
@@ -61,7 +58,6 @@ class Album(models.Model):
 
     def __str__(self):
         return self.name
-
 
 # ============
 #   SONG
@@ -100,7 +96,7 @@ class Song(models.Model):
 
     def __str__(self):
         return self.title
-
+    
 
 # ============
 #   PLAYLIST
