@@ -58,32 +58,32 @@ class Album(models.Model):
 #   SONG
 # ============
 class Song(models.Model):
-    title = models.CharField(max_length=200, default="Untitled")
-    filename = models.FileField(upload_to="songs/")
-    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
-    comment = models.TextField(blank=True)
+    title        = models.CharField(max_length=200, default="Untitled")
+    filename     = models.FileField(upload_to="songs/")
+    artist       = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
+    genre        = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
+    comment      = models.TextField(blank=True)
     
     track_number = models.PositiveIntegerField(default=1, null=True, blank=True)
-    lyrics = models.TextField(blank=True)
-    picture = models.ImageField(upload_to="songs/", blank=True, null=True)
+    lyrics       = models.TextField(blank=True)
+    picture      = models.ImageField(upload_to="songs/", blank=True, null=True)
 
     times_played = models.PositiveIntegerField(default=0)
-    times_skipped = models.PositiveIntegerField(default=0)
-    bookmarked = models.BooleanField(default=False)
+    times_skipped= models.PositiveIntegerField(default=0)
+    bookmarked   = models.BooleanField(default=False)
 
-    album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True, blank=True)
-    codename = models.CharField(max_length=200, blank=True)
+    album        = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True, blank=True)
+    codename     = models.CharField(max_length=200, blank=True)
 
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags         = models.ManyToManyField(Tag, blank=True)
 
-    error = models.BooleanField(default=False)
-    errors = models.TextField(blank=True, null=True)
+    error        = models.BooleanField(default=False)
+    errors       = models.TextField(blank=True, null=True)
 
-    timestamp = models.DateTimeField(auto_now_add=True)
-    hash = models.CharField(max_length=128, blank=True)
-    bpm = models.FloatField(null=True, blank=True)
-    tone = models.CharField(max_length=50, blank=True)
+    timestamp    = models.DateTimeField(auto_now_add=True)
+    hash         = models.CharField(max_length=128, blank=True)
+    bpm          = models.FloatField(null=True, blank=True)
+    tone         = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return self.title

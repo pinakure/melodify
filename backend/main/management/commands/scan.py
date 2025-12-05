@@ -120,7 +120,7 @@ def is_timestamp(tag):
         if is_number(tag[0:2]):
             if is_number(tag[3:5]):
                 if is_number(tag[6:8]):
-                    return f'20{tag[0:3]}{tag[3:5]}{tag[6:8]}'
+                    return f'20{tag[0:2]}{tag[3:5]}{tag[6:8]}'
         return ''
     if len(tag) == 10:
         # 0000-00-00
@@ -148,7 +148,10 @@ def sanitize_tag(tag, song):
     
     timestamp = is_timestamp(tag)
     if len(timestamp) > 0:
-        song.timestamp = datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8]))
+        print("\n")
+        print(song.filename)
+        print(timestamp)
+        song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
         return ""
     if is_number(tag):
         return ""
@@ -170,7 +173,7 @@ def extract_id3_tags(filepath):
                 'COMM::eng',
                 'COMM::esp',
                 'COMM::jap',
-                'COMM:ID3v1 Comment:eng',
+                #'COMM:ID3v1 Comment:eng',
             ]
             comments = []
             for t in target_tags:
@@ -400,7 +403,6 @@ class Command(BaseCommand):
     def scan(self, folder):
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
-
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
