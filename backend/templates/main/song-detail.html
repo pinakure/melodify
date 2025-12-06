@@ -2,45 +2,70 @@
 {% load static %}
 
 {% block header %}
+<style>
+.labels {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.labels > a {
+    display: inline-block;
+    padding: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border: 1px solid #6668;
+    border-radius: 8px;
+    background-color: #6668;
+    user-select: none !important;
+}
 
+.breathe {
+    margin: 16px;
+}
+
+</style>
 {% endblock %}
 
 {% block content-title %}{{ song.title }}{% endblock %}
 
 {% block content %}
 <div class="song-detail-container">
-    <p>
+    <!-- <p>
         <strong>Duración:</strong> 
         {{ song.duration }}
-    </p>
+    </p> -->
 
     <div class="album-info-section">
-        <h3>Perteneciente al Álbum:</h3>
+        <!-- <h3>Perteneciente al Álbum:</h3> -->
         
-        <!-- Accedemos al objeto Album relacionado directamente -->
         <a href="{% url 'album-detail' song.album.pk %}">
-            <img src="{{ song.album.picture }}" alt="Portada de {{ song.album.name }}" style="width: 150px;">
             <h4>{{ song.album.name }}</h4>
+            <div class="album-art" style="justify-content: left !important;">
+                {% if song.album.picture %}
+                <div class="album-image" style="background-image: url('{{ song.album.picture }}')" alt="{{ song.album.name }} cover"></div>
+                {% else %}
+                <div class="placeholder-image">💿</div>
+                {% endif %}
+            </div>
         </a>
 
-        <!-- Accedemos a los artistas del álbum relacionado -->
-        <p>
-            <strong>Artistas Principales:</strong>
+        <!-- lista de artistas -->
+        <p class="labels">
+            <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
             {% for artist in song.album.artists.all %}
-                <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>
             {% endfor %}
         </p>
+        
+        <!-- Datos de cancion -->
+        
+        <p class="labels"><strong>Tags:</strong>{% for tag in song.tags.all %}<a>{{ tag }}</a>{% endfor %}</p>
+        <p><strong>Género:</strong><a>{{ song.genre }}</a></p>
+
         <!-- El reproductor de audio -->
-        <p>
+        <p class="breathe">
             {% if song.filename %}
-                <div class="audio-player-container">
-                    <!-- 
-                        La etiqueta <audio> de HTML5 
-                        'controls' añade los botones de play/pausa
-                        'preload="none"' ayuda a que no se carguen todas las canciones a la vez
-                    -->
+                <div class="audio-player-container">                    
                     <audio controls preload="none">
-                        <!-- Usamos .url para obtener la URL pública del archivo -->
                         <source src="{% static song.filename %}" type="audio/mpeg">
                         Tu navegador no soporta el elemento de audio.
                     </audio>
@@ -51,9 +76,11 @@
         </p>
     </div>
 
-    <a href="{% url 'album-detail' song.album.pk %}" class="back-link">
-        ← Volver al listado del álbum
-    </a>
 </div>
 
+{% endblock %}
+{% block back %}
+<a href="{% url 'album-detail' song.album.pk %}" class="back-link">
+    ← Volver al listado del álbum
+</a>
 {% endblock %}

@@ -1,6 +1,39 @@
 {% extends 'base.html' %}
 {% block header %}
-<style>
+    <!-- Scripts de JavaScript para el filtrado -->
+    <script>
+        function filterArtists() {
+            // Obtener el valor de búsqueda y convertirlo a minúsculas
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            
+            // Obtener todos los elementos de la lista de artistas
+            const artistCards = document.querySelectorAll('.artist-item');
+            const noArtistsMessage = document.getElementById('no-artists-message');
+            
+            let found = false;
+
+            // Iterar sobre todas las tarjetas y ocultar las que no coinciden
+            artistCards.forEach(card => {
+                // Usamos un atributo de datos para una búsqueda más limpia
+                const name = card.getAttribute('data-artist-name');
+                
+                if (name.includes(filter)) {
+                    card.style.display = ""; // Mostrar el elemento (default flex/block)
+                    found = true;
+                } else {
+                    card.style.display = "none"; // Ocultar el elemento
+                }
+            });
+
+            // Manejar el mensaje de "no encontrados" si es necesario
+            if (noArtistsMessage) {
+                noArtistsMessage.style.display = found ? "none" : "";
+            }
+        }
+    </script>
+
+    <style>
     .artist-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -31,6 +64,9 @@
         color: var(--text-color);
     }
 </style>
+
+
+
 {% endblock %}
 
 {% block search %}
@@ -57,38 +93,5 @@
         {% endfor %}
     </div>
 </div>
-
-<!-- Scripts de JavaScript para el filtrado -->
-<script>
-    function filterArtists() {
-        // Obtener el valor de búsqueda y convertirlo a minúsculas
-        const input = document.getElementById('searchInput');
-        const filter = input.value.toLowerCase();
-        
-        // Obtener todos los elementos de la lista de artistas
-        const artistCards = document.querySelectorAll('.artist-item');
-        const noArtistsMessage = document.getElementById('no-artists-message');
-        
-        let found = false;
-
-        // Iterar sobre todas las tarjetas y ocultar las que no coinciden
-        artistCards.forEach(card => {
-            // Usamos un atributo de datos para una búsqueda más limpia
-            const name = card.getAttribute('data-artist-name');
-            
-            if (name.includes(filter)) {
-                card.style.display = ""; // Mostrar el elemento (default flex/block)
-                found = true;
-            } else {
-                card.style.display = "none"; // Ocultar el elemento
-            }
-        });
-
-        // Manejar el mensaje de "no encontrados" si es necesario
-        if (noArtistsMessage) {
-            noArtistsMessage.style.display = found ? "none" : "";
-        }
-    }
-</script>
 
 {% endblock %}

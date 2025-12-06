@@ -13,7 +13,7 @@ urlpatterns = [
     path('albums/<int:pk>/', AlbumDetailView.as_view(), name='album-detail'),
     path('artists/', ArtistListView.as_view(), name='artist-list'),
     path('artist/<int:pk>/', ArtistDetailView.as_view(), name='artist-detail'),
-    path('albums/<int:album_pk>/song/<int:pk>/', SongDetailView.as_view(), name='song-detail'),
+    path('song/<int:pk>/', SongDetailView.as_view(), name='song-detail'),
 ]
 
 if settings.DEBUG:

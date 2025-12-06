@@ -32,12 +32,6 @@
     .artist-list {
         margin-bottom: 20px;
     }
-    .back-link {
-        margin-top: 20px;
-        display: inline-block;
-        color: #007bff;
-        text-decoration: none;
-    }
 </style>
 {% endblock %}
 
@@ -50,14 +44,14 @@
             <img src="{{ album.picture }}" alt="Portada de {{ album.name }}">
         {% else %}
             <div class="placeholder-detail-image">
-                <span>Sin Imagen de Portada</span>
+                <div style="font-size: 120px; line-height: 32px;">💿</div>
             </div>
         {% endif %}
     </div>
 
     <div class="album-info">
         <div class="artist-list">
-            <p><strong>Artista(s):</strong></p>
+            <p><strong>Artista{% if album.artists.count > 1 %}s{% endif %}:</strong></p>
             
             
                 <span class="small">
@@ -69,26 +63,20 @@
                 </span>
         </div>
 
-        <p><strong>Fecha de lanzamiento:</strong> {{ album.release_date|date:"F d, Y" }}</p>
-        <p><strong>Género:</strong> 
+        {% if album.release %}
+            <p> <strong>Fecha de lanzamiento:</strong> {{ album.release|date:"F d, Y" }}</p>
+        {% endif %}
+        <p><strong>Género{% if album.genres.all.count > 1 %}s{% endif %}:</strong> 
             {% for genre in album.genres.all %}
-            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {{ genre.name }}{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </p>
-        <p><strong>Pistas:</strong> 
-            {{songs.count}}
-        </p>
-        <ul>            
-            {% for song in songs %}
-                <a href="{% url 'song-detail' album_pk=album.pk pk=song.pk %}">
-                    <li>{{ song.title }}</li>
-                </a>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'album-tiles' %}" class="back-link">
-            ← Volver a la vista de mosaico
-        </a>
     </div>
 </div>
+{% include 'main/song-list.html' %}
 
+{% endblock %}
+
+{% block back %}
+<a href="{% url 'album-tiles' %}" class="back-link">←</a>
 {% endblock %}

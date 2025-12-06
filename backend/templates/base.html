@@ -20,6 +20,11 @@
             --tile-info-text: #666;
             --nav-height: 60px;
         }
+
+        li {
+            list-style: none;
+        }
+
         body {
             background-color: var(--bg-main);
         }
@@ -135,7 +140,43 @@
             overflow-y: auto; 
             overflow-x: hidden;
         }
+        /* Common */
+        .album-art{
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .album-image{
+            width: 200px;
+            height: 200px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+        }
+        
+        .placeholder-image {
+            width: 200px;
+            height: 200px;
+            background-color: var(--bg-content);
+            font-size: 128px;
+            color: var(--tile-placeholder);
+            border-radius: 8px;
+            filter: opacity(0.5);
+        }
 
+        /* STUB Audio player customization */
+        audio {
+            width:100%; 
+            filter: brightness(0.4) contrast(1.5) saturate(48) hue-rotate(183deg);
+        }
+        
+        /* Generics */
+        .absolute {
+            position: absolute;
+        }
         .small {
             font-size: 12px;
         }
@@ -145,10 +186,19 @@
         }
 
         a { 
-            color: var(--link-color);
+            color: var(--link-color) !important;
         }
         a:hover { 
-            color: var(--accent-color);
+            color: var(--accent-color) !important;
+        }
+
+        /* Link de atrás, cuando hay */
+        .back-link {
+            margin-top: 20px;
+            display: inline-block;
+            color: var(--link-color);
+            font-size: 24px;
+            font-weight: 800;
         }
 
         /* Cuadro de búsqueda (cuando hay)*/
@@ -166,7 +216,7 @@
             color: var(--text-color);
             height: calc( var(--nav-height) / 1.5 );
         }
-
+        
     </style>
     {% block header %}{% endblock %}
 </head>
@@ -186,6 +236,7 @@
             <!-- Formulario de búsqueda -->
             {% block search %}{% endblock %}
         </div>
+        {% block back %}{% endblock %}
     </header>
 
     <!-- Contenedor del Panel Doble -->

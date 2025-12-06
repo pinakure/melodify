@@ -1,0 +1,96 @@
+{% load static %}
+<style>
+    /* Songs list */
+    .tile-item.song-item:hover,
+    .tile-item.song-item:active{
+        filter: brightness(1.3);
+    }
+    .tile-item.song-item{
+        position: relative;
+        background-color: var(--bg-content);
+        justify-content: left;
+        height: 64px;
+        width: calc( 100% - 32px );
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+    .song-list, .album-grid {
+        margin-top: 24px;
+        padding-bottom: 56px;
+    }
+    .song-image {
+        width: 64px;
+        background-size: contain;
+        height: 64px;
+    }
+    .song-name {
+        margin-bottom: 4px !important;
+        font-size: 16px !important;
+        font-weight: 600;
+    }
+    .song-art {
+        display: inline-block;
+        width: 64px !important;
+        height: 64px !important;
+        border-radius: 6px;
+        overflow: hidden;
+        display: inline-block;
+    }
+    .placeholder-song-image {
+        width: 64px !important;
+        height: 64px !important;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .tile-info {
+        position:absolute;
+        bottom: 4px;
+        left: 72px;
+        display: inline-block;
+        padding-bottom: 4px;
+    }
+    .counter {
+        bottom  : 4px;
+        left    : 4px;
+        font-size: 10px;
+        color: #feda;
+    }
+    
+    .audio-player-container {
+        position: absolute; top: 4px; right: 8px;
+        width: 50%
+    }
+</style>
+
+<h3>{{ songs.count }} Pistas</h3>
+<div class="song-list">
+    {% for song in songs %}
+        <a href="{% url 'song-detail' pk=song.pk %}">
+            <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
+                <div class="song-art">
+                    <div class="counter absolute">{{ forloop.counter }}</div>
+                    {% if song.picture %}
+                        <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
+                    {% else %}
+                        <div class="placeholder-song-image">💿</div>
+                    {% endif %}
+                </div>
+                <div class="tile-info">
+                    <h4 class="song-name">{{ song.title }}</h4>
+                    <p class="small">{{ song.artist }}</p>
+                    
+                </div>
+                <div class="audio-player-container">                    
+                    <audio controls preload="none">
+                        <source src="{% static song.filename %}" type="audio/mpeg">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                </div>
+            </div>
+        </a>
+    {% empty %}
+        <p id="no-songs-message">No se encontraron canciones.</p>
+    {% endfor %}
+</div>
