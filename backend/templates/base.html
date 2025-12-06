@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+    <link rel="stylesheet" href="/static/css/player-styles.css">
     <title>Melodify {% block title %}{% endblock %}</title>
     <script src="/static/js/howler.min.js"></script>
     <style>
@@ -193,9 +193,12 @@
             height: 64px;
             background-color: transparent;
             position: absolute;
+            font-size: 48px;
+            line-height: 32px;
+            mix-blend-mode: multiply;
             top: 0px;
             border: none;
-            color: #333;
+            color: var(--accent-color);
             left: 0px; 
         }
         .play-button:hover {

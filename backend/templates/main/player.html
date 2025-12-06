@@ -9,7 +9,7 @@ function playSong(buttonElement) {
     if (soundPlayer && soundPlayer.playing()) {
         soundPlayer.stop();
         if (currentButton) {
-            currentButton.textContent = '►';
+            currentButton.textContent = '⏵︎';
         }
     }
     
@@ -25,7 +25,7 @@ function playSong(buttonElement) {
         html5: true, // Use HTML5 audio to be memory efficient
         onend: function() {
             // Callback function when the song finishes
-            buttonElement.textContent = '►';
+            buttonElement.textContent = '⏵︎';
             currentButton = null;
         }
     });
