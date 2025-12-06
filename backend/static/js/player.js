@@ -56,8 +56,7 @@ Player.prototype = {
     } else {
       sound = data.howl = new Howl({
         src: [ data.file ],
-        // src: ['./audio/' + data.file + '.webm', './audio/' + data.file + '.mp3'],
-        html5: true, // Force to HTML5 so that the audio can stream in (best for large files).
+        html5: false, // Force to HTML5 so that the audio can stream in (best for large files).
         onplay: function() {
           // Display the duration.
           duration.innerHTML = self.formatTime(Math.round(sound.duration()));
@@ -66,30 +65,30 @@ Player.prototype = {
           requestAnimationFrame(self.step.bind(self));
 
           // Start the wave animation if we have already loaded
-          wave.container.style.display = 'block';
+          // wave.container.style.display = 'block';
           bar.style.display = 'none';
           pauseBtn.style.display = 'block';
         },
         onload: function() {
           // Start the wave animation.
-          wave.container.style.display = 'block';
+          // wave.container.style.display = 'block';
           bar.style.display = 'none';
           loading.style.display = 'none';
         },
         onend: function() {
           // Stop the wave animation.
-          wave.container.style.display = 'none';
+          // wave.container.style.display = 'none';
           bar.style.display = 'block';
           self.skip('next');
         },
         onpause: function() {
           // Stop the wave animation.
-          wave.container.style.display = 'none';
+          // wave.container.style.display = 'none';
           bar.style.display = 'block';
         },
         onstop: function() {
           // Stop the wave animation.
-          wave.container.style.display = 'none';
+          // wave.container.style.display = 'none';
           bar.style.display = 'block';
         },
         onseek: function() {
@@ -103,7 +102,7 @@ Player.prototype = {
     sound.play();
 
     // Update the track display.
-    track.innerHTML = /*(index + 1) + '. ' +*/ data.title;
+    track.innerHTML = data.title;
 
     // Show the pause button.
     if (sound.state() === 'loaded') {
@@ -208,6 +207,7 @@ Player.prototype = {
     // Convert the percent into a seek position.
     if (sound.playing()) {
       sound.seek(sound.duration() * per);
+      console.log(sound.duration(), per);
     }
   },
 
@@ -271,13 +271,7 @@ Player.prototype = {
 };
 
 // Setup our new audio player class and pass it the playlist.
-var player = new Player([
-  // {
-  //   title: 'Rave Digger',
-  //   file: 'rave_digger',
-  //   howl: null
-  // },
-]);
+var player = new Player([]);
 
 // Bind our player controls.
 playBtn.addEventListener('click', function() {
@@ -340,32 +334,32 @@ volume.addEventListener('mousemove', move);
 volume.addEventListener('touchmove', move);
 
 // Setup the "waveform" animation.
-var wave = new SiriWave({
-  container: waveform,
-  width: window.innerWidth,
-  height: 12,
-  cover: true,
-  color: 'f80',
-  speed: 0.03,
-  amplitude: 0.7,
-  frequency: 2
-});
-wave.start();
+// var wave = new SiriWave({
+//   container: waveform,
+//   width: window.innerWidth,
+//   height: 12,
+//   cover: true,
+//   color: 'f80',
+//   speed: 0.03,
+//   amplitude: 0.7,
+//   frequency: 2
+// });
+// wave.start();
 
 // Update the height of the wave animation.
 // These are basically some hacks to get SiriWave.js to do what we want.
 var resize = function() {
   var height = window.innerHeight * 0.3;
   var width = window.innerWidth;
-  wave.height = height;
-  wave.height_2 = height / 2;
-  wave.MAX = wave.height_2 - 4;
-  wave.width = width;
-  wave.width_2 = width / 2;
-  wave.width_4 = width / 4;
-  wave.canvas.height = height;
-  wave.canvas.width = width;
-  wave.container.style.margin = -(height / 2) + 'px auto';
+  // wave.height = height;
+  // wave.height_2 = height / 2;
+  // wave.MAX = wave.height_2 - 4;
+  // wave.width = width;
+  // wave.width_2 = width / 2;
+  // wave.width_4 = width / 4;
+  // wave.canvas.height = height;
+  // wave.canvas.width = width;
+  // wave.container.style.margin = -(height / 2) + 'px auto';
 
   // Update the position of the slider.
   var sound = player.playlist.length > 0 ? player.playlist[player.index].howl : null;

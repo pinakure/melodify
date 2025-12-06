@@ -373,7 +373,11 @@ class Command(BaseCommand):
             self.echo(str(e))
             self.add_song_error(song, f"TITLE:{str(e)}")
 
-        song.duration = info.get('duration')
+        try:
+            song.duration = info.get('duration')
+        except Exception as e:
+            song.duration = 1
+            self.add_song_error(song, f"DURATION:{str(e)}", error=False)
 
         try:
             song.track_number   = int(info.get('track_number'))
@@ -467,7 +471,6 @@ class Command(BaseCommand):
         self.echo(f'Created song "{path}"', indent=1)
 
     def scan(self, folder, force=False):
-        print(f"FORCE: {force}")
                         
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
@@ -488,7 +491,6 @@ class Command(BaseCommand):
                     id = os.path.join(root, f)
                     song = self.get_song(id)
                     if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
-                        print(f"FORCE: {force}")
                         continue
                     info = extract_id3_tags(path)
                     if song is None:
@@ -499,12 +501,11 @@ class Command(BaseCommand):
         return results
 
     def handle(self, *args, **options):
-        FORCE_ANALYSIS = false
+        FORCE_ANALYSIS = False
         MUSIC_FOLDER = options["scan_path"][0] or "/mnt/c/Users/smiker/Music/"   # <-- cámbialo
         if options['force'] is not False:
             print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
             force = True
-            print(f"FORCE: {FORCE_ANALYSIS}")
                         
         self.echo("Scanning media...")
         self.echo(f"Folder: {MUSIC_FOLDER}")

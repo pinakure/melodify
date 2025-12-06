@@ -162,7 +162,6 @@ body {
 /* Progress */
 #waveform {
   width: 100%;
-  height: 12px;
   height: 100%;
   position: absolute;
   left: 0px;
@@ -170,7 +169,7 @@ body {
   background-color: transparent;
   margin: 0px !important;
   /* margin: -15% auto; */
-  display: none;
+  /* display: none; */
   cursor: pointer;
   opacity: 0.8;
   -webkit-user-select: none;

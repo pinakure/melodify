@@ -6,12 +6,13 @@ function playSong(buttonElement) {
     const artistName = buttonElement.getAttribute('data-artistname');
     const songName = buttonElement.getAttribute('data-songname');
     const audioUrl = buttonElement.getAttribute('data-src');
+    var howl = null;//player.playlist.length ? player.playlist[player.index].howl : null;
     player.pause();
     player.playlist = [
         {
             title   : `${artistName} - ${songName}`,
             file    : audioUrl,
-            howl    : null
+            howl    : howl
         },
     ];
     player.play();
