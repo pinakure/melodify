@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block header %}
 
@@ -6,12 +7,11 @@
 
 {% block content %}
 <div class="song-detail-container">
-    <h1>{{ cancion.title }}</h1>
+    <h1>{{ song.title }}</h1>
     
     <p>
         <strong>Duración:</strong> 
-        <!-- Formatea la duración si usas DurationField. Si usas CharField, omite el filtro time -->
-        {{ cancion.duration|time:"H:i:s" }} 
+        {{ song.duration }}
     </p>
 
     <div class="album-info-section">
@@ -20,7 +20,7 @@
         <!-- Accedemos al objeto Album relacionado directamente -->
         <a href="{% url 'album-detail' song.album.pk %}">
             <img src="{{ song.album.picture }}" alt="Portada de {{ song.album.name }}" style="width: 150px;">
-            <h4>{{ cancion.album.title }}</h4>
+            <h4>{{ song.album.name }}</h4>
         </a>
 
         <!-- Accedemos a los artistas del álbum relacionado -->
@@ -29,6 +29,25 @@
             {% for artist in song.album.artists.all %}
                 <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
+        </p>
+        <!-- El reproductor de audio -->
+        <p>
+            {% if song.filename %}
+                <div class="audio-player-container">
+                    <!-- 
+                        La etiqueta <audio> de HTML5 
+                        'controls' añade los botones de play/pausa
+                        'preload="none"' ayuda a que no se carguen todas las canciones a la vez
+                    -->
+                    <audio controls preload="none">
+                        <!-- Usamos .url para obtener la URL pública del archivo -->
+                        <source src="{% static song.filename %}" type="audio/mpeg">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                </div>
+            {% else %}
+                <span class="no-track-available">Pista no disponible</span>
+            {% endif %}
         </p>
     </div>
 

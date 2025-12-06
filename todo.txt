@@ -5,6 +5,8 @@ Script Duties
 ·Inspect Tags, Create Song/Artist/Album Objects automatically
 ·Journalkeep scan status, ability restore scanning from last scanned item
 ·Playlist downloader (ytdl) integration
+
+·Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
 ~~~~~~~~~~~~~~~~~
 Data Models
 ~~~~~~~~~~~~~~~~~

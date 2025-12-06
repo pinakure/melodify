@@ -1,13 +1,22 @@
+<!-- templates/app/album_tiles.html -->
+
 {% extends 'base.html' %} 
 
 {% block header %}
 <style>
+    /* 
+      Nota: Algunos de estos estilos tienen colores como #ccc, #f9f9f9, #666, #888, #eee.
+      Para que se integren perfectamente con tu base.html de modo oscuro, 
+      deberías cambiarlos por las variables CSS que definimos: 
+      var(--border-color), var(--bg-sidebar), var(--text-color), etc. 
+      Los he dejado como estaban en tu código original para la revisión.
+    */
+
     .tile-container {
         display: grid;
-        /* Define 4 columnas de ancho igual (1fr), con un espacio de 20px entre ellas */
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
-        padding: 20px;
+        padding: 20px 0; /* Ajustado el padding superior */
     }
 
     .tile-item {
@@ -25,8 +34,8 @@
 
     .tile-item img {
         width: 100%;
-        height: 200px; /* Altura fija para que todas las imágenes se vean uniformes */
-        object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+        height: 200px;
+        object-fit: cover;
         display: block;
     }
 
@@ -37,7 +46,6 @@
         display: flex;
         align-items: center;
         font-size: 128px;
-        /* filter: opacity(0.5); */
         justify-content: center;
         color: #888;
     }
@@ -50,6 +58,7 @@
     .tile-info h3 {
         margin: 0 0 5px 0;
         font-size: 1.1em;
+        /* color: black; para asegurar visibilidad si el fondo es claro */
     }
 
     .tile-info p {
@@ -69,21 +78,41 @@
         height: 200px;
         background-size: contain;
         background-position: center;
-        
         background-repeat: no-repeat;
         display: flex;
         align-items: center;
         justify-content: center;
     }
+    
+    /* Nuevos estilos para la búsqueda */
+    .header-with-search {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0px;
+    }
+    #albumSearchInput {
+        padding: 8px 12px;
+        font-size: 1em;
+        background-color: var(--bg-sidebar);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        color: var(--text-color);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2>Álbumes ({{ albums.count  }})</h2>
+<div class="header-with-search">
+    <h2>Álbumes ({{ albums.count }})</h2>
+    <!-- Cuadro de Búsqueda -->
+    <input type="text" id="albumSearchInput" placeholder="Filtrar álbumes..." onkeyup="filterAlbums()">
+</div>
 
-<div class="tile-container">
+<div class="tile-container" id="tileContainer">
     {% for album in albums %}
-        <div class="tile-item">
+        <!-- Añadimos data-album-name para JS -->
+        <div class="tile-item album-item" data-album-artist="{% if album.artists.all.count > 3 %}various Artists{% else %}{% for artist in album.artists.all %}{{artist.name | lower }} {% endfor %}{% endif %}" data-album-name="{{ album.name|lower }}">
             <a href="{% url 'album-detail' album.pk %}">
                 {% if album.picture %}
                     <div class="album-image" style="background-image: url('{{ album.picture }}')" alt="{{ album.name }} cover"></div>
@@ -105,7 +134,41 @@
             </a>
         </div>
     {% empty %}
-        <p>No se encontraron álbumes.</p>
+        <p id="no-albums-message">No se encontraron álbumes.</p>
     {% endfor %}
 </div>
+
+<!-- Scripts de JavaScript para el filtrado -->
+<script>
+    function filterAlbums() {
+        // Obtener el valor de búsqueda y convertirlo a minúsculas
+        const input = document.getElementById('albumSearchInput');
+        const filter = input.value.toLowerCase();
+        
+        // Obtener todos los elementos de la lista de álbumes
+        const albumCards = document.querySelectorAll('.album-item');
+        const noAlbumsMessage = document.getElementById('no-albums-message');
+        
+        let found = false;
+
+        // Iterar sobre todas las tarjetas y ocultar las que no coinciden
+        albumCards.forEach(card => {
+            const name = card.getAttribute('data-album-name').toLowerCase();
+            const artist = card.getAttribute('data-album-artist').toLowerCase();
+            
+            if (name.includes(filter) ||artist.includes(filter)) {
+                card.style.display = ""; // Mostrar el elemento (default block/grid item)
+                found = true;
+            } else {
+                card.style.display = "none"; // Ocultar el elemento
+            }
+        });
+
+        // Manejar el mensaje de "no encontrados" si es necesario
+        if (noAlbumsMessage) {
+            noAlbumsMessage.style.display = found ? "none" : "";
+        }
+    }
+</script>
+
 {% endblock %}

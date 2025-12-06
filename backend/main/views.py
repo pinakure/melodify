@@ -18,6 +18,18 @@ class AlbumDetailView(DetailView):
         context['songs'] = Song.objects.filter(album=album)
         return context
 
+class ArtistListView(ListView):
+    model = Artist
+    template_name = 'main/artist-list.html'  
+    context_object_name = 'artists'         
+    queryset = Artist.objects.order_by('name') 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)        
+        context['albums_list'] = Album.objects.all().order_by('-release')
+        return context
+
+
 class ArtistDetailView(DetailView):
     model = Artist
     template_name = 'main/artist-detail.html'

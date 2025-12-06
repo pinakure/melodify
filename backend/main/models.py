@@ -84,6 +84,7 @@ class Song(models.Model):
 
     error        = models.BooleanField(default=False)
     errors       = models.TextField(blank=True, null=True)
+    duration     = models.DurationField(default=1)
 
     timestamp    = models.DateTimeField(null=True, blank=True)
     hash         = models.CharField(max_length=128, blank=True)
