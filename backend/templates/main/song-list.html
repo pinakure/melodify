@@ -89,6 +89,8 @@
                 </div>
                 <button 
                     class="play-button" 
+                    data-artistname="{{ song.artist.name }}" 
+                    data-songname="{{ song.title }}" 
                     data-src="/static/{{ song.filename }}" 
                     data-id="{{ song.pk }}"
                     onclick="playSong(this)">

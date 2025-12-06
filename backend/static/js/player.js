@@ -103,7 +103,7 @@ Player.prototype = {
     sound.play();
 
     // Update the track display.
-    track.innerHTML = (index + 1) + '. ' + data.title;
+    track.innerHTML = /*(index + 1) + '. ' +*/ data.title;
 
     // Show the pause button.
     if (sound.state() === 'loaded') {
@@ -343,8 +343,9 @@ volume.addEventListener('touchmove', move);
 var wave = new SiriWave({
   container: waveform,
   width: window.innerWidth,
-  height: 64,
+  height: 12,
   cover: true,
+  color: 'f80',
   speed: 0.03,
   amplitude: 0.7,
   frequency: 2
