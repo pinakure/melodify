@@ -24,7 +24,7 @@ var Player = function(playlist) {
   this.index = 0;
 
   // Display the title of the first track.
-  track.innerHTML = '1. ' + playlist[0].title;
+  //track.innerHTML = '1. ' + playlist[0].title;
 
   // Setup the playlist display.
   playlist.forEach(function(song) {
@@ -48,14 +48,15 @@ Player.prototype = {
 
     index = typeof index === 'number' ? index : self.index;
     var data = self.playlist[index];
-
+    if(!data)return;
     // If we already loaded this track, use the current one.
     // Otherwise, setup and load a new Howl.
     if (data.howl) {
       sound = data.howl;
     } else {
       sound = data.howl = new Howl({
-        src: ['./audio/' + data.file + '.webm', './audio/' + data.file + '.mp3'],
+        src: [ data.file ],
+        // src: ['./audio/' + data.file + '.webm', './audio/' + data.file + '.mp3'],
         html5: true, // Force to HTML5 so that the audio can stream in (best for large files).
         onplay: function() {
           // Display the duration.
@@ -125,8 +126,8 @@ Player.prototype = {
     var self = this;
 
     // Get the Howl we want to manipulate.
-    var sound = self.playlist[self.index].howl;
-
+    var sound = self.playlist.length ? self.playlist[self.index].howl : null;
+    if(!sound)return;
     // Puase the sound.
     sound.pause();
 
@@ -271,21 +272,11 @@ Player.prototype = {
 
 // Setup our new audio player class and pass it the playlist.
 var player = new Player([
-  {
-    title: 'Rave Digger',
-    file: 'rave_digger',
-    howl: null
-  },
-  {
-    title: '80s Vibe',
-    file: '80s_vibe',
-    howl: null
-  },
-  {
-    title: 'Running Out',
-    file: 'running_out',
-    howl: null
-  }
+  // {
+  //   title: 'Rave Digger',
+  //   file: 'rave_digger',
+  //   howl: null
+  // },
 ]);
 
 // Bind our player controls.
@@ -352,7 +343,7 @@ volume.addEventListener('touchmove', move);
 var wave = new SiriWave({
   container: waveform,
   width: window.innerWidth,
-  height: window.innerHeight * 0.3,
+  height: 64,
   cover: true,
   speed: 0.03,
   amplitude: 0.7,
@@ -376,7 +367,7 @@ var resize = function() {
   wave.container.style.margin = -(height / 2) + 'px auto';
 
   // Update the position of the slider.
-  var sound = player.playlist[player.index].howl;
+  var sound = player.playlist.length > 0 ? player.playlist[player.index].howl : null;
   if (sound) {
     var vol = sound.volume();
     var barWidth = (vol * 0.9);

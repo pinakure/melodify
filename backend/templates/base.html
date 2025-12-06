@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/player-styles.css">
     <title>Melodify {% block title %}{% endblock %}</title>
     <script src="/static/js/howler.min.js"></script>
+    <script src="/static/js/siriwave.js"></script>
     <style>
         /* --- 1. Estilos Globales y Modo Oscuro --- */
         :root {
@@ -84,9 +85,10 @@
             background-color: var(--bg-main);
             padding: 10px 20px;
             display: flex;
+            position: relative;
             justify-content: space-between;
             align-items: center;
-            height: 60px; /* Altura fija para la barra inferior */
+            height: 64px; /* Altura fija para la barra inferior */
             /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
             z-index: 10;
         }
@@ -320,6 +322,7 @@
     <!-- Barra Inferior -->
     <div class="playbar">
         {% include 'main/player.html' %}
+        {% include 'main/bottom-player.html' %}
     </div>
 </div>
 

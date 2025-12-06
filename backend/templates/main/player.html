@@ -4,6 +4,19 @@ let currentButton = null; // Variable to track which button is active
 
 function playSong(buttonElement) {
     const audioUrl = buttonElement.getAttribute('data-src');
+    player.pause();
+    player.playlist = [
+        {
+            title: 'Rave Digger',
+            file: audioUrl,
+            howl: null
+        },
+    ];
+    player.play();
+}
+
+function workingPlaySong(buttonElement) {
+    const audioUrl = buttonElement.getAttribute('data-src');
     
     // 1. Stop any currently playing sound
     if (soundPlayer && soundPlayer.playing()) {
