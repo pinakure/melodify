@@ -5,10 +5,10 @@
 
 {% endblock %}
 
+{% block content-title %}{{ song.title }}{% endblock %}
+
 {% block content %}
 <div class="song-detail-container">
-    <h1>{{ song.title }}</h1>
-    
     <p>
         <strong>Duración:</strong> 
         {{ song.duration }}

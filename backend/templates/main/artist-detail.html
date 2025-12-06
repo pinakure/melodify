@@ -29,10 +29,11 @@
 </style>
 {% endblock %}
 
+{% block content-title %}{{ artist.name }}{% endblock %}
+
 {% block content %}
 <div class="artist-profile">
-    <h1>{{ artist.name }}</h1>
-    
+
     {% if artist.bio %}
         <div class="bio">
             <h3>Biografía:</h3>

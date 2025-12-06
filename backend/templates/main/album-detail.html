@@ -41,6 +41,8 @@
 </style>
 {% endblock %}
 
+{% block content-title %}{{ album.name }}{% endblock %}
+
 {% block content %}
 <div class="album-detail-container">
     <div class="cover-art">
@@ -54,26 +56,19 @@
     </div>
 
     <div class="album-info">
-        <h1>{{ album.name }}</h1>
-        
         <div class="artist-list">
             <p><strong>Artista(s):</strong></p>
             
-            <!-- Lógica para "Various Artists" si hay más de 3 artistas -->
-            {% if album.artists.count > 3 %}
-                <span>Various Artists</span>
-            {% else %}
-                <span>
+            
+                <span class="small">
                 {% for artist in album.artists.all %}
                     <a href="{% url 'artist-detail' artist.pk %}">
                         {{ artist.name }}{% if not forloop.last %}, {% endif %}
                     </a>
                 {% endfor %}
                 </span>
-            {% endif %}
         </div>
 
-        <!-- Agrega más detalles del álbum si los tienes en tu modelo -->
         <p><strong>Fecha de lanzamiento:</strong> {{ album.release_date|date:"F d, Y" }}</p>
         <p><strong>Género:</strong> 
             {% for genre in album.genres.all %}

@@ -12,8 +12,11 @@
             --bg-sidebar: #2c2c2c;
             --bg-content: #222222;
             --text-color: #e0e0e0;
-            --accent-color: #007bff;
+            --link-color: #fcd08c;
+            --accent-color: #ff7300;
             --border-color: #444;
+            --tile-placeholder: #222;
+            --tile-info: #030303;
         }
         body {
             background-color: var(--bg-main);
@@ -138,6 +141,20 @@
             overflow-x: hidden;
         }
 
+        .small {
+            font-size: 12px;
+        }
+
+        a, a:hover, a:visited, a:active {
+            text-decoration: none;
+        }
+
+        a { 
+            color: var(--link-color);
+        }
+        a:hover { 
+            color: var(--accent-color);
+        }
 
     </style>
     {% block header %}{% endblock %}
@@ -149,15 +166,14 @@
     <!-- Barra Superior -->
     <header class="navbar">
         <div class="navbar-links">
-            <a href="{% url 'album-tiles' %}">Álbumes</a>
-            <a href="{% url 'artist-list' %}">Artistas</a> 
+            <a href="{% url 'album-tiles' %}">📀Álbumes</a>
+            <a href="{% url 'artist-list' %}">👩‍🎨👨‍🎨Artistas</a> 
+            <a href="% url 'genre-list' %">🎹Géneros</a> 
             <!-- <a href="#">Mi Música</a> -->
         </div>
         <div class="search-box">
             <!-- Formulario de búsqueda -->
-            <form action="#" method="get">
-                <input type="search" name="q" placeholder="Buscar...">
-            </form>
+            {% block search %}{% endblock %}
         </div>
     </header>
 
@@ -168,9 +184,9 @@
         <aside class="sidebar">
             <div class="sidebar-content">
                 <h3>Navegación / Listas</h3>
-                <p>Aquí puedes poner enlaces de navegación secundaria o listas de reproducción. Este panel tiene su propio scroll.</p>
+                <p>parrafo</p>
                 <ul>
-                    {% for i in "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" %}
+                    {% for i in "aaaaaaaaaa" %}
                     <li>Elemento de Sidebar {{ forloop.counter }}</li>
                     {% endfor %}
                 </ul>
@@ -180,6 +196,7 @@
         <!-- Lado Derecho -->
         <main class="main">
             <div class="main-content">
+                <h1>{% block content-title %}{% endblock %}</h1>
                 {% block content %}{% endblock %}
             </div>
             <div class="main-overlay"></div>

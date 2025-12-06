@@ -48,18 +48,17 @@
     }
 </style>
 {% endblock %}
+
+{% block search %}
+    <input type="text" id="artistSearchInput" placeholder="Filtrar artistas..." onkeyup="filterArtists()">
+{% endblock %}
+
+{% block content-title %}Artistas{% endblock %}
+
 {% block content %}
 <div class="artist-list-container">
-    <div class="header-with-search">
-        <h1>Artistas</h1>
-        
-        <!-- Cuadro de Búsqueda -->
-        <input type="text" id="artistSearchInput" placeholder="Filtrar artistas..." onkeyup="filterArtists()">
-    </div>
-
     <div class="artist-grid" id="artistGrid">
         {% for artist in artists %}
-            <!-- Añadimos una clase 'artist-item' a cada tarjeta para identificarla con JS -->
             <div class="artist-card artist-item" data-artist-name="{{ artist.name|lower }}">
                 <a href="{% url 'artist-detail' pk=artist.pk %}">
                     <h3>{{ artist.name }}</h3>

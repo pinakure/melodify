@@ -42,7 +42,7 @@
     .placeholder-image {
         width: 100%;
         height: 200px;
-        background-color: #eee;
+        background-color: var(--tile-placeholder);
         display: flex;
         align-items: center;
         font-size: 128px;
@@ -52,7 +52,7 @@
 
     .tile-info {
         padding: 15px 10px;
-        background-color: #f9f9f9;
+        background-color: var(--tile-info);
     }
 
     .tile-info h3 {
@@ -102,16 +102,15 @@
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="header-with-search">
-    <h2>Álbumes ({{ albums.count }})</h2>
-    <!-- Cuadro de Búsqueda -->
+{% block search %}
     <input type="text" id="albumSearchInput" placeholder="Filtrar álbumes..." onkeyup="filterAlbums()">
-</div>
+{% endblock %}
 
+{% block content-title %}Álbumes (<span id="album-count">{{ albums.count }}</span>){% endblock %}
+
+{% block content %}
 <div class="tile-container" id="tileContainer">
     {% for album in albums %}
-        <!-- Añadimos data-album-name para JS -->
         <div class="tile-item album-item" data-album-artist="{% if album.artists.all.count > 3 %}various Artists{% else %}{% for artist in album.artists.all %}{{artist.name | lower }} {% endfor %}{% endif %}" data-album-name="{{ album.name|lower }}">
             <a href="{% url 'album-detail' album.pk %}">
                 {% if album.picture %}
@@ -143,6 +142,7 @@
     function filterAlbums() {
         // Obtener el valor de búsqueda y convertirlo a minúsculas
         const input = document.getElementById('albumSearchInput');
+        const counter = document.getElementById('album-count');
         const filter = input.value.toLowerCase();
         
         // Obtener todos los elementos de la lista de álbumes
@@ -150,7 +150,7 @@
         const noAlbumsMessage = document.getElementById('no-albums-message');
         
         let found = false;
-
+        let count = 0;
         // Iterar sobre todas las tarjetas y ocultar las que no coinciden
         albumCards.forEach(card => {
             const name = card.getAttribute('data-album-name').toLowerCase();
@@ -159,11 +159,12 @@
             if (name.includes(filter) ||artist.includes(filter)) {
                 card.style.display = ""; // Mostrar el elemento (default block/grid item)
                 found = true;
+                count++;
             } else {
                 card.style.display = "none"; // Ocultar el elemento
             }
         });
-
+        counter.innerHTML = count;
         // Manejar el mensaje de "no encontrados" si es necesario
         if (noAlbumsMessage) {
             noAlbumsMessage.style.display = found ? "none" : "";
