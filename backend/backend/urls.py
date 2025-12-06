@@ -3,6 +3,9 @@ from django.urls import path
 from main.views import AlbumTileView, AlbumDetailView, ArtistDetailView, ArtistListView, SongDetailView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import re_path
+from django.views.static import serve # Import the standard file server view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,3 +18,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

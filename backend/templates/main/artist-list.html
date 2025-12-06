@@ -1,22 +1,6 @@
 {% extends 'base.html' %}
 {% block header %}
 <style>
-    .header-with-search {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    #artistSearchInput {
-        padding: 8px 12px;
-        font-size: 1em;
-        /* Usar variables de modo oscuro */
-        background-color: var(--bg-sidebar);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        color: var(--text-color);
-    }
     .artist-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -50,7 +34,7 @@
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="artistSearchInput" placeholder="Filtrar artistas..." onkeyup="filterArtists()">
+    <input type="text" id="searchInput" placeholder="Filtrar artistas..." onkeyup="filterArtists()">
 {% endblock %}
 
 {% block content-title %}Artistas{% endblock %}
@@ -78,7 +62,7 @@
 <script>
     function filterArtists() {
         // Obtener el valor de búsqueda y convertirlo a minúsculas
-        const input = document.getElementById('artistSearchInput');
+        const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
         
         // Obtener todos los elementos de la lista de artistas

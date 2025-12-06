@@ -15,8 +15,10 @@
             --link-color: #fcd08c;
             --accent-color: #ff7300;
             --border-color: #444;
-            --tile-placeholder: #222;
+            --tile-placeholder: #777;
             --tile-info: #030303;
+            --tile-info-text: #666;
+            --nav-height: 60px;
         }
         body {
             background-color: var(--bg-main);
@@ -50,7 +52,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 60px; /* Altura fija para la barra superior */
+            height: var(--nav-height); /* Altura fija para la barra superior */
             /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
             z-index: 10;
         }
@@ -66,22 +68,15 @@
             z-index: 10;
         }
 
+        /* Nav Link Customization */
         .navbar-links a {
             margin-right: 20px;
             text-decoration: none;
             color: var(--text-color);
             transition: color 0.3s;
         }
-
         .navbar-links a:hover {
             color: var(--accent-color);
-        }
-
-        .search-box input {
-            padding: 5px 10px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-sidebar);
-            border-radius: 4px;
         }
 
         /* --- 4. Panel Doble (Flexbox Horizontal) --- */
@@ -154,6 +149,22 @@
         }
         a:hover { 
             color: var(--accent-color);
+        }
+
+        /* Cuadro de búsqueda (cuando hay)*/
+        #searchInput {
+            width: 25%;
+            left: 37.5%;
+            top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);
+            position: absolute;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: var(--bg-sidebar);
+            border: none;
+            border-radius: calc( var(--nav-height) / 1.5 );
+            color: var(--text-color);
+            height: calc( var(--nav-height) / 1.5 );
         }
 
     </style>
