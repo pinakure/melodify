@@ -12,3 +12,4 @@ backend/db.sqlite3-journal
 /backend/albums
 /backend/media/albums
 /backend/media/songs
+/backend/media/artists

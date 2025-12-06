@@ -1,0 +1,37 @@
+<script>
+let soundPlayer = null; // Variable to hold the current Howler sound instance
+let currentButton = null; // Variable to track which button is active
+
+function playSong(buttonElement) {
+    const audioUrl = buttonElement.getAttribute('data-src');
+    
+    // 1. Stop any currently playing sound
+    if (soundPlayer && soundPlayer.playing()) {
+        soundPlayer.stop();
+        if (currentButton) {
+            currentButton.textContent = '►';
+        }
+    }
+    
+    // 2. If we clicked the SAME song button, we are just pausing/stopping.
+    if (currentButton === buttonElement) {
+        currentButton = null;
+        return; 
+    }
+    
+    // 3. Start the NEW song
+    soundPlayer = new Howl({
+        src: [audioUrl],
+        html5: true, // Use HTML5 audio to be memory efficient
+        onend: function() {
+            // Callback function when the song finishes
+            buttonElement.textContent = '►';
+            currentButton = null;
+        }
+    });
+
+    soundPlayer.play();
+    buttonElement.textContent = '⏸︎';
+    currentButton = buttonElement;
+}
+</script>

@@ -3,7 +3,8 @@
 {% block header %}
 <style>
     .artist-profile {
-        padding-top: 32px;
+        /* padding-top: 16px; */
+        position: relative;
     }
 
     .album-grid {
@@ -46,10 +47,9 @@
         overflow: hidden;
         margin-bottom: 4px;
     }
-    .song-list, .album-grid {
-        margin-top: 24px;
+    /* .song-list, .album-grid {
         padding-bottom: 56px;
-    }
+    } */
     .song-image {
         width: 64px;
         background-size: contain;
@@ -84,24 +84,59 @@
         padding-bottom: 4px;
     }
 
-    
+    .aka *{
+        color: var(--accent-color);
+        margin: 8px;
+    }
 
+    .bio *{
+        color: var(--secondary-color);
+        margin: 16px;
+    }
+
+    .main-content {
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-blend-mode: luminosity;
+        background-color: var(--bg-content);
+    }
 </style>
 {% endblock %}
 
 {% block content-title %}{{ artist.name }}{% endblock %}
 
+{% block background %}
+    {% if artist.picture.name %}style="background-image:url('{{ artist.picture.url }}');"{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="artist-profile">
-
-    {% if artist.bio %}
-        <div class="bio">
-            <h3>Biografía:</h3>
-            <p>{{ artist.bio|linebreaksbr }}</p>
+    {% if artist.aliases %}
+        <div class="aka">
+            <strong class="small italic shadowed">AKA</strong>&nbsp;<span class="small italic shadowed">{{ artist.aliases }}</span>
         </div>
     {% endif %}
+    
+    {% if artist.bio %}
+        <div class="bio medium">
+            <p class="shadowed">{{ artist.bio|linebreaksbr }}</p>
+        </div>
+    {% endif %}    
 
-    <h3>{{ albums_list.count }} Álbumes</h3>    
+    {% if artist.genres.all.count %}
+        <div class="genres medium labels">
+            <strong>Género: </strong>
+            {% for genre in artist.genres.all %}
+                <a >{{genre}}</a>
+            {% endfor %}
+        </div>
+    {% endif %}  
+
+    <div class="counter medium">
+        <h3>{{ albums_list.count }} Álbumes</h3> 
+    </div>
+       
     <div class="album-grid">
         {% for album in albums_list %}
             <div class="album-item">

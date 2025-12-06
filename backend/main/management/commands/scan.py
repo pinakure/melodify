@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils import timezone
 
 #!/usr/bin/env python3
@@ -17,10 +17,8 @@ from mutagen.id3 import ID3
 # ============
 # CONFIG
 # ============
-OUTPUT_JSON = "scan_results.json"            # opcional: para depuración
 INDENT_SIZE = 2
-PATH_SEP = '\\' #os.pathsep
-
+PATH_SEP = '\\' #os.path.sep
 
 def load_array(file):
     payload = []
@@ -28,10 +26,23 @@ def load_array(file):
         payload = file.read().split('\n')
         return payload
 
-FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
-FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
-FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
-CODENAME_PREFIXES   = load_array('codename_prefixes.lst')
+def load_dict(file):
+    payload = {}
+    with open(file, "r") as file:
+        elements = file.read().split('\n')
+    for element in elements:
+        if len(element)==0:continue
+        items = element.split('=')
+        key = items[0]
+        value = items[1].split(',')
+        payload[key] = [ x.strip() for x in value ]
+    return payload
+
+FORBIDDEN_FOLDERS   = load_array('config/forbidden_folders.lst')
+FORBIDDEN_TAGS      = load_array('config/forbidden_tags.lst')
+FORBIDDEN_PREFIXES  = load_array('config/forbidden_prefixes.lst')
+CODENAME_PREFIXES   = load_array('config/codename_prefixes.lst')
+ARTIST_ALIASES      = load_dict('config/artist_aliases.lst')
 
 EMOJI_REPLACEMENT = {
     '♥' : '❤',
@@ -214,7 +225,7 @@ def extract_id3_tags(filepath):
             date = date.strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
             date = str(date) if date else None
-
+                
         return {
             "file"          : filepath,
             "title"         : get("TIT2"),
@@ -232,6 +243,7 @@ def extract_id3_tags(filepath):
             "disc_number"   : get("TPOS"),
             "length_seconds": int(audio.info.length) if audio.info else None,
             "bitrate"       : audio.info.bitrate if audio.info else None,
+            "duration"      : timedelta(seconds=audio.info.length),
         }
     except Exception as e:
         print("ID3:"+str(e))
@@ -250,6 +262,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("scan_path", nargs="+", type=str)
+        parser.add_argument("--force", '-f', default=False,nargs="*", type=bool)
 
     def echo(self, text, indent=0):
         self.stdout.write(" "*(indent*INDENT_SIZE)+text)
@@ -260,17 +273,7 @@ class Command(BaseCommand):
         except Exception:
             return None
 
-    def get_song_artists( self, info ):
-        artist_name = info.get('artist')
-        results = []
-        try:
-            results.append( Artist.objects.filter( name=artist_name ).get() )
-        except:
-            try:
-                results.append( Artist.objects.filter( aliases__icontains=artist_name.lower() ).get())
-            except:
-                pass
-        return results
+
 
     def get_or_create_artist(self, artist_name, info):
         artist_name = artist_name.rstrip().lstrip()
@@ -278,7 +281,7 @@ class Command(BaseCommand):
         artist_name = artist_name.lstrip(' ')
         if len(artist_name)==0: return None
         try:
-            artist = Artist.objects.filter( name=artist_name ).get()
+            artist = Artist.objects.filter( name__iexact=artist_name ).get()
             return artist
         except Exception as e:
             try:
@@ -298,7 +301,7 @@ class Command(BaseCommand):
     def get_or_create_genre(self, genre_name, info):
         if genre_name is None: return None
         try:
-            genre = Genre.objects.filter( name=genre_name ).get()
+            genre = Genre.objects.filter( name__iexact=genre_name ).get()
             return genre
         except Exception as e:
             genre = Genre()
@@ -369,6 +372,8 @@ class Command(BaseCommand):
         except Exception as e:
             self.echo(str(e))
             self.add_song_error(song, f"TITLE:{str(e)}")
+
+        song.duration = info.get('duration')
 
         try:
             song.track_number   = int(info.get('track_number'))
@@ -461,7 +466,9 @@ class Command(BaseCommand):
         self.setup_song( song, info , hash)
         self.echo(f'Created song "{path}"', indent=1)
 
-    def scan(self, folder):
+    def scan(self, folder, force=False):
+        print(f"FORCE: {force}")
+                        
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
         self.folder = folder
@@ -480,7 +487,8 @@ class Command(BaseCommand):
                     # check whether or not the song object exists
                     id = os.path.join(root, f)
                     song = self.get_song(id)
-                    if (song is not None) and song.hash == hash and not song.error:
+                    if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
+                        print(f"FORCE: {force}")
                         continue
                     info = extract_id3_tags(path)
                     if song is None:
@@ -491,14 +499,15 @@ class Command(BaseCommand):
         return results
 
     def handle(self, *args, **options):
-
+        FORCE_ANALYSIS = false
         MUSIC_FOLDER = options["scan_path"][0] or "/mnt/c/Users/smiker/Music/"   # <-- cámbialo
-
+        if options['force'] is not False:
+            print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
+            force = True
+            print(f"FORCE: {FORCE_ANALYSIS}")
+                        
         self.echo("Scanning media...")
         self.echo(f"Folder: {MUSIC_FOLDER}")
-        results = self.scan(MUSIC_FOLDER)
-
-        # with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-        #     json.dump(results, f, indent=2, ensure_ascii=False)
+        results = self.scan(MUSIC_FOLDER, FORCE_ANALYSIS)
 
         self.echo("\n"+f"Scan complete: {len(results)} files.")

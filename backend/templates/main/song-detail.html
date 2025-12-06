@@ -2,40 +2,18 @@
 {% load static %}
 
 {% block header %}
-<style>
-.labels {
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-.labels > a {
-    display: inline-block;
-    padding: 3px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    border: 1px solid #6668;
-    border-radius: 8px;
-    background-color: #6668;
-    user-select: none !important;
-}
-
-.breathe {
-    margin: 16px;
-}
-
-</style>
 {% endblock %}
 
 {% block content-title %}{{ song.title }}{% endblock %}
 
 {% block content %}
 <div class="song-detail-container">
-    <!-- <p>
+    <p>
         <strong>Duración:</strong> 
         {{ song.duration }}
-    </p> -->
+    </p> 
 
     <div class="album-info-section">
-        <!-- <h3>Perteneciente al Álbum:</h3> -->
         
         <a href="{% url 'album-detail' song.album.pk %}">
             <h4>{{ song.album.name }}</h4>
