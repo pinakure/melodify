@@ -72,20 +72,21 @@
         <h3>{{ songs.count }} Pistas</h3> 
     </div>    
     {% for song in songs %}
-        <a xref="{% url 'song-detail' pk=song.pk %}">
-            <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
-                <div class="song-art">
-                    <div class="counter absolute">{{ forloop.counter }}</div>
-                    {% if song.picture %}
-                        <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
-                    {% else %}
-                        <div class="placeholder-song-image">💿</div>
-                    {% endif %}
+    <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
+        <div class="song-art">
+            <div class="counter absolute">{{ forloop.counter }}</div>
+            {% if song.picture %}
+            <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
+            {% else %}
+            <div class="placeholder-song-image">💿</div>
+            {% endif %}
                 </div>
                 <div class="tile-info">
-                    <h4 class="song-name">{{ song.title }}</h4>
-                    <p class="small">{{ song.artist }}</p>
-                    <p class="small">{{ song.duration }}</p>                    
+                    <a href="{% url 'song-detail' pk=song.pk %}">
+                        <h4 class="song-name">{{ song.title }}</h4>
+                        <p class="small">{{ song.artist }}</p>
+                        <p class="small">{{ song.duration }}</p>                    
+                    </a>
                 </div>
                 <button 
                     class="play-button" 
@@ -97,7 +98,6 @@
                     ⏵︎
                 </button>
             </div>
-        </a>
     {% empty %}
         <p id="no-songs-message">No se encontraron canciones.</p>
     {% endfor %}
