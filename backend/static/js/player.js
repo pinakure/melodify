@@ -75,6 +75,11 @@ Player.prototype = {
           bar.style.display = 'none';
           loading.style.display = 'none';
         },
+        onloaderror: function(id, error) {
+          console.log(`Error loading audio: ${error}`);
+          bar.style.display = 'none';
+          loading.style.display = 'none';
+        },
         onend: function() {
           // Stop the wave animation.
           // wave.container.style.display = 'none';
