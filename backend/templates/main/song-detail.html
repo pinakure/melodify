@@ -14,8 +14,9 @@
     </p> 
 
     <div class="album-info-section">
-        
+        {% if song.album.pk %}
         <a href="{% url 'album-detail' song.album.pk %}">
+            {%endif%}
             <h4>{{ song.album.name }}</h4>
             <div class="album-art" style="justify-content: left !important;">
                 {% if song.album.picture %}
@@ -24,7 +25,9 @@
                 <div class="placeholder-image">💿</div>
                 {% endif %}
             </div>
+        {% if song.album.pk %}
         </a>
+        {%endif%}
 
         <!-- lista de artistas -->
         <p class="labels">
@@ -58,7 +61,9 @@
 
 {% endblock %}
 {% block back %}
-<a href="{% url 'album-detail' song.album.pk %}" class="back-link">
-    ← Volver al listado del álbum
-</a>
+{% if song.album.pk %}
+    <a href="{% url 'album-detail' song.album.pk %}" class="back-link">
+        ← Volver al listado del álbum
+    </a>
+{% endif %}
 {% endblock %}
