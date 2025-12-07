@@ -1,0 +1,337 @@
+/* --- 1. Estilos Globales y Modo Oscuro --- */
+:root {
+    --bg-main: #121212;
+    --bg-nav: #1e1e1e;
+    --bg-sidebar: #2c2c2c;
+    --bg-sidebar-selection: #383838;
+    --bg-sidebar-hover: #303030;
+    --bg-content-blend: #222222C0;
+    --bg-content: #222222;
+    --text-color: #e0e0e0;
+    --secondary-color: #b4b0ae;
+    --link-color: #fcd08c;
+    --section-color: #1d8eff;
+    --accent-color: #ff7300;
+    --shadow-color: #442200;
+    --tile-placeholder: #777;
+    --tile-info: #030303;
+    --tile-info-text: #666;
+    --nav-height: 60px;
+    --sidebar-width: 432px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    list-style: none;
+}
+
+/* Customize Scrollbars */
+::-webkit-scrollbar {
+    width: 0;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+
+/* Setup typographics */
+p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'lunchtype-regular'; }
+.light          { font-family: 'lunchtype-light';}
+.light.italic   { font-family: 'lunchtype-light-italic';}
+.regular        { font-family: 'lunchtype-regular';}
+.italic         { font-family: 'lunchtype-italic';}
+/* .italic         { font-style: italic; } */
+.bold           { font-family: 'lunchtype-medium';}
+/* .bold           { font-weight: bold ;} */
+.bold.italic    { font-family: 'lunchtype-medium-italic';}
+.small          { font-size: 12px; }
+.medium         { font-size: 13px; }
+.big            { font-size: 16px; }
+.display        { font-size: 32px; }
+
+/* Generics */
+.shadowed  { text-shadow: 0px 0px 7px #000;}
+.absolute  { position: absolute;}
+.margin-2  { margin: 2px; }
+.margin-4  { margin: 4px; }
+.margin-6  { margin: 6px; }
+.margin-8  { margin: 8px; }
+.margin-10 { margin: 10px; }
+
+body {
+    background-color: var(--bg-main);
+}
+
+
+body, html {
+    height: 100%;
+    font-family: sans-serif;
+    background-color: var(--bg-main);
+    overflow: hidden; /* Oculta el scrolling global */
+}
+
+/* --- 2. Contenedor Principal (Flexbox Vertical) --- */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- 3. Barra de Navegación Fija --- */
+.navbar {
+    background-color: var(--bg-main);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--nav-height); /* Altura fija para la barra superior */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
+    z-index: 10;
+}
+/* --- 3. Barra de Navegación Fija --- */
+.playbar {
+    background-color: var(--bg-main);
+    padding: 10px 20px;
+    display: flex;
+    position: relative;
+    padding: 0;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px; /* Altura fija para la barra inferior */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
+    z-index: 10;
+}
+
+/* Nav Link Customization */
+.navbar-links a {
+    margin-right: 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+.navbar-links a:hover {
+    color: var(--accent-color);
+}
+
+/* --- 4. Panel Doble (Flexbox Horizontal) --- */
+.content-container {
+    display: flex;
+    /* Ocupa el espacio restante después de la navbar */
+    flex: 1; 
+    overflow: hidden; /* Importante para contener el scrolling interno */
+}
+
+/* --- 6. Contenido Principal (75%) --- */
+.main {
+    position: relative;
+    flex-basis: calc( 100% - var(--sidebar-width));
+    background-color: var(--bg-main);
+    padding-left: 4px;
+    border: 0px solid #0000;
+    /* Permite scrolling vertical SOLO aquí */
+    overflow-y: hidden; 
+    overflow-x: hidden;
+}
+.main-content {
+    border-radius: 8px;
+    background-color: var(--bg-content);
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; 
+    overflow-x: hidden;
+}
+.main-overlay {
+    position: absolute;
+    top: 0px;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    box-shadow: -64px -64px 64px #000 inset;
+}
+
+/* Common */
+.album-art{
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.album-image{
+    width: 200px;
+    height: 200px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+}
+
+.placeholder-image {
+    width: 200px;
+    height: 200px;
+    background-color: var(--bg-content);
+    font-size: 128px;
+    color: var(--tile-placeholder);
+    border-radius: 8px;
+    /* filter: opacity(0.5); */
+}
+
+/* STUB Audio player customization */
+.play-button {
+    filter:opacity(0);
+    width: 64px;
+    height: 64px;
+    background-color: transparent;
+    position: absolute;
+    font-size: 48px;
+    line-height: 32px;
+    mix-blend-mode: multiply;
+    top: 0px;
+    border: none;
+    color: var(--accent-color);
+    left: 0px; 
+}
+.play-button:hover {
+    filter: opacity(1);
+}
+/* Hyperlink customization */
+a, a:hover, a:visited, a:active {
+    text-decoration: none;
+}
+
+a { 
+    color: var(--link-color) !important;
+}
+a:hover { 
+    color: var(--accent-color) !important;
+}
+
+/* Labels A */
+.labels {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.labels > a {
+    display: inline-block;
+    padding: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border: 1px solid #6668;
+    border-radius: 8px;
+    background-color: #6668;
+    user-select: none !important;
+    cursor: pointer;
+}
+
+.breathe {
+    margin: 16px;
+}
+
+/* Link de atrás, cuando hay */
+.back-link {
+    margin-top: 20px;
+    display: inline-block;
+    color: var(--link-color);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* Cuadro de búsqueda (cuando hay)*/
+#searchInput {
+    width: 25%;
+    left: 37.5%;
+    top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);
+    position: absolute;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--bg-sidebar);
+    border: none;
+    border-radius: calc( var(--nav-height) / 1.5 );
+    color: var(--text-color);
+    height: calc( var(--nav-height) / 1.5 );
+}
+
+/* --- 5. Sidebar (30%) --- */
+.sidebar {
+    border: 0px solid #0000;
+    flex-basis: var(--sidebar-width);
+    
+    background-color: var(--bg-main);
+    padding-left: 8px;
+    padding-right: 4px;
+    overflow-y: hidden; 
+    overflow-x: hidden;
+}
+.sidebar-content {
+    border-radius: 8px;
+    background-color: var(--bg-content);
+    padding: 8px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; 
+    overflow-x: hidden;
+}
+.sidebar-subtitle {
+
+}
+.sidebar-title {
+    font-size: 10px !important;
+    margin-bottom: 8px;
+}
+.sidebar-inner{
+}
+.sidebar-entry div:nth-child(1){
+    width: 48px !important; 
+    height: 48px !important;
+    padding-left: 8px;
+    margin-right: 12px;
+}
+.sidebar-entry-picture {
+    width: 48px !important; 
+    height: 48px !important;
+    border: none !important;
+    background: var(--bg-main);
+    border-radius: 5px; 
+}
+.sidebar-entry {
+    /* background-color: var(--bg-sidebar); */
+    display: flex;
+    height: 64px;
+    vertical-align: center;
+    border-radius: 6px;
+    align-items: center;   
+}
+
+.sidebar-entry-content {
+    padding-left: 8px;
+    font-size: 10px;
+}
+.sidebar-entry-primary{
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: bold;
+}
+.sidebar-entry-secondary{
+    color: var(--tile-info-text);
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: bold;
+}
+
+.sidebar-entry:hover {
+    background-color: var(--bg-sidebar-hover);
+}
+.sidebar-entry:active {
+    background-color: var(--bg-sidebar-selection);
+}
+.sidebar-entry:active .sidebar-entry-primary{
+    color: var(--accent-color);
+}
