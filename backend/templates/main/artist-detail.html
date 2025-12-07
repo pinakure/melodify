@@ -47,9 +47,7 @@
         overflow: hidden;
         margin-bottom: 4px;
     }
-    /* .song-list, .album-grid {
-        padding-bottom: 56px;
-    } */
+
     .song-image {
         width: 64px;
         background-size: contain;
@@ -105,7 +103,7 @@
 </style>
 {% endblock %}
 
-{% block content-title %}{{ artist.name }}{% endblock %}
+{% block content-title %}{{ artist.name }} <span class="small blend-50" >Artista</span>{% endblock %}
 
 {% block background %}
     {% if artist.picture.name %}style="background-image:url('{{ artist.picture.url }}');"{% endif %}
@@ -119,6 +117,8 @@
         </div>
     {% endif %}
     
+    <br></br>
+
     {% if artist.bio %}
         <div class="bio medium">
             <p class="shadowed">{{ artist.bio|linebreaksbr }}</p>

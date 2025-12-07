@@ -276,9 +276,16 @@ class Command(BaseCommand):
 
 
     def get_or_create_artist(self, artist_name, info):
-        artist_name = artist_name.rstrip().lstrip()
+        
         if artist_name is None: return None
-        artist_name = artist_name.lstrip(' ')
+        artist_name = artist_name.rstrip().lstrip()
+        # Remove featuring from artist name
+        artist_name = artist_name.split('Ft.')[0]
+        artist_name = artist_name.split('Feat.')[0]
+        artist_name = artist_name.split('feat.')[0]
+        artist_name = artist_name.split('ft.')[0]
+        artist_name = artist_name.lstrip(' ').rstrip(' ')
+        
         if len(artist_name)==0: return None
         try:
             artist = Artist.objects.filter( name__iexact=artist_name ).get()
@@ -300,6 +307,8 @@ class Command(BaseCommand):
 
     def get_or_create_genre(self, genre_name, info):
         if genre_name is None: return None
+        genre_name=genre_name.strip().lower().title()
+        if len(genre_name)==0: return None
         try:
             genre = Genre.objects.filter( name__iexact=genre_name ).get()
             return genre
@@ -314,7 +323,6 @@ class Command(BaseCommand):
         tags = []
         if tags_text is None: return tags
         tag_list = tags_text.split(', ')
-        # tag_list = dict.fromkeys(tag_list).keys() #this line removes duplicates, but also removes numeric values...
         res = []
         [res.append(val) for val in tag_list if val not in res]
         tag_list = res

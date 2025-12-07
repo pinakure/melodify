@@ -77,9 +77,9 @@
             <strong>Género{% if album.genres.all.count > 1 %}s{% endif %}:</strong> 
             <ul class="labels">
                 {% for genre in album.genres.all %}
-                    <li>
+                    <a href="{% url 'genre-detail' genre.pk %}">
                         {{ genre.name }}{% if not forloop.last %}, {% endif %}
-                    </li>
+                    </a>
                 {% endfor %}
             </ul> 
         </p>

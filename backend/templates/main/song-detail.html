@@ -1,16 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load utils %}
 
 {% block header %}
 {% endblock %}
 
-{% block content-title %}{{ song.title }}{% endblock %}
+{% block content-title %}{{ song.title }} <span class="small blend-50" >Canción</span>{% endblock %}
 
 {% block content %}
+<a href="{% url 'artist-detail' song.artist.pk %}">
+    {{ song.artist.name }}{% if not forloop.last %}, {% endif %}
+</a>
+
 <div class="song-detail-container">
     <p>
         <strong>Duración:</strong> 
-        {{ song.duration }}
+        {{ song.duration|strftime:'' }}
     </p> 
 
     <div class="album-info-section">
@@ -30,6 +35,20 @@
         {%endif%}
 
         <!-- lista de artistas -->
+         <span class="">
+            <!-- ARTIST OR VARIOUS ARTISTS -->
+            {% if song.album.artists.all.count > 1 %}
+                <a>Varios Artistas</a>
+            {% else %}
+                {% if song.album.artists.all.count == 1 %}
+                    {% for artist in song.album.artists.all %}
+                        <a href="{% url 'artist-detail' artist.pk %}">
+                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        </span>
         <p class="labels">
             <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
             {% for artist in song.album.artists.all %}
@@ -38,9 +57,15 @@
         </p>
         
         <!-- Datos de cancion -->
-        
+        {% if song.tags.all.count > 0 %}
         <p class="labels"><strong>Tags:</strong>{% for tag in song.tags.all %}<a>{{ tag }}</a>{% endfor %}</p>
-        <p><strong>Género:</strong><a>{{ song.genre }}</a></p>
+        {% endif %}
+        
+        {% if song.genre %}
+            <p class="labels"><strong>Género: </strong>
+                <a href="{% url 'genre-detail' song.genre.pk %}">{{ song.genre }}</a>
+            </p>
+        {% endif %}
 
         <!-- El reproductor de audio -->
         <p class="breathe">

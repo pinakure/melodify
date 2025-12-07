@@ -65,6 +65,7 @@ p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'l
 .blend-75  { opacity: 0.75; }
 .blend-25  { opacity: 0.25; }
 .absolute  { position: absolute;}
+.inline-block { display: inline-block; }
 .margin-2  { margin: 2px; }
 .margin-4  { margin: 4px; }
 .margin-6  { margin: 6px; }
@@ -224,24 +225,6 @@ body, html {
     /* filter: opacity(0.5); */
 }
 
-/* STUB Audio player customization */
-.play-button {
-    filter:opacity(0);
-    width: 64px;
-    height: 64px;
-    background-color: transparent;
-    position: absolute;
-    font-size: 48px;
-    line-height: 32px;
-    mix-blend-mode: multiply;
-    top: 0px;
-    border: none;
-    color: var(--accent-color);
-    left: 0px; 
-}
-.play-button:hover {
-    filter: opacity(1);
-}
 /* Hyperlink customization */
 a, a:hover, a:visited, a:active {
     text-decoration: none;
