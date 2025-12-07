@@ -7,38 +7,74 @@ def get_context( context ):
     context['playlists'] = [
         { 
             'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
-            'primary'   : 'Canciones que te gustan',
-            'secondary' : 'Lista · Smiker',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
-            'primary'   : 'Tus Episodios',
-            'secondary' : 'Lista · Smiker',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
             'primary'   : 'Me Gusta',
-            'secondary' : 'Lista · Smiker',
+            'secondary' : 'Lista ⌬ Smiker Pinakure Mageek',
             'use_index' : False,
         },
         { 
             'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
             'primary'   : 'Blonde',
-            'secondary' : 'Lista · Smiker',
+            'secondary' : 'Album ⌬ Frank Ocean',
             'use_index' : False,
         },
         { 
             'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
             'primary'   : 'papa zen',
-            'secondary' : 'Lista · Smiker',
+            'secondary' : 'Artista',
             'use_index' : False,
         },
         { 
             'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
             'primary'   : 'Terror para llevar',
-            'secondary' : 'Lista · Smiker',
+            'secondary' : 'Podcast ⌬ YoSoyPride',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Canciones que te gustan',
+            'secondary' : 'Lista ⌬ 119 canciones',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Tus Episodios',
+            'secondary' : 'Lista ⌬ Episodios guardados y descargados',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Me Gusta',
+            'secondary' : 'Lista ⌬ Smiker Pinakure Mageek',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Blonde',
+            'secondary' : 'Album ⌬ Frank Ocean',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'papa zen',
+            'secondary' : 'Artista',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Terror para llevar',
+            'secondary' : 'Podcast ⌬ YoSoyPride',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Canciones que te gustan',
+            'secondary' : 'Lista ⌬ 119 canciones',
+            'use_index' : False,
+        },
+        { 
+            'picture'   : '/media/songs/1bc2b164477f43b7e6a0894f3dcc807f42beaf5b5a5b2a4c0296db3e8eae0775e59d96f391439fcf03528875b59c57f1253ed99541fda6dcc08d1718a84dc91c.png',
+            'primary'   : 'Tus Episodios',
+            'secondary' : 'Lista ⌬ Episodios guardados y descargados',
             'use_index' : False,
         },
     ]
@@ -51,7 +87,18 @@ class AlbumTileView(ListView):
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
-        obj = self.object
+        return context
+
+class ArtistDetailView(DetailView):
+    model = Artist
+    template_name = 'main/artist-detail.html'
+    context_object_name = 'artist' 
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        artist = self.object
+        context['songs'] = Song.objects.filter(artist=artist)
+        context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
         return context
 
 class AlbumDetailView(DetailView):
@@ -62,7 +109,7 @@ class AlbumDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         album = self.object
-        context['songs'] = Song.objects.filter(album=album)
+        context['songs'] = Song.objects.filter(album=album).order_by('track_number')
         return context
 
 class ArtistListView(ListView):
@@ -76,17 +123,26 @@ class ArtistListView(ListView):
         context['albums_list'] = Album.objects.all().order_by('-release')
         return context
 
-
-class ArtistDetailView(DetailView):
-    model = Artist
-    template_name = 'main/artist-detail.html'
-    context_object_name = 'artist' 
+class GenreListView(ListView):
+    model = Genre
+    template_name = 'main/genre-list.html'  
+    context_object_name = 'genres'         
+    queryset = Genre.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
-        artist = self.object
-        context['songs'] = Song.objects.filter(artist=artist)
-        context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
+        return context
+
+class GenreDetailView(DetailView):
+    model = Genre
+    template_name = 'main/genre-detail.html'
+    context_object_name = 'genre' 
+    
+    def get_context_data(self, **kwargs):
+        genre = self.object
+        context = get_context(super().get_context_data(**kwargs))
+        context['songs'] = Song.objects.filter(genre=genre).order_by('track_number')
+        context['albums_list'] = Album.objects.filter(genres__pk=genre.id).all().order_by('-release')
         return context
 
 class SongDetailView(DetailView):

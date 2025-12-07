@@ -6,7 +6,7 @@
         display: flex;
         gap: 40px;
         padding: 40px;
-        max-width: 900px;
+        /* max-width: 900px; */
         margin: auto;
     }
     .cover-art img {
@@ -35,10 +35,25 @@
 </style>
 {% endblock %}
 
-{% block content-title %}{{ album.name }}{% endblock %}
+{% block content-title %}{{ album.name }} <span class="small blend-50" >Álbum</span>{% endblock %}
 
 {% block content %}
+<span class="">
+    <!-- ARTIST OR VARIOUS ARTISTS -->
+    {% if album.artists.all.count > 1 %}
+        <a>Varios Artistas</a>
+    {% else %}
+        {% if album.artists.all.count == 1 %}
+            {% for artist in album.artists.all %}
+                <a href="{% url 'artist-detail' artist.pk %}">
+                    {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                </a>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+</span>
 <div class="album-detail-container">
+    <!-- COVER ART -->
     <div class="cover-art">
         {% if album.picture %}
             <img src="{{ album.picture }}" alt="Portada de {{ album.name }}">
@@ -50,25 +65,33 @@
     </div>
 
     <div class="album-info">
-        <div class="artist-list">
-            <p><strong>Artista{% if album.artists.count > 1 %}s{% endif %}:</strong></p>
-            
-            
-                <span class="small">
-                {% for artist in album.artists.all %}
-                    <a href="{% url 'artist-detail' artist.pk %}">
-                        {{ artist.name }}{% if not forloop.last %}, {% endif %}
-                    </a>
-                {% endfor %}
-                </span>
-        </div>
-
+        
+        <!-- RELEASE DATE -->
         {% if album.release %}
             <p> <strong>Fecha de lanzamiento:</strong> {{ album.release|date:"F d, Y" }}</p>
         {% endif %}
-        <p><strong>Género{% if album.genres.all.count > 1 %}s{% endif %}:</strong> 
-            {% for genre in album.genres.all %}
-                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+        
+        <!-- FEATURED ARTISTS -->
+        {% if album.genres.all.count > 0 %}
+        <p>
+            <strong>Género{% if album.genres.all.count > 1 %}s{% endif %}:</strong> 
+            <ul class="labels">
+                {% for genre in album.genres.all %}
+                    <li>
+                        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                    </li>
+                {% endfor %}
+            </ul> 
+        </p>
+        {% endif %}
+        
+        <!-- FEATURED ARTISTS -->
+        <p>
+            <strong>Artista{% if album.artists.all.count > 1 %}s{% endif %}:</strong> 
+            {% for artist in album.artists.all %}
+                <a href="{% url 'artist-detail' artist.pk %}">
+                    {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                </a>
             {% endfor %}
         </p>
     </div>

@@ -1,0 +1,130 @@
+
+/* ********************************************************** */
+/* SIDEBAR                                                    */
+/* ********************************************************** */
+/*  Structure:                                                */                 
+/*  sidebar                                                   */      
+/*      sidebar-content                                       */                             
+/*          sidebar-title                                     */      
+/*          sidebar-inner                                     */           
+/*              sidebar-categories                            */                    
+/*              sidebar-items-wrapper                         */               
+/*                  sidebar-search                            */  
+/*                  sidebar-items                             */  
+/*                      sidebar-entry                         */           
+/*                          sidebar-entry-picture             */                                
+/*                          sidebar-entry-content             */                                
+/*                              sidebar-entry-primary         */                                
+/*                              sidebar-entry-secondary       */                              
+/*                                                            */      
+/* ********************************************************** */
+
+.sidebar {
+    border: 0px solid #0000;
+    flex-basis: var(--sidebar-width);
+    height: 100%;
+    background-color: var(--bg-main);
+    padding-left: 8px;
+    padding-right: 4px;
+    overflow-y: hidden; 
+    overflow-x: hidden;
+}
+
+.sidebar-content {
+    border-radius: 8px;
+    background-color: var(--bg-content);
+    padding: 8px;
+    width: 100%;
+    height: 100%;
+    padding-top: 20px;
+    overflow-y: hidden; 
+    overflow-x: hidden;
+}
+
+#sidebar-title {
+    font-size: 16px !important;
+    padding-left: 4px;
+    margin-bottom: 8px;
+}
+
+#sidebar-inner {
+    overflow: hidden;
+    height: calc(100% - 28px);
+}
+
+#sidebar-categories {
+    padding-top: 14px;
+    padding-left: 8px;
+}
+
+.sidebar-search {
+    height: 32px;
+    margin: 8px;
+}
+
+.sidebar-items-wrapper{
+    width: 100%;
+    padding: 0;
+    height: calc( 100% - 60px ) !important;
+    margin: 0;
+    overflow: auto;
+}
+
+#sidebar-items{
+}
+
+.sidebar-entry {
+    /* background-color: var(--bg-sidebar); */
+    display: flex;
+    height: 64px;
+    vertical-align: center;
+    border-radius: 6px;
+    align-items: center;   
+}
+
+.sidebar-entry div:nth-child(1){
+    width: 48px !important; 
+    height: 48px !important;
+    padding-left: 8px;
+    margin-right: 12px;
+}
+
+.sidebar-entry-picture {
+    width: 48px !important; 
+    height: 48px !important;
+    border: none !important;
+    background: var(--bg-main);
+    border-radius: 5px; 
+}
+
+.sidebar-entry-content {
+    padding-left: 8px;
+    font-size: 10px;
+}
+
+.sidebar-entry-primary{
+    font-size: 16px;
+    line-height: 24px;
+    font-family: 'lunchtype-light';
+    font-weight: bold;
+}
+
+.sidebar-entry-secondary{
+    color: var(--tile-info-text);
+    font-size: 15px;
+    margin-top: 2px; 
+    font-family: 'lunchtype-medium';
+}
+
+/* Sidebar Overrides */
+.sidebar-entry:hover {
+    background-color: var(--bg-sidebar-hover);
+}
+
+.sidebar-entry:active {
+    background-color: var(--bg-sidebar-selection);
+}
+
+.sidebar-entry:active .sidebar-entry-primary{
+    color: var(--accent-color);
+}

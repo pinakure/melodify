@@ -1,4 +1,5 @@
 {% load static %}
+{% load utils %}
 <style>
     /* Songs list */
     .tile-item.song-item:hover,
@@ -85,7 +86,7 @@
                     <a href="{% url 'song-detail' pk=song.pk %}">
                         <h4 class="song-name">{{ song.title }}</h4>
                         <p class="small">{{ song.artist }}</p>
-                        <p class="small">{{ song.duration }}</p>                    
+                        <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
                     </a>
                 </div>
                 <button 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="/static/css/fonts.css">
     <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
     <link rel="stylesheet" href="/static/css/player-styles.css">
     <title>Melodify {% block title %}{% endblock %}</title>
 
@@ -19,11 +20,15 @@
 
     <!-- Barra Superior -->
     <header class="navbar">
+        
         <div class="navbar-links">
-            <a href="{% url 'album-tiles' %}">📀Álbumes</a>
-            <a href="{% url 'artist-list' %}">👩‍🎨👨‍🎨Artistas</a> 
-            <a href="% url 'genre-list' %">🎹Géneros</a> 
+            <a href="{% url 'album-tiles' %}">Álbumes</a>
+            <a href="{% url 'artist-list' %}">Artistas</a> 
+            <a href="{% url 'genre-list'  %}">Géneros</a> 
             <!-- <a href="#">Mi Música</a> -->
+        </div>
+        <div id="melodify-logo">
+            <div class="benzene">⌬</div>
         </div>
         <div class="search-box">
             <!-- Formulario de búsqueda -->
@@ -38,15 +43,25 @@
         <!-- Lado Izquierdo -->
         <aside class="sidebar">
             <div class="sidebar-content">
-                <div class="margin-2">
-                    <h3 id="sidebar-title">{% block sidebar-title %}Playlist{% endblock %}</h3>
+                <div class="margin-8">
+                    <h3 id="sidebar-title" class="bold">{% block sidebar-title %}Tu biblioteca{% endblock %}</h3>
                 </div> 
                 <div id="sidebar-inner">{% block sidebar-content %}
-                    <ul>
-                        {% for item in playlists %}
-                            {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture %}
-                        {% endfor %}
+                    <ul id="sidebar-categories" class="labels">
+                        <li>Listas</li>   
+                        <li>Artistas</li>   
+                        <li>Albumes</li>   
+                        <li>Podcasts</li>   
                     </ul>
+                    
+                    <div class="sidebar-items-wrapper">
+                        <div class="sidebar-search"></div>
+                        <ul id="sidebar-items">
+                            {% for item in playlists %}
+                            {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture %}
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
                 {% endblock %}
             </div>
