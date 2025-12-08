@@ -116,7 +116,7 @@ def is_forbidden_tag(tag: str) -> bool:
         if fb == tag: return True
     for fb in FORBIDDEN_PREFIXES:
         if len(fb)==0:continue
-        if tag.startswith(fb): return True
+        if tag.lower().startswith(fb): return True
     return False
 
 def is_number(var):

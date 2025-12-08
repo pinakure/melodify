@@ -38,6 +38,7 @@
             background-color: var(--bg-sidebar);
             border-radius: 5px;
             transition: background-color 0.2s;
+            overflow:  hidden;
         }
         .{{ type }}-card:hover {
             background-color: var(--border-color);
@@ -74,7 +75,7 @@
                 </a>
             </div>
         {% empty %}
-            <p id="no-{{ type }}-s-message">No se encontraron {{ title }}s.</p>
+            <p id="no-{{ type }}-s-message">No se encontraron {{ title }}.</p>
         {% endfor %}
     </div>
 </div>

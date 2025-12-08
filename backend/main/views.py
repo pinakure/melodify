@@ -234,7 +234,9 @@ class TagDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
-        # tag= self.object
+        tag = self.object
+        context['songs'] = Song.objects.filter(tags__pk=tag.id).order_by('track_number')
+        #context['albums_list'] = Album.objects.filter(genres__pk=tag.id).all().order_by('-release')
         return context
 
 class PlaylistListView(ListView):

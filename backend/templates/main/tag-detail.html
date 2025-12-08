@@ -2,7 +2,7 @@
 
 {% block header %}
 <style>
-    .artist-profile {
+    .tag-detail {
         /* padding-top: 16px; */
         position: relative;
     }
@@ -103,35 +103,20 @@
 </style>
 {% endblock %}
 
-{% block content-title %}{{ genre.name }} <span class="small blend-50" >Género</span>{% endblock %}
+{% block content-title %}{{ tag.name }} <span class="small blend-50" >Etiqueta</span>{% endblock %}
+
+{% block background %}
+    style="background:linear-gradient('45deg, #123, #fec)"
+{% endblock %}
 
 {% block content %}
-<div class="artist-profile">
-    {% if artist.aliases %}
-        <div class="aka medium italic shadowed">
-            <strong class="medium italic shadowed">AKA</strong>&nbsp;<span class="medium italic shadowed">{{ artist.aliases }}</span>
-        </div>
-    {% endif %}
-    
-    {% if artist.bio %}
-        <div class="bio medium">
-            <p class="shadowed">{{ artist.bio|linebreaksbr }}</p>
-        </div>
-    {% endif %}    
-
-    {% if artist.genres.all.count %}
-        <div class="genres medium labels">
-            <strong>Género: </strong>
-            {% for genre in artist.genres.all %}
-                <a >{{genre}}</a>
-            {% endfor %}
-        </div>
-    {% endif %}  
+<div class="tag-detail">
 
     <div class="counter medium">
         <h3>{{ albums_list.count }} Álbumes</h3> 
     </div>
-       
+    
+    {% if albums_list.all.count %}
     <div class="album-grid">
         {% for album in albums_list %}
             <div class="album-item">
@@ -146,9 +131,10 @@
                 </a>
             </div>
             {% empty %}
-            <p>No hay álbumes de éste género registrados.</p>
+            <p>Esta etiqueta no tiene álbumes registrados.</p>
         {% endfor %}
     </div>
+    {% endif %}
 
     {% include 'main/song-list.html' %}
 
