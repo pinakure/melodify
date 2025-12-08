@@ -178,6 +178,7 @@ class ArtistListView(ListView):
     model = Artist
     template_name = 'main/artist-list.html'  
     context_object_name = 'artists'         
+    # queryset = Artist.objects.order_by('-picture') 
     queryset = Artist.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
