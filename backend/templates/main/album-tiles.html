@@ -68,7 +68,7 @@
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="searchInput" placeholder="Filtrar álbumes..." onkeyup="filterAlbums()">
+    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes..." onkeyup="filterAlbums()">
 {% endblock %}
 
 {% block content-title %}Álbumes (<span id="album-count">{{ albums.count }}</span>){% endblock %}
