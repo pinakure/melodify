@@ -180,6 +180,12 @@ body, html {
     overflow-y: hidden; 
     overflow-x: hidden;
 }
+@media (max-width: 512px){
+    .main {
+        flex-basis: 100%;
+        zoom: 0.8;
+    }
+}
 .main-content {
     border-radius: 8px;
     background-color: var(--bg-content);
