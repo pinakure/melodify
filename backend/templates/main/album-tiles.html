@@ -8,21 +8,16 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
-        padding: 20px 0; /* Ajustado el padding superior */
+        padding: 20px 0; 
     }
 
     .tile-item {
         border: none;
         border-radius: 8px;
         overflow: hidden;
-        /* box-shadow: 0 4px 6px rgba(0,0,0,0.1); */
         transition: transform 0.2s;
         text-align: center;
     }
-
-    .tile-item:hover {
-        /* transform: translateY(-5px); */
-    } 
 
     .tile-item img {
         width: 100%;
@@ -49,7 +44,6 @@
         font-size: 0.9em;
     }
 
-    /* Album Name (fixed height) */
     h3.album-name {
         margin: 0 0 5px 0;
         font-size: 16px !important;   
@@ -70,14 +64,13 @@
         let nextPage = 1;
         let isLoading = false;
         let albumCount = 0;
-        let currentSearchTerm = '-'; // Variable para guardar el término de búsqueda actual
+        let currentSearchTerm = '-';
         
-        function loadPlaylists() {
+        function loadAlbums() {
             if (isLoading) return;
             isLoading = true;
             loadingIndicator.style.display = 'block';
 
-            // Construimos la URL con parámetros de página Y búsqueda
             const url = new URL(`{% url 'album-tiles' %}`, window.location.origin);
             url.searchParams.set('page', nextPage);
             if (currentSearchTerm) {
@@ -119,7 +112,7 @@
                          countDisplay.textContent = albumCount;
                     }
                 } else {
-                    window.removeEventListener('scroll', handleScroll);
+                    scrollbox.removeEventListener('scroll', handleScroll);
                 }
                 loadingIndicator.style.display = 'none';
             })
@@ -130,15 +123,13 @@
             });
         }
         
-        // ... handleScroll function remains the same ...
         function handleScroll() {
             const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
             if (scrollTop + clientHeight >= scrollHeight - 200) {
-                loadPlaylists();
+                loadAlbums();
             }
         }
 
-        // --- Lógica de Búsqueda Integrada ---
         function triggerSearch() {
             const newSearchTerm = searchInput.value.toLowerCase().trim();
             
@@ -149,8 +140,7 @@
                 albumCount = 0;
                 container.innerHTML = ''; // Limpiar álbumes anteriores
                 scrollbox.addEventListener('scroll', handleScroll); // Asegurarse de que el scroll listener esté activo
-                loadPlaylists(); // Cargar la primera página de los resultados de la búsqueda
-                // La función filterAlbums() local ya no es necesaria si todo se hace por backend AJAX
+                loadAlbums(); // Cargar la primera página de los resultados de la búsqueda
             }
         }
     </script>
@@ -158,7 +148,6 @@
 
 {% block search %}
     <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
-    <!-- <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes..." onkeyup="filterAlbums()"> -->
 {% endblock %}
 
 {% block content-title %}Álbumes (<span id="album-count">{{ albums.count }}</span>){% endblock %}
@@ -166,96 +155,31 @@
 
 {% block content %}
 
-<!-- Un elemento de "carga" o "spinner" -->
-<div id="loading" style="display: none;">Cargando más playlists...</div>
+<div id="loading" style="display: none;">Cargando albumes...</div>
 
 <div class="tile-container" id="tileContainer">
-    <!-- {% for album in albums %}
-        <div class="tile-item album-item" data-album-artist="{% if album.artists.all.count > 3 %}various Artists{% else %}{% for artist in album.artists.all %}{{artist.name | lower }} {% endfor %}{% endif %}" data-album-name="{{ album.name|lower }}">
-            <a href="{% url 'album-detail' album.pk %}">
-                <div class="album-art">
-                    {% if album.picture %}
-                        <div class="album-image" style="background-image: url('{{ album.picture }}')" alt="{{ album.name }} cover"></div>
-                    {% else %}
-                        <div class="placeholder-image">💿</div>
-                    {% endif %}
-                </div>
-                <div class="tile-info">
-                    <h3 class="album-name">{{ album.name }}</h3>
-                    {% if album.artists.all.count > 3 %}
-                        <p>Various Artists</p>
-                    {% else %}
-                        {% for artist in album.artists.all %}
-                        <p>
-                            {{artist.name}}
-                        </p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </a>
-        </div>
-    {% empty %}
-        <p id="no-albums-message">No se encontraron álbumes.</p>
-    {% endfor %} -->
+    
 </div>
 
-<!-- Scripts de JavaScript para el filtrado -->
 <script>
-
     const container = document.getElementById('tileContainer');
     const scrollbox = document.getElementsByClassName('main-content')[0];
     const loadingIndicator = document.getElementById('loading');
     const countDisplay = document.getElementById('album-count');
-    const searchInput = document.getElementById('searchInput'); // Referencia al input
+    const searchInput = document.getElementById('searchInput'); 
 
     // Carga inicial y listeners
     window.addEventListener('DOMContentLoaded', (event) => {
         scrollbox.addEventListener('scroll', handleScroll);
         
-        // Reemplazamos el onkeyup del HTML por un event listener aquí
-        // Usamos 'input' para una respuesta más rápida que 'change' o 'keyup'
         searchInput.addEventListener('input', () => {
             // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(triggerSearch, 300);
         });
 
-        // Cargar la primera página (vacía si el input de búsqueda ya tiene algo al cargar)
         triggerSearch(); 
     });
-
-
-    function filterAlbums() {
-        // Obtener el valor de búsqueda y convertirlo a minúsculas
-        const input = document.getElementById('searchInput');
-        const counter = document.getElementById('album-count');
-        const filter = input.value.toLowerCase();
-        
-        // Obtener todos los elementos de la lista de álbumes
-        const albumCards = document.querySelectorAll('.album-item');
-        const noAlbumsMessage = document.getElementById('no-albums-message');
-        
-        let found = false;
-        let count = 0;
-        // Iterar sobre todas las tarjetas y ocultar las que no coinciden
-        albumCards.forEach(card => {
-            const name = card.getAttribute('data-album-name').toLowerCase();
-            const artist = card.getAttribute('data-album-artist').toLowerCase();
-            
-            if (name.includes(filter) ||artist.includes(filter)) {
-                card.style.display = ""; // Mostrar el elemento (default block/grid item)
-                found = true;
-                count++;
-            } else {
-                card.style.display = "none"; // Ocultar el elemento
-            }
-        });
-        counter.innerHTML = count;
-        // Manejar el mensaje de "no encontrados" si es necesario
-        if (noAlbumsMessage) {
-            noAlbumsMessage.style.display = found ? "none" : "";
-        }
-    }
 </script>
 
 {% endblock %}

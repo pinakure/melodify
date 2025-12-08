@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse
+from django.db.models       import Q
 from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 def get_context( context ):
@@ -81,13 +84,72 @@ def get_context( context ):
     return context
 
 class AlbumTileView(ListView):
-    model = Album
-    template_name = 'main/album-tiles.html' 
-    context_object_name = 'albums'          
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
+    
+class AlbumTileView(ListView):
+    model = Album
+    template_name = 'main/album-tiles.html' 
+    context_object_name = 'albums'          
+    paginate_by = 32  
+
+    def get_context_data(self, **kwargs):
+        # Asegúrate de que tu función get_context maneje correctamente el contexto
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+
+    # Modificamos get_queryset para centralizar la lógica de filtrado/ordenación
+    def get_queryset(self):
+        # Definimos el queryset base
+        queryset = Album.objects.order_by('name')
+        
+        # Obtenemos el término de búsqueda de los parámetros GET (para peticiones AJAX y normales)
+        search_query = self.request.GET.get('search', None)
+
+        if search_query:
+            # Filtramos por nombre de álbum O nombre de artista usando Q objects
+            # get_artists() es un método de tu modelo que asumo que existe.
+            # Nota: Filtrar por métodos personalizados puede ser ineficiente a escala. 
+            # Una mejor práctica sería buscar en un campo M2M indexado si es posible.
+            
+            # Esto es un ejemplo básico de cómo buscar:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) | 
+                Q(artists__name__icontains=search_query)
+            ).distinct() # Usamos distinct si la búsqueda en M2M duplica resultados
+
+        return queryset
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Petición AJAX: devolvemos JSON
+            page = request.GET.get('page', 1)
+            queryset = self.get_queryset() # Usamos el queryset ya filtrado por `get_queryset`
+            paginator = Paginator(queryset, self.paginate_by)
+            
+            try:
+                items = paginator.page(page)
+            except (PageNotAnInteger, EmptyPage):
+                return JsonResponse({'albums': []})
+
+            data = []
+            for item in items:
+                data.append({
+                    'id': item.id,
+                    'nombre': item.name,
+                    'artist': item.get_artists(),
+                    'safeartist': item.get_artists().lower(),
+                    'safename': item.name.lower(),
+                    'descripcion': item.brief,
+                    'url_picture': f'{item.picture}',
+                    'url_detalle': f'/albums/{item.id}/',
+                })
+            return JsonResponse({'albums': data, 'total_count': queryset.count()})
+        
+        # Petición normal: renderiza la vista HTML completa (incluye la primera página filtrada si hay búsqueda)
+        return super().get(request, *args, **kwargs)
 
 class ArtistDetailView(DetailView):
     model = Artist
