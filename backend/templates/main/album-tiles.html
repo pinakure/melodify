@@ -65,6 +65,12 @@
         let isLoading = false;
         let albumCount = 0;
         let currentSearchTerm = '-';
+
+        function truncate(artist, n){
+            return  (artist.split(', ').length == 2) ? artist.replace(', ', ' / ') : 
+                    (artist.split(', ').length  > n) ? 'Various Artists'           : 
+                    artist;
+        };
         
         function loadAlbums() {
             if (isLoading) return;
@@ -98,7 +104,7 @@
                                 </div>
                                 <div class="tile-info">
                                     <h3 class="album-name">${album.nombre}</h3>
-                                    <h6>${album.artist}</h6>
+                                    <h6>${truncate(album.artist, 3)}</h6>
                                 </div>
                             </a>
                         `;
