@@ -284,7 +284,7 @@ a:hover {
 }
 
 /* Cuadro de búsqueda (cuando hay)*/
-#searchInput {
+.searchInput {
     width: 25%;
     left: 37.5%;
     top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);

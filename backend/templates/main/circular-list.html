@@ -62,13 +62,14 @@
             height: 200px;
             border-radius: 100px;
             /* border: 2px solid #fcfcfc; */
+            background: var(--bg-sidebar);
             background-size: cover;
         }
     </style>
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="search{{ type }}-Input" placeholder="Filtrar {{title}}..." onkeyup="filter{{ type }}()">
+    <input type="text" id="search{{ type }}-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="filter{{ type }}()">
 {% endblock %}
 
 {% block content-title %}{{title}}{% endblock %}
@@ -81,6 +82,7 @@
                 <a href="{% url url_detail pk=item.pk %}">
                     <div class="circular-{{type}}-item" {% if item.picture.name %}style="background-image: url('{{ item.picture.url }}')">{% endif %}></div>
                     <h3>{{ item.name }}</h3>
+                    <h6>{{ item.name }}</h6>
                 </a>
             </div>
         {% empty %}

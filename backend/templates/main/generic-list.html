@@ -59,7 +59,7 @@
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="search{{ type }}-Input" placeholder="Filtrar {{title}}..." onkeyup="filter{{ type }}()">
+    <input type="text" id="search{{ type }}-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="filter{{ type }}()">
 {% endblock %}
 
 {% block content-title %}{{title}}{% endblock %}
