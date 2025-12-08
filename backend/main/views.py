@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from .models import Album, Song, Artist, Genre
+from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 def get_context( context ):
     # Enter global severside data here
@@ -153,4 +153,44 @@ class SongDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         obj = self.object
+        return context
+    
+class TagListView(ListView):
+    model = Tag
+    template_name = 'main/tag-list.html'  
+    context_object_name = 'tags'         
+    queryset = Tag.objects.order_by('name') 
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+    
+class TagDetailView(DetailView):
+    model = Tag
+    template_name = 'main/tag-detail.html'
+    context_object_name = 'tag' 
+    
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        # tag= self.object
+        return context
+
+class PlaylistListView(ListView):
+    model = Playlist
+    template_name = 'main/playlist-list.html'  
+    context_object_name = 'playlists'         
+    queryset = Playlist.objects.order_by('title') 
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+
+class PlaylistDetailView(DetailView):
+    model = Playlist
+    template_name = 'main/playlist-detail.html'
+    context_object_name = 'playlist' 
+    
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        # playlist = self.object
         return context

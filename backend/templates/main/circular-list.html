@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block header %}
+    <script>
+        function filter{{ type }}() {
+            const input  = document.getElementById('search{{ type }}-Input');
+            const filter = input.value.toLowerCase();
+            const {{ type }}Cards = document.querySelectorAll('.{{ type }}-item');
+            const noMessage  = document.getElementById('no-{{ type }}s-message');
+            
+            let found = false;
+
+            {{ type }}Cards.forEach(card => {
+                const name = card.getAttribute('data-{{ type }}-name');
+                
+                if (name.includes(filter)) {
+                    card.style.display = ""; 
+                    found = true;
+                } else {
+                    card.style.display = "none"; 
+                }
+            });
+            if (noMessage) {
+                noMessage.style.display = found ? "none" : "";
+            }
+        }
+    </script>
+
+    <style>
+        .{{ type }}-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding-top: 20px;
+        }
+        .{{ type }}-card {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            background-color: transparent;
+            border-radius: 5px;
+            height: 280px;
+            max-height: 280px;
+            transition: background-color 0.2s;
+        }
+        .{{ type }}-card:hover {
+            background-color: var(--border-color);
+        }
+        .{{ type }}-card a {
+            text-decoration: none;
+            display: block;
+        }
+        .{{ type }}-card h3 {
+            margin: 0 0 5px 0;
+            color: var(--accent-color);
+        }
+        .{{ type }}-card p {
+            margin: 0;
+            font-size: 0.8em;
+            color: var(--text-color);
+        }
+        .circular-{{type}}-item {
+            width: 200px;
+            height: 200px;
+            border-radius: 100px;
+            /* border: 2px solid #fcfcfc; */
+            background-size: cover;
+        }
+    </style>
+{% endblock %}
+
+{% block search %}
+    <input type="text" id="search{{ type }}-Input" placeholder="Filtrar {{title}}..." onkeyup="filter{{ type }}()">
+{% endblock %}
+
+{% block content-title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="list-container">
+    <div class="{{ type }}-grid" id="{{ type }}-Grid">
+        {% for item in items %}
+            <div class="{{ type }}-card {{ type }}-item" data-{{ type }}-name="{{ item.name|lower }}">
+                <a href="{% url url_detail pk=item.pk %}">
+                    <div class="circular-{{type}}-item" {% if item.picture.name %}style="background-image: url('{{ item.picture.url }}')">{% endif %}></div>
+                    <h3>{{ item.name }}</h3>
+                </a>
+            </div>
+        {% empty %}
+            <p id="no-{{ type }}-s-message">No se encontraron {{ title }}s.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

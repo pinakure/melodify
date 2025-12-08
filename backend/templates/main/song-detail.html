@@ -9,19 +9,15 @@
 
 {% block content %}
 <a href="{% url 'artist-detail' song.artist.pk %}">
-    {{ song.artist.name }}{% if not forloop.last %}, {% endif %}
+    {{ song.artist.name }}
 </a>
 
 <div class="song-detail-container">
-    <p>
-        <strong>Duración:</strong> 
-        {{ song.duration|strftime:'' }}
-    </p> 
+    
 
     <div class="album-info-section">
         {% if song.album.pk %}
         <a href="{% url 'album-detail' song.album.pk %}">
-            {%endif%}
             <h4>{{ song.album.name }}</h4>
             <div class="album-art" style="justify-content: left !important;">
                 {% if song.album.picture %}
@@ -30,31 +26,17 @@
                 <div class="placeholder-image">💿</div>
                 {% endif %}
             </div>
-        {% if song.album.pk %}
         </a>
-        {%endif%}
-
+        
         <!-- lista de artistas -->
-         <span class="">
-            <!-- ARTIST OR VARIOUS ARTISTS -->
-            {% if song.album.artists.all.count > 1 %}
-                <a>Varios Artistas</a>
-            {% else %}
-                {% if song.album.artists.all.count == 1 %}
-                    {% for artist in song.album.artists.all %}
-                        <a href="{% url 'artist-detail' artist.pk %}">
-                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
-                        </a>
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-        </span>
+        
         <p class="labels">
             <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
             {% for artist in song.album.artists.all %}
             <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>
             {% endfor %}
         </p>
+        {%endif%}
         
         <!-- Datos de cancion -->
         {% if song.tags.all.count > 0 %}
@@ -66,7 +48,12 @@
                 <a href="{% url 'genre-detail' song.genre.pk %}">{{ song.genre }}</a>
             </p>
         {% endif %}
-
+        
+        <p>
+            <strong>Duración:</strong> 
+            {{ song.duration|strftime:'' }}
+        </p> 
+        
         <!-- El reproductor de audio -->
         <p class="breathe">
             {% if song.filename %}
