@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.core.files import File
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -58,10 +59,19 @@ FORBIDEN_CHARACTERS = [
     '~',
 ]
 
+def sanitize(text):
+    text = text.replace('/','')
+    text = text.replace('&','and')
+    text = text.replace('"','')
+    return text
+
 def sanitize_filename(text):
     for target in FORBIDEN_CHARACTERS:
         text = text.replace(target, '')
-    return text                        
+    return text    
+
+def sanitize_name(name):
+    return name.strip().lower().title()
 
 def get_sanitized_year(year : str):
     year = year.split('-')[0]
@@ -259,7 +269,7 @@ def dump_picture(filename, data):
 
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
-
+    
     def add_arguments(self, parser):
         parser.add_argument("scan_path", nargs="+", type=str)
         parser.add_argument("--force", '-f', default=False,nargs="*", type=bool)
@@ -285,7 +295,7 @@ class Command(BaseCommand):
         artist_name = artist_name.split('feat.')[0]
         artist_name = artist_name.split('ft.')[0]
         artist_name = artist_name.lstrip(' ').rstrip(' ')
-        
+
         if len(artist_name)==0: return None
         try:
             artist = Artist.objects.filter( name__iexact=artist_name ).get()
@@ -300,14 +310,19 @@ class Command(BaseCommand):
                 artist.aliases  = ''
                 artist.bio      = ''
                 artist.picture = None
-                # artist.genres  = None
                 artist.save()
+                if os.path.isdir(os.path.join(self.folder, '.artists')):
+                    image_file = os.path.join(self.folder, '.artists', f'{sanitize(artist_name)}.jpg')
+                    if os.path.isfile( image_file ):
+                            with open(image_file, 'rb') as f:
+                                artist.picture.save(os.path.basename(image_file), File(f), save=True)
+                                artist.save()
                 self.echo(f'Created artist "{ artist_name }"')
                 return artist
 
     def get_or_create_genre(self, genre_name, info):
         if genre_name is None: return None
-        genre_name=genre_name.strip().lower().title()
+        genre_name=sanitize_name(genre_name)
         if len(genre_name)==0: return None
         try:
             genre = Genre.objects.filter( name__iexact=genre_name ).get()
@@ -320,8 +335,9 @@ class Command(BaseCommand):
             return genre
 
     def get_or_create_tags(self, tags_text, song=None):
+        if tags_text is None: return []
+        tags_text=sanitize_name(tags_text)
         tags = []
-        if tags_text is None: return tags
         tag_list = tags_text.split(', ')
         res = []
         [res.append(val) for val in tag_list if val not in res]
@@ -510,12 +526,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         FORCE_ANALYSIS = False
-        MUSIC_FOLDER = options["scan_path"][0] or "/mnt/c/Users/smiker/Music/"   # <-- cámbialo
+        MUSIC_FOLDER = options["scan_path"][0]
+        self.folder = MUSIC_FOLDER
         if options['force'] is not False:
             print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
             force = True
                         
-        self.echo("Scanning media...")
+        self.echo(f"[{datetime.now().strftime('%H:%I:%S')}] Scanning media..." + '\n' + ('-'*80))
         self.echo(f"Folder: {MUSIC_FOLDER}")
         results = self.scan(MUSIC_FOLDER, FORCE_ANALYSIS)
 
