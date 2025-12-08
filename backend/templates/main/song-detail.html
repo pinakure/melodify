@@ -3,9 +3,12 @@
 {% load utils %}
 
 {% block header %}
+
+
+
 {% endblock %}
 
-{% block content-title %}{{ song.title }} <span class="small blend-50" >Canción</span>{% endblock %}
+{% block content-title %}<a style="color: var(--text-color) !important;" target="_blank" rel="noopener noreferrer"  href="/admin/main/song/{{ song.pk }}/change" title="Edit song details">{{ song.title }}</a> <span class="small blend-50" >Canción</span>{% endblock %}
 
 {% block content %}
 <a href="{% url 'artist-detail' song.artist.pk %}">
@@ -14,7 +17,6 @@
 
 <div class="song-detail-container">
     
-
     <div class="album-info-section">
         {% if song.album.pk %}
         <a href="{% url 'album-detail' song.album.pk %}">
@@ -70,6 +72,10 @@
     </div>
 
 </div>
+
+<script>
+
+</script>
 
 {% endblock %}
 {% block back %}
