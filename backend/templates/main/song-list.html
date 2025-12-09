@@ -129,7 +129,13 @@
             data-artistname="{{ song.artist.name }}" 
             data-songname="{{ song.title }}" 
             data-src="/static/{{ song.filename }}" 
+            id="song-{{ song.pk }}"
             data-id="{{ song.pk }}"
+            {% if not forloop.last %}
+                data-next-id="{{ songs|get_next_song_id:forloop.counter0 }}"
+            {% else %}
+                data-next-id="{{ songs.0.id }}"
+            {% endif %}
             onclick="playSong(this)">
             <div class="playBtn"></div>
         </button>
@@ -147,7 +153,6 @@
                         <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
                     </a>
                 </div>
-                
             </div>
     {% empty %}
         <p id="no-songs-message">No se encontraron canciones.</p>

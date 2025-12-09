@@ -9,3 +9,8 @@ def strftime(value, arg):
         timestamp = timestamp.lstrip(':') # remove : if no hours present
     timestamp = timestamp.lstrip('0') #remove heading minute zeros, if any
     return timestamp
+
+@register.filter(name="get_next_song_id")
+def get_next_song_id(songs, position):
+    return songs[position+1].id
+
