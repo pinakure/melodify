@@ -1,4 +1,4 @@
-<!-- templates/app/album_tiles.html -->
+<!-- templates/app/playlist_tiles.html -->
 
 {% extends 'base.html' %} 
 
@@ -26,7 +26,7 @@
         display: block;
     }
 
-    .album-image {
+    .playlist-image {
         background: var(--bg-sidebar);
         background-size: cover;
     }
@@ -44,7 +44,7 @@
         font-size: 0.9em;
     }
 
-    h3.album-name {
+    h3.playlist-name {
         margin: 0 0 5px 0;
         font-size: 16px !important;   
         padding-bottom: 8px;
@@ -52,13 +52,24 @@
         overflow: hidden;
     }
 
-</style>
+    .new-list{
+        margin-top: 16px;
+        width: 90%;
+    }
+    #new-list-name {
+        width: 75%;
+    }
+    #new-list-send {
+        color: var(--bg-main);
+        
+    }
 
+</style>
    
  <script>
         let nextPage = 1;
         let isLoading = false;
-        let albumCount = 0;
+        let playlistCount = 0;
         let currentSearchTerm = '-';
 
         function truncate(artist, n){
@@ -67,12 +78,12 @@
                     artist;
         };
         
-        function loadAlbums() {
+        function loadPlaylists() {
             if (isLoading) return;
             isLoading = true;
             loadingIndicator.style.display = 'block';
 
-            const url = new URL(`{% url 'album-tiles' %}`, window.location.origin);
+            const url = new URL(`{% url 'playlist-list' %}`, window.location.origin);
             url.searchParams.set('page', nextPage);
             if (currentSearchTerm) {
                 url.searchParams.set('search', currentSearchTerm);
@@ -85,21 +96,22 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.albums.length > 0) {
-                    data.albums.forEach(album => {
+                if (data.playlists.length > 0) {
+                    data.playlists.forEach(playlist => {
                         const div = document.createElement('div');
-                        div.className = "tile-item album-item";
-                        div.setAttribute('data-album-artist', album.safeartist); 
-                        div.setAttribute('data-album-name', album.safename);
+                        div.className = "tile-item playlist-item";
+                        div.setAttribute('data-playlist-artist', playlist.safeartist); 
+                        div.setAttribute('data-playlist-name', playlist.safename);
                         
                         div.innerHTML = `
-                            <a href="${album.url_detalle}"> 
-                                <div class="album-art">
-                                    <div class="album-image" style="background-image: url('${album.url_picture ? album.url_picture : ''}')" alt="Album cover"></div>
+                            <a href="${playlist.url_detalle}"> 
+                                <div class="playlist-art">
+                                    <div class="playlist-image" style="background-image: url('${playlist.url_picture ? playlist.url_picture : ''}')" alt="Album cover"></div>
                                 </div>
                                 <div class="tile-info">
-                                    <h3 class="album-name">${album.nombre}</h3>
-                                    <h6>${truncate(album.artist, 3)}</h6>
+                                    <h3 class="playlist-name">${playlist.nombre}</h3>
+                                    <h6>${truncate(playlist.artists, 3)}</h6>
+                                    <h6>${truncate(playlist.genres, 3)}</h6>
                                 </div>
                             </a>
                         `;
@@ -109,8 +121,8 @@
                     isLoading = false;
                     // Actualizamos el contador total si la respuesta lo incluye
                     if (data.total_count !== undefined) {
-                         albumCount = data.total_count;
-                         countDisplay.textContent = albumCount;
+                         playlistCount = data.total_count;
+                         countDisplay.textContent = playlistCount;
                     }
                 } else {
                     scrollbox.removeEventListener('scroll', handleScroll);
@@ -118,7 +130,7 @@
                 loadingIndicator.style.display = 'none';
             })
             .catch(error => {
-                console.error('Error fetching albums:', error);
+                console.error('Error fetching playlists:', error);
                 isLoading = false;
                 loadingIndicator.style.display = 'none';
             });
@@ -127,7 +139,7 @@
         function handleScroll() {
             const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
             if (scrollTop + clientHeight >= scrollHeight - 200) {
-                loadAlbums();
+                loadPlaylists();
             }
         }
 
@@ -138,43 +150,48 @@
                 // Reiniciar el estado para una nueva búsqueda
                 currentSearchTerm = newSearchTerm;
                 nextPage = 1;
-                albumCount = 0;
+                playlistCount = 0;
                 container.innerHTML = ''; // Limpiar álbumes anteriores
                 scrollbox.addEventListener('scroll', handleScroll); // Asegurarse de que el scroll listener esté activo
-                loadAlbums(); // Cargar la primera página de los resultados de la búsqueda
+                loadPlaylists(); // Cargar la primera página de los resultados de la búsqueda
             }
         }
-    </script>
+</script>
 {% endblock %}
 
 {% block search %}
     <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 {% endblock %}
 
-{% block content-title %}Álbumes (<span id="album-count">{{ albums.count }}</span>){% endblock %}
+{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>){% endblock %}
 
 
 {% block content %}
 
-<div id="loading" style="display: none;">Cargando albumes...</div>
+<div id="loading" style="display: none;">Cargando playlists...</div>
+
+<div class="new-list" id="new-list">
+    <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
+    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista">+</button>
+    <button type="button" id="new-list-cancel" class="input" title="Cancelar">X</button>
+</div>
+    
 
 <div class="tile-container" id="tileContainer">
     
 </div>
 
 <script>
-    const container = document.getElementById('tileContainer');
-    const scrollbox = document.getElementsByClassName('main-content')[0];
-    const loadingIndicator = document.getElementById('loading');
-    const countDisplay = document.getElementById('album-count');
-    const searchInput = document.getElementById('searchInput'); 
+    const container         = document.getElementById('tileContainer');
+    const scrollbox         = document.getElementsByClassName('main-content')[0];
+    const loadingIndicator  = document.getElementById('loading');
+    const countDisplay      = document.getElementById('playlist-count');
+    const searchInput       = document.getElementById('searchInput'); 
 
-    // Carga inicial y listeners
     window.addEventListener('DOMContentLoaded', (event) => {
         scrollbox.addEventListener('scroll', handleScroll);
         
         searchInput.addEventListener('input', () => {
-            // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(triggerSearch, 300);
         });

@@ -109,6 +109,14 @@ class Playlist(models.Model):
     picture = models.ImageField(upload_to="playlists/", blank=True, null=True)
     genres = models.ManyToManyField(Genre, blank=True)
 
+    def get_artists(self):
+        artists = [ x.name for x in self.artists.all()]
+        return ", ".join(artists)
+
+    def get_genres(self):
+        genres = [ x.name for x in self.genres.all()]
+        return ", ".join(genres)
+
     def __str__(self):
         return self.title
 

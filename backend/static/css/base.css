@@ -11,6 +11,7 @@
     --secondary-color: #b4b0ae;
     --link-color: #fcd08c;
     --section-color: #1d8eff;
+    --confirm-color: #73bf00;
     --accent-color: #ff7300;
     --shadow-color: #442200;
     --tile-placeholder: #777;
@@ -59,6 +60,10 @@ p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'l
 .medium         { font-size: 13px; }
 .big            { font-size: 16px; }
 .display        { font-size: 32px; }
+
+/* Colors */
+.confirm         { background-color: var(--confirm-color) !important; }
+.accent          { background-color: var(--accent-color) !important; }
 
 /* Generics */
 .shadowed  { text-shadow: 0px 0px 7px #000;}
@@ -291,17 +296,35 @@ a:hover {
 }
 
 /* Cuadro de búsqueda (cuando hay)*/
+.input,
+input {
+    height: calc( var(--nav-height) / 1.5 );
+    color: var(--text-color);
+    border-radius: calc( var(--nav-height) / 1.5 );
+    font-weight: bold;
+    border: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    background-color: var(--bg-main);
+    min-width: calc( var(--nav-height) / 1.5 );
+}
+button.input{
+    background-color: var(--bg-sidebar-selection);
+    color: var(--secondary-color)
+}
+
+button.input:hover {
+    filter: brightness(1.2);
+}
+button.input:active {
+    filter: brightness(0.9);
+    background-color: var(--accent-color) !important;
+}
+
 .searchInput {
     width: 25%;
     left: 37.5%;
     top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);
     position: absolute;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: bold;
     background-color: var(--bg-sidebar);
-    border: none;
-    border-radius: calc( var(--nav-height) / 1.5 );
-    color: var(--text-color);
-    height: calc( var(--nav-height) / 1.5 );
 }

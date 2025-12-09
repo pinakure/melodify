@@ -61,7 +61,7 @@
                     <div class="sidebar-items-wrapper">
                         <div class="sidebar-search"></div>
                         <ul id="sidebar-items">
-                            {% for item in playlists %}
+                            {% for item in sidebar %}
                             {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture %}
                             {% endfor %}
                         </ul>
