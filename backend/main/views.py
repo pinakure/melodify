@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
-from django.db.models       import Q
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 def get_context( context ):
@@ -143,7 +145,8 @@ class ArtistListView(ListView):
     model = Artist
     template_name = 'main/artist-list.html'  
     context_object_name = 'artists'         
-    queryset = Artist.objects.order_by('name') 
+    queryset = Artist.objects.order_by('picture') 
+    # queryset = Artist.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
@@ -250,7 +253,7 @@ class PlaylistListView(ListView):
                     'artists'       : item.get_artists(),
                     'safeartist'    : item.get_artists().lower(),
                     'genres'        : item.get_genres(),
-                    'safename'      : item.name.lower(),
+                    'safename'      : item.title.lower(),
                     'url_picture'   : f'{item.picture}',
                     'url_detalle'   : f'/playlist/{item.id}/',
                 })
@@ -276,3 +279,35 @@ class SongDetailView(DetailView):
         context = get_context(super().get_context_data(**kwargs))
         obj = self.object
         return context
+    
+
+@login_required # Recomendación: Usa @login_required si tus usuarios deben estar logueados
+# @csrf_exempt solo si no puedes usar el token CSRF en JS, pero es mejor usar el token. Si usas el token JS getCookie, NO necesitas @csrf_exempt aquí.
+def create_playlist_ajax(request):
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            playlist_name = data.get('name', '').strip()
+            
+            if not playlist_name:
+                return JsonResponse({'status': 'error', 'message': 'El nombre no puede estar vacío.'}, status=400)
+
+            # Crear la nueva playlist en la base de datos
+            # Asegúrate de que tu modelo Playlist pueda ser creado solo con el nombre
+            # y, si tienes un campo de usuario (ForeignKey), asígnalo:
+            
+            new_playlist = Playlist.objects.create(
+                title=playlist_name,
+                usuario=request.user # 
+            )
+            
+            return JsonResponse({'status': 'success', 'message': 'Playlist creada', 'id': new_playlist.id})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)

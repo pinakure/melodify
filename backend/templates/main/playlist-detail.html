@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<style>
+    .playlist-detail { position: relative; }
+
+    .playlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    .playlist-item {
+        text-align: center;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .playlist-item img, .placeholder-image {
+        width: 100%;
+        height: 180px;
+        border-radius: 8px;
+        object-fit: cover;
+        display: block;
+        margin-bottom: 10px;
+    }
+    .placeholder-image {
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-content {
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-blend-mode: luminosity;
+        background-color: var(--bg-content);
+    }
+</style>
+{% endblock %}
+
+{% block content-title %}{{ playlist.title }} <span class="small blend-50" >Lista</span>{% endblock %}
+
+{% block background %}
+    style="background:linear-gradient('45deg, #123, #fec)"
+{% endblock %}
+
+{% block content %}
+<div class="playlist-detail">
+    <p class="bold medium">Lista de <a>{{ user.username }}</a></p>    
+    {% if albums_list.all.count %}
+    <div class="counter medium">
+        <h3>{{ albums_list.count }} Álbumes</h3> 
+    </div>
+    <div class="playlist-grid">
+        {% for album in albums_list %}
+            <div class="playlist-item">
+                <a href="{% url 'album-detail' album.pk %}">
+                    {% if album.picture %}
+                        <img src="{{ album.picture }}" alt="{{ album.name }} cover">
+                    {% else %}
+                        <div class="placeholder-image">💿</div>
+                    {% endif %}
+                    <h4>{{ album.name }}</h4>
+                    <p>{{ album.release|date:"Y" }}</p>
+                </a>
+            </div>
+            {% empty %}
+            <p>Esta lista no tiene álbumes registrados.</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% include 'main/song-list.html' %}
+
+</div>
+{% endblock %}

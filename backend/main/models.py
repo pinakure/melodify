@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 
 # ============
 #   ARTIST
@@ -108,6 +108,7 @@ class Playlist(models.Model):
     artists = models.ManyToManyField(Artist, blank=True)
     picture = models.ImageField(upload_to="playlists/", blank=True, null=True)
     genres = models.ManyToManyField(Genre, blank=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def get_artists(self):
         artists = [ x.name for x in self.artists.all()]

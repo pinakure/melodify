@@ -26,9 +26,15 @@
         display: block;
     }
 
-    .playlist-image {
+    .album-image {
         background: var(--bg-sidebar);
         background-size: cover;
+        background-color: var(--bg-main); 
+        background: linear-gradient(-45deg, #fcce, #8868, #3340), 
+                    linear-gradient(-135deg, #cfce, #8668, #4430), 
+                    linear-gradient(-225deg, #ccfe, #6868, #3340), 
+                    linear-gradient(-315deg, #ffce, #6688, #3430) 
+                    !important;
     }
 
     .tile-info {
@@ -49,7 +55,15 @@
         font-size: 16px !important;   
         padding-bottom: 8px;
         height: 18px;
+        text-align: left;
+        padding-left: 14px;
         overflow: hidden;
+    }
+
+    .playlist-genres,
+    .playlist-artists {
+        color: var(--bg-sidebar);
+        text-align: left;
     }
 
     .new-list{
@@ -62,6 +76,24 @@
     #new-list-send {
         color: var(--bg-main);
         
+    }
+
+    /* Estilo para ocultar el formulario por defecto */
+    #new-list {
+        display: none; 
+    }
+    
+    .new-list-toggle {
+        /* Estilo para el botón flotante o fijo que abre el form */
+        /* Puedes ajustarlo a tu diseño (p. ej., un botón + en la esquina superior derecha) */
+        cursor: pointer;
+        padding: 5px 10px;
+        background-color: var(--bg-sidebar);
+        color: var(--bg-main) !important;
+        border-radius: 5px;
+        position: absolute;
+        right: 16px;
+        top: 16px;
     }
 
 </style>
@@ -105,13 +137,13 @@
                         
                         div.innerHTML = `
                             <a href="${playlist.url_detalle}"> 
-                                <div class="playlist-art">
-                                    <div class="playlist-image" style="background-image: url('${playlist.url_picture ? playlist.url_picture : ''}')" alt="Album cover"></div>
+                                <div class="album-art">
+                                    <div class="album-image" style="background-image: url('${playlist.url_picture ? playlist.url_picture : ''}')" alt="Playlist cover"></div>
                                 </div>
                                 <div class="tile-info">
                                     <h3 class="playlist-name">${playlist.nombre}</h3>
-                                    <h6>${truncate(playlist.artists, 3)}</h6>
-                                    <h6>${truncate(playlist.genres, 3)}</h6>
+                                    <h6 class="playlist-artists">${truncate(playlist.artists, 3)}</h6>
+                                    <h6 class="playlist-genres">${truncate(playlist.genres, 3)}</h6>
                                 </div>
                             </a>
                         `;
@@ -156,6 +188,76 @@
                 loadPlaylists(); // Cargar la primera página de los resultados de la búsqueda
             }
         }
+
+        function toggleNewListForm() {
+            const form = document.getElementById('new-list');
+            // Muestra u oculta el formulario
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'flex'; // o 'block', dependiendo de tus estilos 'new-list'
+                document.getElementById('new-list-name').focus();
+            } else {
+                form.style.display = 'none';
+                document.getElementById('new-list-name').value = ''; // Limpia el input al ocultar
+            }
+        }
+        function createPlaylist() {
+            const playlistNameInput = document.getElementById('new-list-name');
+            const playlistName = playlistNameInput.value.trim();
+
+            if (!playlistName) {
+                alert("Por favor, introduce un nombre para la lista.");
+                return;
+            }
+
+            // Enviar datos al endpoint de Django usando AJAX POST
+            fetch('{% url "create-playlist" %}', { // Usaremos este nombre de URL en urls.py
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Importante: Necesitas el CSRF token para peticiones POST en Django
+                    'X-CSRFToken': getCookie('csrftoken'), 
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ name: playlistName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`Lista "${playlistName}" creada con éxito.`);
+                    toggleNewListForm(); // Oculta el formulario después del éxito
+                    
+                    // Opcional: Reiniciar la vista para mostrar la nueva lista inmediatamente
+                    // Esto recargará todos los tiles desde el backend
+                    currentSearchTerm = '-'; // Reseteamos el término de búsqueda si es necesario
+                    nextPage = 1;
+                    container.innerHTML = '';
+                    loadPlaylists(); 
+
+                } else {
+                    alert('Error al crear la playlist: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('Ocurrió un error de red o del servidor.');
+            });
+        }
+        
+        // Función auxiliar para obtener el CSRF token de las cookies (necesario para POST)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
 </script>
 {% endblock %}
 
@@ -163,7 +265,7 @@
     <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 {% endblock %}
 
-{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>){% endblock %}
+{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">+</button>{% endblock %}
 
 
 {% block content %}
@@ -172,8 +274,8 @@
 
 <div class="new-list" id="new-list">
     <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
-    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista">+</button>
-    <button type="button" id="new-list-cancel" class="input" title="Cancelar">X</button>
+    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="createPlaylist()">+</button>
+    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">X</button>
 </div>
     
 

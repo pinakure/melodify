@@ -112,11 +112,12 @@
 {% block content %}
 <div class="tag-detail">
 
+    
+    
+    {% if albums_list.all.count %}
     <div class="counter medium">
         <h3>{{ albums_list.count }} Álbumes</h3> 
     </div>
-    
-    {% if albums_list.all.count %}
     <div class="album-grid">
         {% for album in albums_list %}
             <div class="album-item">

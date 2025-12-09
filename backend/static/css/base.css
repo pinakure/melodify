@@ -221,6 +221,7 @@ body, html {
 .album-image{
     width: 200px;
     height: 200px;
+    background-color: var(--bg-main);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
