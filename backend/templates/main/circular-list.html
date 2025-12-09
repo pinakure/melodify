@@ -81,13 +81,21 @@
             <div class="{{ type }}-card {{ type }}-item" data-{{ type }}-name="{{ item.name|lower }}">
                 <a href="{% url url_detail pk=item.pk %}">
                     <div class="circular-{{type}}-item" {% if item.picture.name %}style="background-image: url('{{ item.picture.url }}')"{% endif %}></div>
-                    <h3>{{ item.name }}</h3>
-                    <h6>{{ item.name }}</h6>
+                    <h3>{{ item.name |truncatewords:5 }}</h3>
                 </a>
+                {% if not item.picture.name %}
+                    <a target="_blank" href="https://www.discogs.com/es/search?q={{ item.name }}&type=all">
+                        <h6>Search {{ item.name }} on Discogs</h6>
+                    </a>
+                {% endif %}
             </div>
         {% empty %}
             <p id="no-{{ type }}-s-message">No se encontraron {{ title }}.</p>
         {% endfor %}
     </div>
 </div>
+<script>
+    document.getElementsByClassName('main-content')[0].focus();
+</script>
+
 {% endblock %}
