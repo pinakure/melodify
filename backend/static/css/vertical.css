@@ -1,0 +1,21 @@
+@media (orientation: portrait){
+    /* Vertical Layout */
+
+    /* Reduce Song List Button Gap */
+
+    /* Hide Sidebar Completely and Move Main Content To Fit Screen */
+    .sidebar {   
+        display: none !important;
+    }
+    .main {
+        flex-basis: 100%;
+        zoom: 0.8;
+    }
+
+    /* Extender Ventana de Playlists */
+    .playlists {
+        width : 100% !important;
+        max-width : 100% !important;
+        left: 0px;
+    }
+}

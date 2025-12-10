@@ -11,6 +11,9 @@
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
     <link rel="stylesheet" href="/static/css/player-styles.css">
+    <link rel="stylesheet" href="/static/css/song-list.css">
+    <!-- Esta linea de estilos debe ser la última para que los estilos responsivos tengan efecto  -->
+    <link rel="stylesheet" href="/static/css/vertical.css">
     <title>Melodify {% block title %}{% endblock %}</title>
     {% fontawesome_5_static %}
     <script src="/static/js/howler.min.js"></script>
@@ -64,7 +67,7 @@
                         <div class="sidebar-search"></div>
                         <ul id="sidebar-items">
                             {% for item in sidebar %}
-                            {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture %}
+                                {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture %}
                             {% endfor %}
                         </ul>
                     </div>

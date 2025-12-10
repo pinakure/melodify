@@ -18,14 +18,6 @@
 /*                              sidebar-entry-secondary       */                              
 /*                                                            */      
 /* ********************************************************** */
-@media (max-width: 512px){
-    .sidebar {
-        display: none;
-    }
-}
-
-
-
 .sidebar {
     border: 0px solid #0000;
     flex-basis: var(--sidebar-width);
