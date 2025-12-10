@@ -11,7 +11,7 @@ function MelodifyPlayer() {
 MelodifyPlayer.prototype.enqueue = function(song){
     this.playlist.push(song);
     this.index = this.playlist.length-1;
-    console.table(this.playlist);
+    // console.table(this.playlist);
 }
 
 MelodifyPlayer.prototype.play = function(song){

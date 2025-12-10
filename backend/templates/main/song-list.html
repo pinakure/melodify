@@ -130,6 +130,54 @@
         font-size: 14px;
         margin-right: 16px;
     }
+    #playlists-window {
+        display: none;
+    }
+    .playlists {
+        position: absolute;
+        display: inline-block;
+        right: 64px;
+        top: 64px;
+        width: calc( 33% - 128px );
+        height: calc( 100% - 128px );
+        max-width: calc( 100% - 128px );
+        max-height: calc( 100% - 128px );
+        background-color: var(--bg-main);
+        border-radius: 7px;
+        padding: 12px;
+        padding-top: 16px;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 32px;
+        opacity: .95;
+        box-sizing: border-box;
+        box-shadow: 0px 4px 0px #0008;
+    }
+    .playlists li div {
+        background-color: var(--bg-sidebar);
+        margin-right: 8px;
+    }
+    .playlists li{
+        background-color: var(--bg-main);
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+    }
+    .playlists li:hover{
+        filter: brightness(1.2);
+    }
+    .wrapper {
+        padding: 0px;
+        margin: 0px;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 100%;
+        height: calc( 100% - 64px);
+        box-sizing: border-box;
+        overflow: auto;
+    }
 </style>
 
 
@@ -177,21 +225,62 @@
             <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
             <div style="display: flex" >
                 <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual" onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button>
-                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista" onclick="showPlaylists( this, 'song-{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista" onclick="showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
             </div>
         </div>
 
     </div>
+    
+    
     {% empty %}
-        <p id="no-songs-message">No se encontraron canciones.</p>
+    <p id="no-songs-message">No se encontraron canciones.</p>
     {% endfor %}
 </div>
 
-<script>
-    function showPlaylists( parent, song_id ){
-
-    }
-    function enqueueSong( artist, title, filename, node_id, song_id ){
-        alert(`Enqueue ${title}...`);
-    }
-</script>
+<div id="playlists-window" class="playlists">
+    <button type="button" style="float: right" id="close-playlists" class="input" title="Cancelar" onclick="hidePlaylists()">{% fa5_icon 'times'%}</button>
+    <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
+    <div class="wrapper">
+        {% for playlist in playlists %}
+            <li onclick="playlistmgr.addSongToPlaylist('{{ playlist.id }}')">
+                <div class="sidebar-entry-picture"></div>
+                <p>
+                    <!-- Playlist {{ forloop.counter }} -->
+                    {{ playlist.title }}
+                </p>
+                <p>
+                    <!-- Playlist {{ forloop.counter }} -->
+                </p>
+            </li>
+        {% endfor %}
+    </div>
+    <script>
+       
+       function hidePlaylists( ){
+            const div = document.getElementById('playlists-window');
+            div.style.display = 'none';
+        }
+       
+        function showPlaylists( parent, song_id ){
+            const div = document.getElementById('playlists-window');
+            div.style.display = 'inline-block';
+        
+            /* Do stuff */
+            document.getElementById('playlists-window').setAttribute('data-song', song_id);
+        }
+       
+        function enqueueSong( artist, title, filename, node_id, song_id ){
+            alert(`Enqueue ${title}...`);
+            var song = {
+                title   : `${artist}`,
+                file    : filename,
+                howl    : null,
+                next    : melodify_player.playlist[ melodify_player.index ].next ?? null,
+            };
+            melodify_player.enqueue(song); 
+            melodify_player.playlist[ melodify_player.playlist.count-2 ].next = melodify_player.playlist[ melodify_player.playlist.count-2 ].next; 
+            
+            melodify_player.playlist[ melodify_player.index ].next = song; ç
+        }
+    </script>
+</div>

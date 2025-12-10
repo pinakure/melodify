@@ -9,6 +9,7 @@ from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 def get_context( context ):
     # Enter global severside data here
+    context['playlists'] = Playlist.objects.all()
     context['sidebar'] = [
         { 
             'picture'   : '/static/images/like.png',
@@ -227,8 +228,10 @@ class PlaylistListView(ListView):
 
         if search_query:
             queryset = queryset.filter(
-                Q(name__icontains=search_query) | 
-                Q(artists__name__icontains=search_query)
+                Q(title__icontains=search_query) #| 
+                #Q(artists__name__icontains=search_query)|
+                #Q(songs__name__icontains=search_query)
+                # Q(genres__name__icontains=search_query)
             ).distinct() # Usamos distinct si la búsqueda en M2M duplica resultados
 
         return queryset
@@ -243,7 +246,7 @@ class PlaylistListView(ListView):
             try:
                 items = paginator.page(page)
             except (PageNotAnInteger, EmptyPage):
-                return JsonResponse({'albums': []})
+                return JsonResponse({'playlists': []})
 
             data = []
             for item in items:
@@ -267,7 +270,10 @@ class PlaylistDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
-        # playlist = self.object
+        playlist = self.object
+        context['songs'] = playlist.songs.all()
+        # context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
+        
         return context
     
 class SongDetailView(DetailView):
@@ -281,8 +287,7 @@ class SongDetailView(DetailView):
         return context
     
 
-@login_required # Recomendación: Usa @login_required si tus usuarios deben estar logueados
-# @csrf_exempt solo si no puedes usar el token CSRF en JS, pero es mejor usar el token. Si usas el token JS getCookie, NO necesitas @csrf_exempt aquí.
+@login_required 
 def create_playlist_ajax(request):
     if request.method == 'POST':
         try:
@@ -293,16 +298,38 @@ def create_playlist_ajax(request):
             if not playlist_name:
                 return JsonResponse({'status': 'error', 'message': 'El nombre no puede estar vacío.'}, status=400)
 
-            # Crear la nueva playlist en la base de datos
-            # Asegúrate de que tu modelo Playlist pueda ser creado solo con el nombre
-            # y, si tienes un campo de usuario (ForeignKey), asígnalo:
-            
             new_playlist = Playlist.objects.create(
                 title=playlist_name,
                 usuario=request.user # 
             )
             
             return JsonResponse({'status': 'success', 'message': 'Playlist creada', 'id': new_playlist.id})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+
+@login_required
+def populate_playlist_ajax(request):
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            playlist_id = int(data.get('playlist', '').strip())
+            song_id     = int(data.get('song', '').strip())
+            
+            if not playlist_id or not song_id:
+                return JsonResponse({'status': 'error', 'message': 'Debeb especificarse lista y pista.'}, status=400)
+
+            playlist = Playlist.objects.filter(id=playlist_id).get()
+            playlist.songs.add(Song.objects.filter(id=song_id).get())
+            playlist.save()
+            return JsonResponse({'status': 'success', 'message': 'Pista añadida a lista.', 'id': playlist_id})
 
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)

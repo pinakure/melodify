@@ -223,12 +223,12 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert(`Lista "${playlistName}" creada con éxito.`);
+                    //alert(`Lista "${playlistName}" creada con éxito.`);
                     toggleNewListForm(); // Oculta el formulario después del éxito
                     
                     // Opcional: Reiniciar la vista para mostrar la nueva lista inmediatamente
                     // Esto recargará todos los tiles desde el backend
-                    currentSearchTerm = '-'; // Reseteamos el término de búsqueda si es necesario
+                    currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
                     nextPage = 1;
                     container.innerHTML = '';
                     loadPlaylists(); 

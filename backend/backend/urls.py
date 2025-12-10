@@ -18,6 +18,7 @@ urlpatterns = [
     path('artist/<int:pk>/'     , ArtistDetailView.as_view()    , name='artist-detail'),
     path('playlists/'           , PlaylistListView.as_view()    , name='playlist-list'),
     path('playlists/new/'       , views.create_playlist_ajax    , name='create-playlist'),
+    path('playlists/populate/'  , views.populate_playlist_ajax  , name='populate-playlist'),
     path('playlist/<int:pk>/'   , PlaylistDetailView.as_view()  , name='playlist-detail'),
     path('tags/'                , TagListView.as_view()         , name='tag-list'),
     path('tag/<int:pk>/'        , TagDetailView.as_view()       , name='tag-detail'),
