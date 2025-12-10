@@ -57,6 +57,7 @@ FORBIDEN_CHARACTERS = [
     '!',
     '*',
     '~',
+    ':',
 ]
 
 def sanitize(text):

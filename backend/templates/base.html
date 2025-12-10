@@ -1,4 +1,5 @@
 {% load static %}
+{% load fontawesome_5 %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,7 +12,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
     <link rel="stylesheet" href="/static/css/player-styles.css">
     <title>Melodify {% block title %}{% endblock %}</title>
-
+    {% fontawesome_5_static %}
     <script src="/static/js/howler.min.js"></script>
     <script src="/static/js/siriwave.js"></script>
     {% block header %}{% endblock %}

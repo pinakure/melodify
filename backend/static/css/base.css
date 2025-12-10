@@ -40,6 +40,7 @@ html {
 ::-webkit-scrollbar {
     width: 8px;  /* width: 0px;  */
     background: transparent;  /* Optional: just make scrollbar invisible */
+    position: absolute;
 }
 ::-webkit-scrollbar-thumb { background: var(--bg-sidebar); border-radius: 4px;}
 *:focus{

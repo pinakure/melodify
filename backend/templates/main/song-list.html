@@ -1,4 +1,5 @@
 {% load static %}
+{% load fontawesome_5 %}
 {% load utils %}
 <style>
     /* Songs list */
@@ -114,6 +115,21 @@
         filter: opacity(0);
     }
     
+    .tile-buttons {
+        float: right;
+        align-items: center;
+        vertical-align: middle;
+        height: 100%;
+        display: inline-flex;
+    }
+    .tile-buttons button {
+        margin-right: 6px;
+        color: var(--bg-main);
+    }
+    .tile-buttons p {
+        font-size: 14px;
+        margin-right: 16px;
+    }
 </style>
 
 
@@ -123,7 +139,9 @@
     </div>    
     {% for song in songs %}
     <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
+        
         <div class="song-tracknumber">{{ forloop.counter }}</div>
+        
         <button 
             class="play-button" 
             data-artistname="{{ song.artist.name }}" 
@@ -139,22 +157,41 @@
             onclick="playSong(this)">
             <div class="playBtn"></div>
         </button>
+        
         <div class="song-art">
             {% if song.picture %}
             <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
             {% else %}
             <div class="placeholder-song-image">💿</div>
             {% endif %}
-                </div>
-                <div class="tile-info">
-                    <a href="{% url 'song-detail' pk=song.pk %}">
-                        <h4 class="song-name">{{ song.title }}</h4>
-                        <p class="small">{{ song.artist }}</p>
-                        <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
-                    </a>
-                </div>
+        </div>
+        
+        <div class="tile-info">
+            <a href="{% url 'song-detail' pk=song.pk %}">
+                <h4 class="song-name">{{ song.title }}</h4>
+                <p class="small">{{ song.artist }}</p>
+            </a>
+        </div>
+        
+        <div class="tile-buttons" style="float: right">
+            <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
+            <div style="display: flex" >
+                <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual" onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista" onclick="showPlaylists( this, 'song-{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
             </div>
+        </div>
+
+    </div>
     {% empty %}
         <p id="no-songs-message">No se encontraron canciones.</p>
     {% endfor %}
 </div>
+
+<script>
+    function showPlaylists( parent, song_id ){
+
+    }
+    function enqueueSong( artist, title, filename, node_id, song_id ){
+        alert(`Enqueue ${title}...`);
+    }
+</script>
