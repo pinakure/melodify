@@ -1,11 +1,18 @@
 ~~~~~~~~~~~~~~~~~
-Script Duties
+Script 
 ~~~~~~~~~~~~~~~~~
 · Generate and Display Discrepance List
 · Inspect Tags, Create Song/Artist/Album Objects automatically
 · Journalkeep scan status, ability restore scanning from last scanned item
+
+~~~~~~~~~~~~~~~~~
+Fronted Duties
+~~~~~~~~~~~~~~~~~
+
 · Playlist downloader (ytdl) integration
 * Detectar cuando el usuario no está logeado y enviarlo a pantalla de login
+· Boton para Añadir todas las pistas de un album a una lista de reproduccion
+
 
 ·Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
 ~~~~~~~~~~~~~~~~~
