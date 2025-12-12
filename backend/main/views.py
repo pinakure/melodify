@@ -3,6 +3,8 @@ from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
+from django.shortcuts import redirect
 from django.db.models import Q
 import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
@@ -299,8 +301,8 @@ class SongDetailView(DetailView):
 
 # @login_required 
 def create_playlist_ajax(request):
-    if not request.user:
-        return JsonResponse({ 'status' : 'No logeado'})
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición

@@ -18,4 +18,39 @@
         max-width : 100% !important;
         left: 0px;
     }
+
+    /* Player time counters, smaller */
+    #timer,
+    #track,
+    #duration {
+        font-size: 12px;
+        line-height: 16px;
+    }
+    #track {
+        position: absolute;
+        bottom: 0px;
+        padding-left: 8px;
+        padding-right: 8px;
+        left: 0px;
+        width: 100%;
+        background-color: var(--bg-player-title);
+    }
+
+    /* Raise central buttons a little */
+    #playBtn, #pauseBtn {
+        top: 14px;
+    }
+    /* small bar */
+    #progress {
+        position: absolute;
+        top: 16px;
+        left: 25%;
+        height: 4px;
+    }
+    #nextBtn {
+        left: calc( 50% - 64px);
+    }
+    #prevBtn {
+        right: calc( 50% + 64px);
+    }
 }

@@ -45,8 +45,9 @@
         <div class="tile-buttons" style="float: right">
             <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
             <div style="display: flex" >
-                <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual" onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button>
-                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista" onclick="showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+                <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual"    onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+                <button type="button" id="delete-entry"     class="input accent"  title="Eliminar de la lista"      onclick="remSongFromPlaylist('{{ playlist.id }}', '{{ song.pk }}')">{% fa5_icon 'trash' color="#000"%}</button>
             </div>
         </div>
 

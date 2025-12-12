@@ -35,10 +35,9 @@ PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
     fetch('/playlists/populate/', { // Usaremos este nombre de URL en urls.py
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            // Importante: Necesitas el CSRF token para peticiones POST en Django
-            'X-CSRFToken': getCookie('csrftoken'), 
-            'X-Requested-With': 'XMLHttpRequest'
+            'Content-Type'      : 'application/json',
+            'X-CSRFToken'       : getCookie('csrftoken'), 
+            'X-Requested-With'  : 'XMLHttpRequest'
         },
         body: JSON.stringify({ song: song_id, playlist: playlist_id })
     })
@@ -47,6 +46,8 @@ PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
         if (data.status === 'success') {
             // loadPlaylists(); 
             hidePlaylists();
+        } else if (data.status === 'login') {
+            window.location = '/accounts/login/?next=/';
         } else {
             alert('Error al asociar la pista a la lista: ' + data.message);
         }
@@ -57,6 +58,81 @@ PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
     });
 
 }
+
+PlaylistManager.prototype.request = function(json_data, url, done_callback) { 
+    fetch(
+        url, 
+        { 
+            method: 'POST',
+            headers: {
+                'Content-Type'      : 'application/json',
+                'X-CSRFToken'       : getCookie('csrftoken'), 
+                'X-Requested-With'  : 'XMLHttpRequest'
+            }, body: JSON.stringify(json_data)
+        }
+    )
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            done_callback(data);
+        } else if (data.status === 'login') {
+            window.location = '/accounts/login/?next=/';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Ocurrió un error de red o del servidor.');
+    });
+}
+
+PlaylistManager.prototype.remSongToPlaylist = function(playlist_id, song_id){
+    // Enviar datos al endpoint de Django usando AJAX POST
+    fetch('/playlists/removefrom/', { 
+        method: 'POST',
+        headers: {
+            'Content-Type'      : 'application/json',
+            'X-CSRFToken'       : getCookie('csrftoken'), 
+            'X-Requested-With'  : 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ song: song_id, playlist: playlist_id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // loadPlaylists(); 
+            hidePlaylists();
+        } else if (data.status === 'login') {
+            window.location = '/accounts/login/?next=/';
+        } else {
+            alert('Error al asociar la pista a la lista: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Ocurrió un error de red o del servidor.');
+    });
+}
+
+PlaylistManager.prototype.createPlaylist = function() {
+    const playlistNameInput = document.getElementById('new-list-name');
+    const playlistName = playlistNameInput.value.trim();
+
+    if (!playlistName) {
+        alert("Por favor, introduce un nombre para la lista.");
+        return;
+    }
+
+    this.request('/playlist/new/', { name : playlistName }, ()=>{ 
+        toggleNewListForm(); 
+        currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
+        nextPage = 1;
+        container.innerHTML = '';
+        loadPlaylists(); 
+     });
+}
+        
 
 function getCookie(name) {
     let cookieValue = null;
