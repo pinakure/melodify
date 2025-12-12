@@ -4,81 +4,7 @@
 
 {% block header %}
 <style>
-    .tile-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 20px 0; 
-    }
-
-    .tile-item {
-        border: none;
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.2s;
-        text-align: center;
-    }
-
-    .tile-item img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        display: block;
-    }
-
-    .album-image {
-        background: var(--bg-sidebar);
-        background-size: cover;
-        background-color: var(--bg-main); 
-        background: linear-gradient(-45deg, #fcce, #8868, #3340), 
-                    linear-gradient(-135deg, #cfce, #8668, #4430), 
-                    linear-gradient(-225deg, #ccfe, #6868, #3340), 
-                    linear-gradient(-315deg, #ffce, #6688, #3430) 
-                    !important;
-    }
-
-    .tile-info {
-        padding-left: 15px;
-        padding-right: 15px;
-        padding-bottom: 10px;
-        background-color: var(--bg-content);
-    }
-
-    .tile-info p {
-        margin: 0;
-        color: var(--tile-info-text);
-        font-size: 0.9em;
-    }
-
-    h3.playlist-name {
-        margin: 0 0 5px 0;
-        font-size: 16px !important;   
-        padding-bottom: 8px;
-        height: 18px;
-        text-align: left;
-        padding-left: 14px;
-        overflow: hidden;
-    }
-
-    .playlist-genres,
-    .playlist-artists {
-        color: var(--bg-sidebar);
-        text-align: left;
-    }
-
-    .new-list-toggle {
-        /* Estilo para el botón flotante o fijo que abre el form */
-        /* Puedes ajustarlo a tu diseño (p. ej., un botón + en la esquina superior derecha) */
-        cursor: pointer;
-        padding: 5px 10px;
-        background-color: var(--bg-sidebar);
-        color: var(--bg-main) !important;
-        border-radius: 5px;
-        position: absolute;
-        right: 16px;
-        top: 16px;
-    }
-
+   
 </style>
    
  <script>
@@ -243,7 +169,7 @@
 
 <h3>Tus listas</h3>
 <div class="tile-container" id="tileContainer"></div>
-
+{% include 'main/song-list.html' %}
 <script>
     const container         = document.getElementById('tileContainer');
     const scrollbox         = document.getElementsByClassName('main-content')[0];

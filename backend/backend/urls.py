@@ -12,6 +12,7 @@ urlpatterns = [
     path('admin/'               , admin.site.urls),
     path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
     path(''                     , HomeView.as_view()            , name='home'),
+    path('steal/'               , StealView.as_view()           , name='steal'),
     path('albums/'              , AlbumTileView.as_view()       , name='album-tiles'),
     path('albums/<int:pk>/'     , AlbumDetailView.as_view()     , name='album-detail'),
     path('genres/'              , GenreListView.as_view()       , name='genre-list'),

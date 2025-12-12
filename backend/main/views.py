@@ -6,6 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.db.models import Q
+import spotdl
+from spotdl import Spotdl
+
+
 import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
 
@@ -200,11 +204,27 @@ class TagListView(ListView):
         context = get_context(super().get_context_data(**kwargs))
         return context
     
+class StealView(ListView):
+    model = Song
+    template_name = 'main/steal.html'  
+    context_object_name = 'songs'         
+    queryset = Song.objects.order_by('title') 
+
+    def getSong(self, url):
+        obj = Spotdl(client_id="-", client_secret="", no_cache=True)
+        song_objs = obj.search([url])
+        print(song_objs)
+        obj.download_songs(song_objs)      
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+    
 class HomeView(ListView):
     model = Song
     template_name = 'main/home.html'  
     context_object_name = 'songs'         
-    queryset = Song.objects.order_by('title') 
+    queryset = Song.objects.order_by('?')[:25]
 
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
