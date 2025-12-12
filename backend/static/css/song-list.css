@@ -41,6 +41,9 @@
     margin-bottom: 4px !important;
     font-size: 16px !important;
     font-weight: 600;
+    overflow: hidden;
+    height: 20px;
+    width: 100%;
 }
 .song-art {
     display: inline-block;
@@ -186,3 +189,24 @@
     overflow: auto;
 }
 
+/* OVERRIDES */
+.song-info {
+    height: 100%;
+    bottom: 0px;
+    width: calc(100% - 100px);
+    overflow: hidden;
+    z-index: 0;
+}
+.song-artist {
+    width: calc(100% - 200px);
+    height: calc(100% - 20px);
+    overflow: hidden;
+}
+.tile-buttons{
+    z-index: 1000;
+    position: absolute;
+    right: 0px;
+}
+.tile-item.song-item {
+        width: 100%;
+    }

@@ -29,37 +29,8 @@ function enqueueSong( artist, title, filename, node_id, song_id ){
     melodify_player.playlist[ melodify_player.index ].next = song;
 }
 
-PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
-    song_id = document.getElementById('playlists-window').getAttribute('data-song');
-    // Enviar datos al endpoint de Django usando AJAX POST
-    fetch('/playlists/populate/', { // Usaremos este nombre de URL en urls.py
-        method: 'POST',
-        headers: {
-            'Content-Type'      : 'application/json',
-            'X-CSRFToken'       : getCookie('csrftoken'), 
-            'X-Requested-With'  : 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ song: song_id, playlist: playlist_id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // loadPlaylists(); 
-            hidePlaylists();
-        } else if (data.status === 'login') {
-            window.location = '/accounts/login/?next=/';
-        } else {
-            alert('Error al asociar la pista a la lista: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert('Ocurrió un error de red o del servidor.');
-    });
 
-}
-
-PlaylistManager.prototype.request = function(json_data, url, done_callback) { 
+PlaylistManager.prototype.request = function(url, json_data, done_callback) { 
     fetch(
         url, 
         { 
@@ -76,7 +47,7 @@ PlaylistManager.prototype.request = function(json_data, url, done_callback) {
         if (data.status === 'success') {
             done_callback(data);
         } else if (data.status === 'login') {
-            window.location = '/accounts/login/?next=/';
+            window.location = `/accounts/login/?next=${window.location}`;
         } else {
             alert('Error: ' + data.message);
         }
@@ -87,31 +58,17 @@ PlaylistManager.prototype.request = function(json_data, url, done_callback) {
     });
 }
 
-PlaylistManager.prototype.remSongToPlaylist = function(playlist_id, song_id){
-    // Enviar datos al endpoint de Django usando AJAX POST
-    fetch('/playlists/removefrom/', { 
-        method: 'POST',
-        headers: {
-            'Content-Type'      : 'application/json',
-            'X-CSRFToken'       : getCookie('csrftoken'), 
-            'X-Requested-With'  : 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ song: song_id, playlist: playlist_id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // loadPlaylists(); 
-            hidePlaylists();
-        } else if (data.status === 'login') {
-            window.location = '/accounts/login/?next=/';
-        } else {
-            alert('Error al asociar la pista a la lista: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert('Ocurrió un error de red o del servidor.');
+PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
+    song_id = document.getElementById('playlists-window').getAttribute('data-song');
+    this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
+        hidePlaylists();
+        location.reload(); 
+    });
+}
+
+PlaylistManager.prototype.remSongFromPlaylist = function(playlist_id, song_id){
+    this.request('/playlists/songs/remove/', { song : song_id, playlist : playlist_id }, ()=>{ 
+        location.reload(); 
     });
 }
 
@@ -124,7 +81,7 @@ PlaylistManager.prototype.createPlaylist = function() {
         return;
     }
 
-    this.request('/playlist/new/', { name : playlistName }, ()=>{ 
+    this.request('/playlists/new/', { name : playlistName }, ()=>{ 
         toggleNewListForm(); 
         currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
         nextPage = 1;
@@ -135,18 +92,9 @@ PlaylistManager.prototype.createPlaylist = function() {
         
 
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+    var node = document.getElementsByName('csrfmiddlewaretoken')[0];
+    console.log(node);
+    return node.value;
 }
 
 const playlistmgr = new PlaylistManager();

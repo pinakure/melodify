@@ -34,6 +34,10 @@
         }
         .{{ type }}-card {
             padding: 15px;
+            height: 64px;
+            max-height: 64px;
+            align-items: center;
+            vertical-align: middle;
             border: 1px solid var(--border-color);
             background-color: var(--bg-sidebar);
             border-radius: 5px;
@@ -45,9 +49,11 @@
         }
         .{{ type }}-card a {
             text-decoration: none;
-            display: block;
+            /* display: block; */
         }
         .{{ type }}-card h3 {
+            overflow: hidden;
+            width: 100%;
             margin: 0 0 5px 0;
             color: var(--accent-color);
         }
@@ -69,11 +75,11 @@
 <div class="list-container">
     <div class="{{ type }}-grid" id="{{ type }}-Grid">
         {% for item in items %}
+        <a href="{% url url_detail pk=item.pk %}">
             <div class="{{ type }}-card {{ type }}-item" data-{{ type }}-name="{{ item.name|lower }}">
-                <a href="{% url url_detail pk=item.pk %}">
                     <h3>{{ item.name }}</h3>
-                </a>
-            </div>
+                </div>
+            </a>
         {% empty %}
             <p id="no-{{ type }}-s-message">No se encontraron {{ title }}.</p>
         {% endfor %}

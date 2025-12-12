@@ -6,6 +6,7 @@
     <div class="counter medium">
         <h3>{{ songs.count }} Pistas</h3> 
     </div>    
+    {% csrf_token %}
     {% for song in songs %}
     <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
         
@@ -38,11 +39,11 @@
         <div class="song-info">
             <a href="{% url 'song-detail' pk=song.pk %}">
                 <h4 class="song-name">{{ song.title }}</h4>
-                <p class="small">{{ song.artist }}</p>
+                <p class="song-artist small">{{ song.artist }}</p>
             </a>
         </div>
         
-        <div class="tile-buttons" style="float: right">
+        <div class="tile-buttons" style="float: right; z-index: 1000;">
             <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
             <div style="display: flex" >
                 <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual"    onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button>

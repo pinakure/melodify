@@ -328,8 +328,10 @@ def create_playlist_ajax(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
 
-@login_required
+# @login_required
 def populate_playlist_ajax(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición

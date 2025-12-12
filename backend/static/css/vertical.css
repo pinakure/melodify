@@ -23,7 +23,7 @@
     #timer,
     #track,
     #duration {
-        font-size: 12px;
+        font-size: 14px;
         line-height: 16px;
     }
     #track {
@@ -40,17 +40,47 @@
     #playBtn, #pauseBtn {
         top: 14px;
     }
-    /* small bar */
-    #progress {
-        position: absolute;
-        top: 16px;
-        left: 25%;
-        height: 4px;
-    }
+    /* bring next and prev buttons together  */
     #nextBtn {
-        left: calc( 50% - 64px);
+        left: calc( 50% + 64px);
+        right: auto;
     }
     #prevBtn {
         right: calc( 50% + 64px);
+        left: auto;
     }
+
+    /* small bottom player progress bar */
+    @if(var(--small-bar)){
+        #progress,
+        #progress-wrapper {
+            width: calc( 100% - 25%);
+            position: absolute;
+            height: 4px;
+        }
+        #waveform-wrapper{
+            left: 12.5%;
+            width: 75%;
+        }
+        #waveform {
+            top: 0px;
+            left: 0;
+            height: 100%;
+        }
+        #progress-wrapper {
+            left: 12.5%;
+            z-index: 0;
+            top: 6px;
+            background-color: var(--bg-player-title);
+        }
+        #progress{
+            z-index: 1000;
+            top: 0px;
+            width: 0px;
+        }
+    }
+    /* Make song-list song title text smaller */
+    .song-name {
+        font-size: 14px !important;
+    }    
 }

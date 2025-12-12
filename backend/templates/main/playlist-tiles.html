@@ -1,7 +1,7 @@
 <!-- templates/app/playlist_tiles.html -->
 
 {% extends 'base.html' %} 
-
+{% load fontawesome_5 %}
 {% block header %}
 <style>
     .tile-container {
@@ -200,52 +200,7 @@
                 document.getElementById('new-list-name').value = ''; // Limpia el input al ocultar
             }
         }
-        // function createPlaylist() {
-        //     const playlistNameInput = document.getElementById('new-list-name');
-        //     const playlistName = playlistNameInput.value.trim();
-
-        //     if (!playlistName) {
-        //         alert("Por favor, introduce un nombre para la lista.");
-        //         return;
-        //     }
-
-        //     // Enviar datos al endpoint de Django usando AJAX POST
-        //     fetch('{% url "create-playlist" %}', { // Usaremos este nombre de URL en urls.py
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             // Importante: Necesitas el CSRF token para peticiones POST en Django
-        //             'X-CSRFToken': getCookie('csrftoken'), 
-        //             'X-Requested-With': 'XMLHttpRequest'
-        //         },
-        //         body: JSON.stringify({ name: playlistName })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         if (data.status === 'success') {
-        //             //alert(`Lista "${playlistName}" creada con éxito.`);
-        //             toggleNewListForm(); // Oculta el formulario después del éxito
-                    
-        //             // Opcional: Reiniciar la vista para mostrar la nueva lista inmediatamente
-        //             // Esto recargará todos los tiles desde el backend
-        //             currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
-        //             nextPage = 1;
-        //             container.innerHTML = '';
-        //             loadPlaylists(); 
-
-        //         } else if (data.status === 'login') {
-        //             window.location = '/accounts/login/?next=/';
-        //         } else {
-        //             alert('Error al crear la playlist: ' + data.message);
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('Fetch error:', error);
-        //         alert('Ocurrió un error de red o del servidor.');
-        //     });
-        // }
         
-        // Función auxiliar para obtener el CSRF token de las cookies (necesario para POST)
         
 </script>
 {% endblock %}
@@ -254,17 +209,17 @@
     <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 {% endblock %}
 
-{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">+</button>{% endblock %}
+{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>{% endblock %}
 
 
 {% block content %}
-
+{% csrf_token %}
 <div id="loading" style="display: none;">Cargando playlists...</div>
 
 <div class="new-list" id="new-list">
     <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
-    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="playlistmanager.createPlaylist()">+</button>
-    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">X</button>
+    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="playlistmgr.createPlaylist()">{% fa5_icon 'plus' color="#000"%}</button>
+    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">{% fa5_icon 'times' color="#000"%}</button>
 </div>    
 
 <div class="tile-container" id="tileContainer"></div>
