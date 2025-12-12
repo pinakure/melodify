@@ -26,7 +26,7 @@ function enqueueSong( artist, title, filename, node_id, song_id ){
     melodify_player.enqueue(song); 
     melodify_player.playlist[ melodify_player.playlist.count-2 ].next = melodify_player.playlist[ melodify_player.playlist.count-2 ].next; 
     
-    melodify_player.playlist[ melodify_player.index ].next = song; ç
+    melodify_player.playlist[ melodify_player.index ].next = song;
 }
 
 PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){

@@ -66,23 +66,6 @@
         text-align: left;
     }
 
-    .new-list{
-        margin-top: 16px;
-        width: 90%;
-    }
-    #new-list-name {
-        width: 75%;
-    }
-    #new-list-send {
-        color: var(--bg-main);
-        
-    }
-
-    /* Estilo para ocultar el formulario por defecto */
-    #new-list {
-        display: none; 
-    }
-    
     .new-list-toggle {
         /* Estilo para el botón flotante o fijo que abre el form */
         /* Puedes ajustarlo a tu diseño (p. ej., un botón + en la esquina superior derecha) */
@@ -249,22 +232,16 @@
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
+    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
 {% endblock %}
 
-{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">+</button>{% endblock %}
+{% block content-title %}Tu Biblioteca{% endblock %}
 
 
 {% block content %}
-
 <div id="loading" style="display: none;">Cargando playlists...</div>
 
-<div class="new-list" id="new-list">
-    <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
-    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="createPlaylist()">+</button>
-    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">X</button>
-</div>    
-
+<h3>Tus listas</h3>
 <div class="tile-container" id="tileContainer"></div>
 
 <script>

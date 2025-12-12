@@ -198,6 +198,16 @@ class TagListView(ListView):
         context = get_context(super().get_context_data(**kwargs))
         return context
     
+class HomeView(ListView):
+    model = Song
+    template_name = 'main/home.html'  
+    context_object_name = 'songs'         
+    queryset = Song.objects.order_by('title') 
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+    
 class TagDetailView(DetailView):
     model = Tag
     template_name = 'main/tag-detail.html'
@@ -287,8 +297,10 @@ class SongDetailView(DetailView):
         return context
     
 
-@login_required 
+# @login_required 
 def create_playlist_ajax(request):
+    if not request.user:
+        return JsonResponse({ 'status' : 'No logeado'})
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición

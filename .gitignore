@@ -14,3 +14,4 @@ backend/db.sqlite3-journal
 /backend/media/songs
 /backend/media/artists
 /backend/main/templatetags/__pycache__
+*.pyc

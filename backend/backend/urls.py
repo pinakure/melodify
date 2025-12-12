@@ -4,12 +4,14 @@ from main.views import *
 from main import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import re_path
+from django.urls import re_path, include
 from django.views.static import serve # Import the standard file server view
 
 
 urlpatterns = [
     path('admin/'               , admin.site.urls),
+    path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
+    path(''                     , HomeView.as_view()            , name='home'),
     path('albums/'              , AlbumTileView.as_view()       , name='album-tiles'),
     path('albums/<int:pk>/'     , AlbumDetailView.as_view()     , name='album-detail'),
     path('genres/'              , GenreListView.as_view()       , name='genre-list'),
