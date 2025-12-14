@@ -144,23 +144,25 @@ def is_timestamp(tag):
                     return f'{tag[3:7]}{tag[0:2]}01'
         return ''
     if len(tag) == 8:
-        if is_number(tag[0:6]):
-            # YYYYMMXX
-            if not is_number(tag[6:8]):
-                return f'{tag[0:4]}{tag[4:6]}01'
-            # YYYYMMDD
-            else:
-                return f'{tag[0:4]}{tag[4:6]}{tag[6:8]}'
-        # YYYYXXXX
-        else:
-            if is_number(tag[0:4]):
-                return f'{tag[0:4]}0101'
-
-        # DD-MM-YY
-        if is_number(tag[0:2]):
-            if is_number(tag[3:5]):
-                if is_number(tag[6:8]):
-                    return f'20{tag[0:2]}{tag[3:5]}{tag[6:8]}'
+        if is_number(tag[0:4]):
+            if int(tag[0:4]) < 2500:
+                if not is_number(tag[6:8]):
+                    # YYYYMMXX
+                    return f'{tag[0:4]}{tag[4:6]}01'
+                elif not is_number(tag[4:6]):
+                    # YYYYXXXX
+                    if is_number(tag[0:4]):
+                        return f'{tag[0:4]}0101'
+                else:
+                    # YYYYMMDD
+                    return f'{tag[0:4]}{tag[4:6]}{tag[6:8]}'
+        elif is_number(tag[0:2]):
+            # DD-MM-YY
+            if not is_number(tag[2]):
+                if is_number(tag[3:5]):
+                    if not is_number(tag[5]):
+                        if is_number(tag[6:8]):
+                            return f'20{tag[0:2]}{tag[3:5]}{tag[6:8]}'
         return ''
     if len(tag) == 10:
         # 0000-00-00
