@@ -348,3 +348,16 @@ button.input:disabled{
 .hidden {
     display: none;
 }
+
+#fullplayer {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    background-color: #555555;
+    background: linear-gradient(-130deg , #555555, #404040);
+    border-radius: 7px;
+    box-shadow: 0px 3px 2px #0006;
+    border: 2px ridge #888888;
+}
