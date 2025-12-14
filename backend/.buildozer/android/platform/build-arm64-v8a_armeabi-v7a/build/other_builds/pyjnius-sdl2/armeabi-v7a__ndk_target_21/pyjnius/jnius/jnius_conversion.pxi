@@ -62,7 +62,7 @@ cdef void populate_args(JNIEnv *j_env, tuple definition_args, jvalue *j_args, ar
                 j_args[index].l = NULL
 
             # numeric types
-            elif isinstance(py_arg, (int, long)):
+            elif isinstance(py_arg, (int, int)):
                 j_args[index].l = convert_python_to_jobject(
                     j_env, 'Ljava/lang/Integer;', py_arg
                 )
@@ -322,7 +322,7 @@ cdef convert_jarray_to_python(JNIEnv *j_env, definition, jobject j_object):
     elif r == 'J':
         j_longs = j_env[0].GetLongArrayElements(
                 j_env, j_object, &iscopy)
-        ret = [(<long long>j_longs[i]) for i in range(array_size)]
+        ret = [(<int>j_longs[i]) for i in range(array_size)]
         j_env[0].ReleaseLongArrayElements(
                 j_env, j_object, j_longs, 0)
 
@@ -479,7 +479,7 @@ cdef jobject convert_python_to_jobject(JNIEnv *j_env, definition, obj) except *:
             return convert_pystr_to_java(j_env, to_unicode(obj))
 
         # numeric types
-        elif isinstance(obj, (int, long)) and \
+        elif isinstance(obj, (int, int)) and \
                 definition in (
                     'Ljava/lang/Integer;',
                     'Ljava/lang/Number;',
