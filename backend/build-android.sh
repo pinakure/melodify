@@ -1,5 +1,5 @@
 #!/bin/bash
-buildozer appclean
+#buildozer appclean
 git stash
 git pull
 source ../venv/bin/activate
