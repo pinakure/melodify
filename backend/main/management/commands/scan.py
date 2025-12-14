@@ -439,7 +439,7 @@ class Command(BaseCommand):
             self.add_song_error(song, f"GENRE:{str(e)}")
 
         try:
-            song.bpm = info.get('bpm')
+            song.bpm = info.get('bpm') if is_number(info.get('bpm')) else None
         except Exception as e:
             self.add_song_error(song, f"BPM:{str(e)}")
 
@@ -531,9 +531,10 @@ class Command(BaseCommand):
         FORCE_ANALYSIS = False
         MUSIC_FOLDER = options["scan_path"][0]
         DRIVE = MUSIC_FOLDER.split(':')[0]
+        print(MUSIC_FOLDER.split(':'))
         if len(DRIVE) == 1:
-            MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', MUSIC_FOLDER.split(':')[1] )
-        self.folder = MUSIC_FOLDER + (os.path.sep if not MUSIC_FOLDER.endswith('/') else '')
+            MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, MUSIC_FOLDER.split(':')[1] )
+        MUSIC_FOLDER = MUSIC_FOLDER + (os.path.sep if not MUSIC_FOLDER.endswith('/') else '')
         if options['force'] is not False:
             print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
             force = True
