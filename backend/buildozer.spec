@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,django,kivy,kivymd,Pillow,mutagen,requests,django-fontawesome-5
+requirements = python3,hostpython3,django,kivy,kivymd,asgiref,sqlparse,Pillow,mutagen,requests,django-fontawesome-5,setuptools
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -206,7 +206,7 @@ android.ndk = 25b
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
 # android.enable_androidx requires android.api >= 28
-#android.enable_androidx = True
+android.enable_androidx = True
 
 # (list) add java compile options
 # this can for example be necessary when importing certain java libraries using the 'android.gradle_dependencies' option
