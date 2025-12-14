@@ -66,7 +66,7 @@ p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'l
 /* Colors */
 .confirm         { background-color: var(--confirm-color) !important; }
 .accent          { background-color: var(--accent-color) !important; }
-
+.section         { background-color:var(--bg-sidebar) ;padding:4px; border-radius: 4px; margin-top: 16px;}
 /* Generics */
 .shadowed  { text-shadow: 0px 0px 7px #000;}
 .blend-50  { opacity: 0.5; }

@@ -4,10 +4,10 @@
 
 <div class="song-list">
     <div class="counter medium">
-        <h3>{{ songs.count }} Pistas</h3> 
+        <h3>{{ data.count }} Pistas</h3> 
     </div>    
     {% csrf_token %}
-    {% for song in songs %}
+    {% for song in data %}
     <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
         
         <div class="song-tracknumber">{{ forloop.counter }}</div>
@@ -20,9 +20,9 @@
             id="song-{{ song.pk }}"
             data-id="{{ song.pk }}"
             {% if not forloop.last %}
-                data-next-id="{{ songs|get_next_song_id:forloop.counter0 }}"
+                data-next-id="{{ data|get_next_song_id:forloop.counter0 }}"
             {% else %}
-                data-next-id="{{ songs.0.id }}"
+                data-next-id="{{ data.0.id }}"
             {% endif %}
             onclick="playSong(this)">
             <div class="playBtn"></div>
