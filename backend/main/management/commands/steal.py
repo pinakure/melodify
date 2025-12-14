@@ -51,6 +51,7 @@ def clean(songname):
     songname = songname.replace('?', '')
     songname = songname.replace(':', '')
     songname = songname.replace('*', '')
+    songname = songname.replace('/', '-')
     songname = songname.replace('\\', '')
     return songname
 
@@ -80,23 +81,24 @@ class Command(BaseCommand):
             try:
                 artist = ", ".join(song.artists)
                 letter = artist[0].upper()
-                album = song.album_name
-                title = f'{song.name}.mp3'
-                title = clean(title)
+                album = clean(song.album_name)
+                title = clean(f'{song.name}.mp3')
                 filename = f'{artist} - {title}'
                 source = os.path.join('.', filename)
                 dest   = os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')
                 if os.path.exists(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')):
                     print('Skipping download, song already exists.')
                     continue
-                obj.download_songs([song])
-                print(f'Move "{source}" ---> "{dest}"')
+                result = obj.download_songs([song])[0]
+                print(result)
+                filename = clean(result[1].name)
+                print(f'Move "{filename}" ---> "{dest}"')
                 try:
                     os.makedirs(os.path.join(settings.LIBRARY_ROOT, artist[0], artist.split(',')[0], album))
                 except:
                     pass
                 try:
-                    shutil.move(source, dest)
+                    shutil.move(filename, dest)
                 except Exception as e:
                     print(str(e))
             except Exception as e:
