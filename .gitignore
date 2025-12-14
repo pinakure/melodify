@@ -17,3 +17,4 @@ backend/db.sqlite3-journal
 *.pyc
 /backend/.buildozer
 /venv
+backend/download-queue.bat
