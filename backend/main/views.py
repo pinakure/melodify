@@ -210,12 +210,6 @@ class StealView(ListView):
     context_object_name = 'songs'         
     queryset = Song.objects.order_by('title') 
 
-    def getSong(self, url):
-        obj = Spotdl(client_id="-", client_secret="", no_cache=True)
-        song_objs = obj.search([url])
-        print(song_objs)
-        obj.download_songs(song_objs)      
-
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
@@ -318,8 +312,6 @@ class SongDetailView(DetailView):
         obj = self.object
         return context
     
-
-# @login_required 
 def create_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
@@ -347,8 +339,80 @@ def create_playlist_ajax(request):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
+def steal_get(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            url = data.get('url', '').strip()
+            
+            if not url:
+                return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
+            from main.management.commands.steal import Command
+            c = Command()
+            songs = c.getSong(url)
+            return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : songs})
 
-# @login_required 
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+def steal_search(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            url = data.get('url', '').strip()
+            
+            if not url:
+                return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
+            from main.management.commands.steal import Command
+            c = Command()
+            songs = c.searchSong(url)
+            return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : songs})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+def scan_artist(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            artist = data.get('artist', '').strip()
+            
+            if not artist:
+                return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
+            from main.management.commands.scan import Command
+            c = Command()
+            import os
+            from django.conf import settings
+            songs = c.scan(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist), False)
+            return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
 def bookmark_song(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
@@ -378,8 +442,6 @@ def bookmark_song(request):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
-
-# @login_required
 def populate_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})

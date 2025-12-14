@@ -13,6 +13,8 @@ urlpatterns = [
     path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
     path(''                     , HomeView.as_view()            , name='home'),
     path('steal/'               , StealView.as_view()           , name='steal'),
+    path('stealget/'            , views.steal_get               , name='steal-get'),
+    path('stealsearch/'         , views.steal_search            , name='steal-search'),
     path('albums/'              , AlbumTileView.as_view()       , name='album-tiles'),
     path('albums/<int:pk>/'     , AlbumDetailView.as_view()     , name='album-detail'),
     path('genres/'              , GenreListView.as_view()       , name='genre-list'),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('tag/<int:pk>/'        , TagDetailView.as_view()       , name='tag-detail'),
     path('song/<int:pk>/'       , SongDetailView.as_view()      , name='song-detail'),
     path('song/bookmark/'       , views.bookmark_song           , name='bookmark-song'),
+    path('scan/artist/'         , views.scan_artist             , name='scan-artist'),
 ]
 
 if settings.DEBUG:

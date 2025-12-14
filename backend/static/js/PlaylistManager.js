@@ -61,9 +61,21 @@ PlaylistManager.prototype = {
             }
         })
         .catch(error => {
-            console.error('Fetch error:', error);
-            alert('Ocurrió un error de red o del servidor.');
+            if( error == "TypeError: done_callback is not a function"){
+                alert("You forgot to write the done callback.")
+            } else {
+                console.error('Fetch error:', error);
+                alert('Ocurrió un error de red o del servidor.');
+            }
         });
+    },
+
+    scanSongs : function(artist_list){
+        console.log("Scanning songs");
+        console.log(artist_list);
+        for(artist in artist_list){
+            this.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
+        }   
     },
 
     addSongToPlaylist : function(playlist_id){

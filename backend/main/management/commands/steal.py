@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
 from django.conf import settings
-import spotdl
 import shutil
 from spotdl import Spotdl
 
@@ -47,6 +46,13 @@ import os
 ]
 """
 
+spotdl = Spotdl(
+    client_id="dc75272b15354119b9df60392848cc6a", 
+    client_secret="76d4dfef594f4625bd68b8068a574289", 
+    no_cache=True
+)
+
+
 def clean(songname):
     songname = songname.replace('?', '')
     songname = songname.replace(':', '')
@@ -61,49 +67,54 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("url", nargs="+", type=str)
 
+    def searchSong(self, url):
+        song_objs = spotdl.search([url])
+        payload = []
+        for song in song_objs:
+            payload.append({ 
+                'name'   : song.name,
+                'artist' : song.artist,
+                'url'    : song.url,
+                'album'  : song.album_name,
+            }) 
+        return payload
+    
     def getSong(self, url):
-
-        config_data = {
-            'client-id': "dc75272b15354119b9df60392848cc6a",
-            'client-secret': "76d4dfef594f4625bd68b8068a574289",
-            'no-cache': True,
-        }
-        obj = Spotdl(
-            client_id="dc75272b15354119b9df60392848cc6a", 
-            client_secret="76d4dfef594f4625bd68b8068a574289", 
-            no_cache=True
-        )
         
-        song_objs = obj.search([url])
+        song_objs = spotdl.search([url])
+    
+        payload = []
+    
         for song in song_objs:
             print(f'{song.artist}, {song.name}')
             print("-"*80)
             try:
-                artist = ", ".join(song.artists)
-                letter = artist[0].upper()
-                album = clean(song.album_name)
-                title = clean(f'{song.name}.mp3')
-                filename = f'{artist} - {title}'
-                source = os.path.join('.', filename)
-                dest   = os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')
-                if os.path.exists(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')):
+                artists  = ", ".join(song.artists)
+                artist   = artists.split(',')[0]
+                letter   = artist[0].upper()
+                album    = clean(song.album_name)
+                title    = clean(f'{song.name}.mp3')
+                dest     = os.path.join(settings.LIBRARY_ROOT, letter, artist, album, title)
+                dstpath  = os.path.join(settings.LIBRARY_ROOT, letter, artist, album)
+                if os.path.exists(os.path.join(dstpath,  title)):
                     print('Skipping download, song already exists.')
                     continue
-                result = obj.download_songs([song])[0]
-                print(result)
+                result   = spotdl.download_songs([song])[0]
                 filename = clean(result[1].name)
                 print(f'Move "{filename}" ---> "{dest}"')
                 try:
-                    os.makedirs(os.path.join(settings.LIBRARY_ROOT, artist[0], artist.split(',')[0], album))
+                    os.makedirs(dstpath)
                 except:
                     pass
                 try:
                     shutil.move(filename, dest)
+                    payload.append(artist)
                 except Exception as e:
                     print(str(e))
             except Exception as e:
                 print(f"Error downloading '{ song.name }' : {str(e)}")
-
+        return payload
+    
     def handle(self, *args, **options):
         URL = options["url"][0]
         print(("*"*80)+'\n'+f" Downloading {URL}..."+"\n"+("*"*80))

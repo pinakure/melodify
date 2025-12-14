@@ -328,10 +328,17 @@ button.input:active {
     background-color: var(--bg-sidebar);
 }
 
+
 button.input.transparent:active,
 button.input.transparent:hover,
 button.input.transparent {
     background-color: transparent !important;
+}
+
+button.input:disabled:active,
+button.input:disabled:hover,
+button.input:disabled{
+    background-color: var(--bg-sidebar-selection) !important;
 }
 
 .hidden {
