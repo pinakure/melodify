@@ -327,3 +327,13 @@ button.input:active {
     position: absolute;
     background-color: var(--bg-sidebar);
 }
+
+button.input.transparent:active,
+button.input.transparent:hover,
+button.input.transparent {
+    background-color: transparent !important;
+}
+
+.hidden {
+    display: none;
+}

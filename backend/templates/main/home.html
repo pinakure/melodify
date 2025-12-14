@@ -1,4 +1,4 @@
-<!-- templates/app/playlist_tiles.html -->
+<!-- templates/app/home.html -->
 
 {% extends 'base.html' %} 
 
@@ -61,9 +61,13 @@
                     nextPage++;
                     isLoading = false;
                     // Actualizamos el contador total si la respuesta lo incluye
-                    if (data.total_count !== undefined) {
+                    try {
+                        if (data.total_count !== undefined) {
                          playlistCount = data.total_count;
                          countDisplay.textContent = playlistCount;
+                        }
+                    } catch(e){
+
                     }
                 } else {
                     scrollbox.removeEventListener('scroll', handleScroll);
@@ -178,7 +182,6 @@
     const searchInput       = document.getElementById('searchInput'); 
 
     window.addEventListener('DOMContentLoaded', (event) => {
-        scrollbox.addEventListener('scroll', handleScroll);
         
         searchInput.addEventListener('input', () => {
             clearTimeout(this.searchTimeout);

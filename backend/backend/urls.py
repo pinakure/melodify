@@ -26,6 +26,7 @@ urlpatterns = [
     path('tags/'                , TagListView.as_view()         , name='tag-list'),
     path('tag/<int:pk>/'        , TagDetailView.as_view()       , name='tag-detail'),
     path('song/<int:pk>/'       , SongDetailView.as_view()      , name='song-detail'),
+    path('song/bookmark/'       , views.bookmark_song           , name='bookmark-song'),
 ]
 
 if settings.DEBUG:

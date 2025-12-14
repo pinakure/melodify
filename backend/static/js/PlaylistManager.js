@@ -15,6 +15,13 @@ function showPlaylists( parent, song_id ){
     document.getElementById('playlists-window').setAttribute('data-song', song_id);
 }
 
+    
+function getCookie(name) {
+    var node = document.getElementsByName('csrfmiddlewaretoken')[0];
+    console.log(node);
+    return node.value;
+}
+
 function enqueueSong( artist, title, filename, node_id, song_id ){
     alert(`Enqueue ${title}...`);
     var song = {
@@ -29,72 +36,75 @@ function enqueueSong( artist, title, filename, node_id, song_id ){
     melodify_player.playlist[ melodify_player.index ].next = song;
 }
 
+PlaylistManager.prototype = {
+    
+    request : function(url, json_data, done_callback) { 
+        fetch(
+            url, 
+            { 
+                method: 'POST',
+                headers: {
+                    'Content-Type'      : 'application/json',
+                    'X-CSRFToken'       : getCookie('csrftoken'), 
+                    'X-Requested-With'  : 'XMLHttpRequest'
+                }, body: JSON.stringify(json_data)
+            }
+        )
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                done_callback(data);
+            } else if (data.status === 'login') {
+                window.location = `/accounts/login/?next=${window.location}`;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            alert('Ocurrió un error de red o del servidor.');
+        });
+    },
 
-PlaylistManager.prototype.request = function(url, json_data, done_callback) { 
-    fetch(
-        url, 
-        { 
-            method: 'POST',
-            headers: {
-                'Content-Type'      : 'application/json',
-                'X-CSRFToken'       : getCookie('csrftoken'), 
-                'X-Requested-With'  : 'XMLHttpRequest'
-            }, body: JSON.stringify(json_data)
+    addSongToPlaylist : function(playlist_id){
+        song_id = document.getElementById('playlists-window').getAttribute('data-song');
+        this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
+            hidePlaylists();
+            location.reload(); 
+        });
+    },
+
+    remSongFromPlaylist : function(playlist_id, song_id){
+        this.request('/playlists/songs/remove/', { song : song_id, playlist : playlist_id }, ()=>{ 
+            location.reload(); 
+        });
+    },
+
+    createPlaylist : function() {
+        const playlistNameInput = document.getElementById('new-list-name');
+        const playlistName = playlistNameInput.value.trim();
+
+        if (!playlistName) {
+            alert("Por favor, introduce un nombre para la lista.");
+            return;
         }
-    )
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            done_callback(data);
-        } else if (data.status === 'login') {
-            window.location = `/accounts/login/?next=${window.location}`;
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert('Ocurrió un error de red o del servidor.');
-    });
-}
 
-PlaylistManager.prototype.addSongToPlaylist = function(playlist_id){
-    song_id = document.getElementById('playlists-window').getAttribute('data-song');
-    this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
-        hidePlaylists();
-        location.reload(); 
-    });
-}
+        this.request('/playlists/new/', { name : playlistName }, ()=>{ 
+            toggleNewListForm(); 
+            currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
+            nextPage = 1;
+            container.innerHTML = '';
+            loadPlaylists(); 
+        });
+    },
 
-PlaylistManager.prototype.remSongFromPlaylist = function(playlist_id, song_id){
-    this.request('/playlists/songs/remove/', { song : song_id, playlist : playlist_id }, ()=>{ 
-        location.reload(); 
-    });
-}
+    bookmarkSong : function( song_id, enable ){
+        this.request('/song/bookmark/', { song : song_id }, ()=>{ 
+            document.getElementById(  `bookmark-song-${ song_id }`).classList.toggle("hidden"),
+            document.getElementById(`unbookmark-song-${ song_id }`).classList.toggle("hidden")
+        });
+    },
 
-PlaylistManager.prototype.createPlaylist = function() {
-    const playlistNameInput = document.getElementById('new-list-name');
-    const playlistName = playlistNameInput.value.trim();
-
-    if (!playlistName) {
-        alert("Por favor, introduce un nombre para la lista.");
-        return;
-    }
-
-    this.request('/playlists/new/', { name : playlistName }, ()=>{ 
-        toggleNewListForm(); 
-        currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
-        nextPage = 1;
-        container.innerHTML = '';
-        loadPlaylists(); 
-     });
-}
-        
-
-function getCookie(name) {
-    var node = document.getElementsByName('csrfmiddlewaretoken')[0];
-    console.log(node);
-    return node.value;
-}
+};    
 
 const playlistmgr = new PlaylistManager();
