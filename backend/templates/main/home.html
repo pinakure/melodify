@@ -162,7 +162,7 @@
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
+    <input type="text" id="searchInput" class="searchInput hidden" placeholder="Filtrar...">
 {% endblock %}
 
 {% block content-title %}Tu Biblioteca{% endblock %}
@@ -188,8 +188,8 @@
     window.addEventListener('DOMContentLoaded', (event) => {
         
         searchInput.addEventListener('input', () => {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(triggerSearch, 300);
+             clearTimeout(this.searchTimeout);
+             this.searchTimeout = setTimeout(triggerSearch, 300);
         });
 
         triggerSearch(); 
