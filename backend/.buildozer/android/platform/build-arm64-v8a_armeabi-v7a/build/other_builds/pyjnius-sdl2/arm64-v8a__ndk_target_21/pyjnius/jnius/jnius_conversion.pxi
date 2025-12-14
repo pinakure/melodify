@@ -640,7 +640,6 @@ cdef jobject convert_pyarray_to_java(JNIEnv *j_env, definition, pyarray) except 
         conversions = {
             int: 'I',
             bool: 'Z',
-            long: 'J',
             float: 'F',
             bytes: 'B',
             str: 'Ljava/lang/String;',

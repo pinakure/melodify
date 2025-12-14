@@ -541,7 +541,6 @@ cdef jobject convert_python_to_jobject(JNIEnv *j_env, definition, obj) except *:
         conversions = {
             int: 'I',
             bool: 'Z',
-            long: 'J',
             float: 'F',
             unicode: 'Ljava/lang/String;',
             bytes: 'B'
