@@ -32,10 +32,22 @@
     .artist-list {
         margin-bottom: 20px;
     }
+    .main-content {
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-blend-mode: luminosity;
+        background-blend-mode: overlay;
+        background-color: var(--bg-content);
+    }
 </style>
 {% endblock %}
 
 {% block content-title %}{{ album.name }} <span class="small blend-50" >Álbum</span>{% endblock %}
+
+{% block background %}
+    {% if album.picture %}style="background-image:url('{{ album.picture }}');"{% endif %}
+{% endblock %}
 
 {% block content %}
 <span class="">
@@ -96,7 +108,7 @@
         </p>
     </div>
 </div>
-{% include 'main/song-list.html' %}
+{% include 'main/song-list.html' with data=songs %}
 
 {% endblock %}
 

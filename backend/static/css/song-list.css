@@ -5,13 +5,14 @@
 }
 .tile-item.song-item{
     position: relative;
-    background-color: var(--bg-content-blend);
+    background-color: var(--bg-content-blend) !important;
     justify-content: left;
     height: 64px;
     width: calc( 100% - 32px );
     overflow: hidden;
     margin-bottom: 4px;
-    border-radius: 6px;;
+    border-radius: 6px;
+    background-blend-mode: overlay;
 }
 .song-list {
     margin-top: 24px;
