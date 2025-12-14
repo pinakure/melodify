@@ -73,7 +73,7 @@ class SongAdmin(admin.ModelAdmin):
         return obj.get_tags()
     
     def year(self, obj):
-        return f"{obj.timestamp.strftime("%Y")}" if obj.timestamp else " "
+        return obj.timestamp.strftime('%Y') if obj.timestamp else " "
     
     @admin.display(boolean=True, description='✔')
     def status(self, obj):
