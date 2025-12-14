@@ -45,13 +45,7 @@ import os
     )
 ]
 """
-
-spotdl = Spotdl(
-    client_id="dc75272b15354119b9df60392848cc6a", 
-    client_secret="76d4dfef594f4625bd68b8068a574289", 
-    no_cache=True
-)
-
+spotdl = None
 
 def clean(songname):
     songname = songname.replace('?', '')
@@ -62,13 +56,24 @@ def clean(songname):
     return songname
 
 class Command(BaseCommand):
-    help = "Steal"
+    help            = "Steal"
+    initialized     = False
+    spotdl          = None
+
+    def initialize():
+        Command.spotdl = Spotdl(
+            client_id="dc75272b15354119b9df60392848cc6a", 
+            client_secret="76d4dfef594f4625bd68b8068a574289", 
+            no_cache=True
+        )
 
     def add_arguments(self, parser):
         parser.add_argument("url", nargs="+", type=str)
 
     def searchSong(self, url):
-        song_objs = spotdl.search([url])
+        if not Command.initialized: Command.initialize()
+        
+        song_objs = Command.spotdl.search([url])
         payload = []
         for song in song_objs:
             payload.append({ 
@@ -80,8 +85,9 @@ class Command(BaseCommand):
         return payload
     
     def getSong(self, url):
-        
-        song_objs = spotdl.search([url])
+        if not Command.initialized: Command.initialize()
+                
+        song_objs = Command.spotdl.search([url])
     
         payload = []
     
@@ -99,7 +105,7 @@ class Command(BaseCommand):
                 if os.path.exists(os.path.join(dstpath,  title)):
                     print('Skipping download, song already exists.')
                     continue
-                result   = spotdl.download_songs([song])[0]
+                result   = Command.spotdl.download_songs([song])[0]
                 filename = clean(result[1].name)
                 print(f'Move "{filename}" ---> "{dest}"')
                 try:
