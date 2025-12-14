@@ -499,7 +499,6 @@ class Command(BaseCommand):
         self.echo(f'Created song "{path}"', indent=1)
 
     def scan(self, folder, force=False):
-                        
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
         self.folder = folder
@@ -514,9 +513,9 @@ class Command(BaseCommand):
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
                     path = os.path.join(root, f)
-                    hash = get_hash(path)
+                    hash = get_hash(path.capitalize())
                     # check whether or not the song object exists
-                    id = os.path.join(root, f)
+                    id = os.path.join(root, f).capitalize()
                     song = self.get_song(id)
                     if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
                         continue
@@ -531,7 +530,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         FORCE_ANALYSIS = False
         MUSIC_FOLDER = options["scan_path"][0]
-        self.folder = MUSIC_FOLDER
+        DRIVE = MUSIC_FOLDER.split(':')[0]
+        if len(DRIVE) == 1:
+            MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', MUSIC_FOLDER.split(':')[1] )
+        self.folder = MUSIC_FOLDER + (os.path.sep if not MUSIC_FOLDER.endswith('/') else '')
         if options['force'] is not False:
             print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
             force = True
