@@ -6,12 +6,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.db.models import Q
+import os
+from django.conf import settings            
+from main.management.commands.scan  import Command as Scan
+from main.management.commands.steal import Command as Steal
+
 import spotdl
 from spotdl import Spotdl
 
 
 import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
+
+scanner = Scan()
+stealer = Steal()
+
 
 def get_context( context ):
     # Enter global severside data here
@@ -350,9 +359,7 @@ def steal_get(request):
             
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
-            from main.management.commands.steal import Command
-            c = Command()
-            songs = c.getSong(url)
+            songs = stealer.getSong(url)
             return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : songs})
 
         except json.JSONDecodeError:
@@ -374,9 +381,7 @@ def steal_search(request):
             
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
-            from main.management.commands.steal import Command
-            c = Command()
-            songs = c.searchSong(url)
+            songs = stealer.searchSong(url)
             return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : songs})
 
         except json.JSONDecodeError:
@@ -398,11 +403,7 @@ def scan_artist(request):
             
             if not artist:
                 return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
-            from main.management.commands.scan import Command
-            c = Command()
-            import os
-            from django.conf import settings
-            songs = c.scan(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist), False)
+            songs = scanner.scan(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist), False)
             return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
 
         except json.JSONDecodeError:

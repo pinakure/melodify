@@ -321,8 +321,12 @@ button.input:active {
 }
 
 .searchInput {
+    left: auto;
+    right: 8px;
+    /*
     width: 25%;
     left: 37.5%;
+    */
     top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);
     position: absolute;
     background-color: var(--bg-sidebar);

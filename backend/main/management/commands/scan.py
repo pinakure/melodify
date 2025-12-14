@@ -295,6 +295,7 @@ class Command(BaseCommand):
         artist_name = artist_name.split('Feat.')[0]
         artist_name = artist_name.split('feat.')[0]
         artist_name = artist_name.split('ft.')[0]
+        artist_name = artist_name.split('/')[0]
         artist_name = artist_name.lstrip(' ').rstrip(' ')
 
         if len(artist_name)==0: return None
