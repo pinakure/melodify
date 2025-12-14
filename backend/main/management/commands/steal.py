@@ -7,11 +7,6 @@ from spotdl import Spotdl
 
 import os 
 
-def empty(folder):
-    for root, dirs, files in os.walk(os.path.join(settings.MEDIA_ROOT, folder)):
-        for file in files:
-            os.remove(os.path.join(settings.MEDIA_ROOT,folder, file))
-
 """
 [
     Song(
@@ -52,6 +47,13 @@ def empty(folder):
 ]
 """
 
+def clean(songname):
+    songname = songname.replace('?', '')
+    songname = songname.replace(':', '')
+    songname = songname.replace('*', '')
+    songname = songname.replace('\\', '')
+    return songname
+
 class Command(BaseCommand):
     help = "Steal"
 
@@ -75,19 +77,22 @@ class Command(BaseCommand):
         for song in song_objs:
             print(f'{song.artist}, {song.name}')
             print("-"*80)
-            
             try:
-                obj.download_songs([song])
                 artist = ", ".join(song.artists)
                 letter = artist[0].upper()
                 album = song.album_name
                 title = f'{song.name}.mp3'
+                title = clean(title)
                 filename = f'{artist} - {title}'
                 source = os.path.join('.', filename)
-                dest   = os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist, album, f'{title}')
+                dest   = os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')
+                if os.path.exists(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist.split(',')[0], album, f'{title}')):
+                    print('Skipping download, song already exists.')
+                    continue
+                obj.download_songs([song])
                 print(f'Move "{source}" ---> "{dest}"')
                 try:
-                    os.makedirs(os.path.join(settings.LIBRARY_ROOT, artist[0], artist, album))
+                    os.makedirs(os.path.join(settings.LIBRARY_ROOT, artist[0], artist.split(',')[0], album))
                 except:
                     pass
                 try:
