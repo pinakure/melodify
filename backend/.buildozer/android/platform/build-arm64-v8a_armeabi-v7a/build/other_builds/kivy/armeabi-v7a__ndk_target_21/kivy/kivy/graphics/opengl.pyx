@@ -1163,7 +1163,7 @@ def glReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
     assert type == GL_UNSIGNED_BYTE
 
     cdef object py_pixels = None
-    cdef int 1 size
+    cdef int size
     cdef char *data
 
     size = width * height * sizeof(GLubyte)
