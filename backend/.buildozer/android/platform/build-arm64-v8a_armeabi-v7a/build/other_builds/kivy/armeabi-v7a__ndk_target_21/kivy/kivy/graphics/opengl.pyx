@@ -689,7 +689,7 @@ def glDrawElements(GLenum mode, GLsizei count, GLenum type, indices):
     cdef void *ptr = NULL
     if isinstance(indices, bytes):
         ptr = <void *>(<char *>(<bytes>indices))
-    elif isinstance(indices, (long, int)):
+    elif isinstance(indices, (int, int)):
         ptr = <void *>(<unsigned int>indices)
     else:
         raise TypeError("Argument 'indices' has incorrect type (expected bytes or int).")
@@ -1163,7 +1163,7 @@ def glReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
     assert type == GL_UNSIGNED_BYTE
 
     cdef object py_pixels = None
-    cdef long size
+    cdef int 1 size
     cdef char *data
 
     size = width * height * sizeof(GLubyte)
@@ -1539,7 +1539,7 @@ def glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean norma
     cdef void *ptr = NULL
     if isinstance(data, bytes):
         ptr = <void *>(<char *>(<bytes>data))
-    elif isinstance(data, (long, int)):
+    elif isinstance(data, (int, int)):
         ptr = <void *>(<unsigned int>data)
     else:
         raise TypeError("Argument 'data' has incorrect type (expected bytes or int).")
