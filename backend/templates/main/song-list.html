@@ -46,9 +46,9 @@
         <div class="tile-buttons" style="float: right; z-index: 1000;">
             <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
             <div style="display: flex" >
-                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="playlistmgr.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
-                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="playlistmgr.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
-                <!-- <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual"    onclick="enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button> -->
+                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
+                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
+                <!-- <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual"    onclick="melodify.enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button> -->
                 <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
                 <button type="button" id="delete-entry"     class="input accent"  title="Eliminar de la lista"      onclick="remSongFromPlaylist('{{ playlist.id }}', '{{ song.pk }}')">{% fa5_icon 'trash' color="#000"%}</button>
             </div>
@@ -68,7 +68,7 @@
         <ul>
             {% for playlist in playlists %}
                 <!-- {% include 'main/playlist-entry.html' with index=forloop.counter title=playlist.title subtitle='Test' use_index=False picture=playlist.songs.0.picture.url %} -->
-                <li onclick="playlistmgr.addSongToPlaylist('{{ playlist.id }}')">
+                <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
                     <div class="playlist-entry-picture"></div>
                     <div>
                         <!-- Playlist {{ forloop.counter }} -->

@@ -1,18 +1,18 @@
 <!-- templates/app/playlist_tiles.html -->
 
-{% extends 'base.html' %} 
+{% comment %}{% extends 'base.html' %}{% endcomment %} 
 {% load fontawesome_5 %}
 {% block header %}
 <script>
     function showResults(data){
         container = document.getElementById('results');
-        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="playlistmgr.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ playlistmgr.scanSongs(data.songs); })">{% fa5_icon "download" %}</button></div>`;
+        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })">{% fa5_icon "download" %}</button></div>`;
         container.innerHTML += "<ul>";
         console.log(data.songs);
         for( d in data.songs ){
             song = data.songs[d];
             console.log(song);
-            container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); playlistmgr.request('/stealget/', { url : '${ song.url }' }, (data)=>{ playlistmgr.scanSongs(data.songs); enable(${d}); })">{% fa5_icon "download" %}</button></li>`;
+            container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })">{% fa5_icon "download" %}</button></li>`;
         }
         container.innerHTML += "</ul>";
     }
@@ -58,6 +58,6 @@
 {% block content %}
 {% csrf_token %}
 <input type="text" id="searchInput" class="input" placeholder="URL / KEYWORD">
-<button class="input" onclick="playlistmgr.request('/stealsearch/', { url : document.getElementById('searchInput').value}, showResults)">{% fa5_icon "search" %}</button>
+<button class="input" onclick="melodify.request('/stealsearch/', { url : document.getElementById('searchInput').value}, showResults)">{% fa5_icon "search" %}</button>
 <div id="results"></div>
 {% endblock %}

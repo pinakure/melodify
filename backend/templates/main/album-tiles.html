@@ -1,6 +1,6 @@
 <!-- templates/app/album_tiles.html -->
 
-{% extends 'base.html' %} 
+{% comment %}{% extends 'base.html' %}{% endcomment %}
 
 {% block header %}
 <style>
@@ -53,105 +53,14 @@
     }
 
 </style>
-
-   
- <script>
-        let nextPage = 1;
-        let isLoading = false;
-        let albumCount = 0;
-        let currentSearchTerm = '-';
-
-        function truncate(artist, n){
-            return  (artist.split(', ').length == 2) ? artist.replace(', ', ' / ') : 
-                    (artist.split(', ').length  > n) ? 'Various Artists'           : 
-                    artist;
-        };
-        
-        function loadAlbums() {
-            if (isLoading) return;
-            isLoading = true;
-            loadingIndicator.style.display = 'block';
-
-            const url = new URL(`{% url 'album-tiles' %}`, window.location.origin);
-            url.searchParams.set('page', nextPage);
-            if (currentSearchTerm) {
-                url.searchParams.set('search', currentSearchTerm);
-            }
-
-            fetch(url.toString(), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.albums.length > 0) {
-                    data.albums.forEach(album => {
-                        const div = document.createElement('div');
-                        div.className = "tile-item album-item";
-                        div.setAttribute('data-album-artist', album.safeartist); 
-                        div.setAttribute('data-album-name', album.safename);
-                        
-                        div.innerHTML = `
-                            <a href="${album.url_detalle}"> 
-                                <div class="album-art">
-                                    <div class="album-image" style="background-image: url('${album.url_picture ? album.url_picture : ''}')" alt="Album cover"></div>
-                                </div>
-                                <div class="tile-info">
-                                    <h3 class="album-name">${album.nombre}</h3>
-                                    <h6>${truncate(album.artist, 3)}</h6>
-                                </div>
-                            </a>
-                        `;
-                        container.appendChild(div);
-                    });
-                    nextPage++;
-                    isLoading = false;
-                    // Actualizamos el contador total si la respuesta lo incluye
-                    if (data.total_count !== undefined) {
-                         albumCount = data.total_count;
-                         countDisplay.textContent = albumCount;
-                    }
-                } else {
-                    scrollbox.removeEventListener('scroll', handleScroll);
-                }
-                loadingIndicator.style.display = 'none';
-            })
-            .catch(error => {
-                console.error('Error fetching albums:', error);
-                isLoading = false;
-                loadingIndicator.style.display = 'none';
-            });
-        }
-        
-        function handleScroll() {
-            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-            if (scrollTop + clientHeight >= scrollHeight - 200) {
-                loadAlbums();
-            }
-        }
-
-        function triggerSearch() {
-            const newSearchTerm = searchInput.value.toLowerCase().trim();
-            
-            if (newSearchTerm !== currentSearchTerm) {
-                // Reiniciar el estado para una nueva búsqueda
-                currentSearchTerm = newSearchTerm;
-                nextPage = 1;
-                albumCount = 0;
-                container.innerHTML = ''; // Limpiar álbumes anteriores
-                scrollbox.addEventListener('scroll', handleScroll); // Asegurarse de que el scroll listener esté activo
-                loadAlbums(); // Cargar la primera página de los resultados de la búsqueda
-            }
-        }
-    </script>
 {% endblock %}
 
 {% block search %}
-    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
+    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes..." onkeyup="clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(triggerSearch, 300);">
 {% endblock %}
 
-{% block content-title %}Álbumes (<span id="album-count">{{ albums.count }}</span>){% endblock %}
+
+<h1 class="shadowed">Álbumes (<span id="album-count">{{ albums.count }}</span>)</h1>
 
 
 {% block content %}
@@ -163,24 +72,27 @@
 </div>
 
 <script>
+    console.log("REACH");
+    loadAlbums();
+
     const container = document.getElementById('tileContainer');
     const scrollbox = document.getElementsByClassName('main-content')[0];
     const loadingIndicator = document.getElementById('loading');
     const countDisplay = document.getElementById('album-count');
-    const searchInput = document.getElementById('searchInput'); 
 
     // Carga inicial y listeners
-    window.addEventListener('DOMContentLoaded', (event) => {
+    // window.addEventListener('DOMContentLoaded', (event) => {
         scrollbox.addEventListener('scroll', handleScroll);
         
         searchInput.addEventListener('input', () => {
             // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(triggerSearch, 300);
+            
         });
 
         triggerSearch(); 
-    });
+        alert("OK");
+    // });
+    
 </script>
 
 {% endblock %}

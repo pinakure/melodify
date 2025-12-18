@@ -1,6 +1,6 @@
 <!-- templates/app/playlist_tiles.html -->
 
-{% extends 'base.html' %} 
+{% comment %}{% extends 'base.html' %}{% endcomment %} 
 {% load fontawesome_5 %}
 {% block header %}
 <style>
@@ -99,17 +99,6 @@
 </style>
    
  <script>
-        let nextPage = 1;
-        let isLoading = false;
-        let playlistCount = 0;
-        let currentSearchTerm = '-';
-
-        function truncate(artist, n){
-            return  (artist.split(', ').length == 2) ? artist.replace(', ', ' / ') : 
-                    (artist.split(', ').length  > n) ? 'Various Artists'           : 
-                    artist;
-        };
-        
         function loadPlaylists() {
             if (isLoading) return;
             isLoading = true;
@@ -209,7 +198,7 @@
     <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 {% endblock %}
 
-{% block content-title %}Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>{% endblock %}
+<h1 class="shadowed">Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button></h1>
 
 
 {% block content %}
@@ -218,7 +207,7 @@
 
 <div class="new-list" id="new-list">
     <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
-    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="playlistmgr.createPlaylist()">{% fa5_icon 'plus' color="#000"%}</button>
+    <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="melodify.createPlaylist()">{% fa5_icon 'plus' color="#000"%}</button>
     <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">{% fa5_icon 'times' color="#000"%}</button>
 </div>    
 

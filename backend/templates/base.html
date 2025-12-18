@@ -18,7 +18,7 @@
     {% fontawesome_5_static %}
     <script src="/static/js/howler.min.js"></script>
     <script src="/static/js/siriwave.js"></script>
-    <script src="/static/js/PlaylistManager.js"></script>
+    <script src="/static/js/Melodify.js"></script>
     {% block header %}{% endblock %}
 </head>
 <body>
@@ -29,12 +29,12 @@
     <header class="navbar">
         
         <div class="navbar-links">
-            <a href="{% url 'album-tiles'   %}">Álbumes</a>
-            <a href="{% url 'artist-list'   %}">Artistas</a> 
-            <a href="{% url 'genre-list'    %}">Géneros</a> 
-            <a href="{% url 'tag-list'      %}">Etiquetas</a> 
-            <a href="{% url 'playlist-list' %}">Listas</a> 
-            <a href="{% url 'steal'         %}">{% fa5_icon "search" color="var(--link-color)" %}</a> 
+            {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      %}
+            {% include 'main/link.html' with url='artist-list'   caption="Artistas"     %}
+            {% include 'main/link.html' with url='genre-list'    caption="Géneros"      %}
+            {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    %}
+            {% include 'main/link.html' with url='playlist-list' caption="Listas"       %}
+            {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
             <!-- <a href="#">Mi Música</a> -->
         </div>
         <a href="/">
@@ -82,7 +82,6 @@
         <!-- Lado Derecho -->
         <main class="main">
             <div class="main-content" {% block background %}{% endblock %}>
-                <h1 class="shadowed">{% block content-title %}{% endblock %}</h1>
                 {% block content %}{% endblock %}
             </div>
             <!-- <div class="main-overlay"></div> -->
