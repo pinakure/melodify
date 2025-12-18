@@ -30,9 +30,9 @@
         
         <div class="song-art">
             {% if song.picture %}
-            <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
+                <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
             {% else %}
-            <div class="placeholder-song-image">💿</div>
+                <div class="placeholder-song-image"><span>💿</span></div>
             {% endif %}
         </div>
         

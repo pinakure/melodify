@@ -349,6 +349,11 @@ button.input:disabled{
     display: none;
 }
 
+.fullsize {
+    width: 100%;
+    height: 100%;
+}
+
 #fullplayer {
     position: absolute;
     top: 25%;

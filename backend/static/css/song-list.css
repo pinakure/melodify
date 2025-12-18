@@ -57,11 +57,43 @@
 .placeholder-song-image {
     width: 64px !important;
     height: 64px !important;
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; */
+    background: linear-gradient( 35deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+                linear-gradient( 80deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+                linear-gradient(125deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+                linear-gradient(170deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+                linear-gradient(215deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+                linear-gradient(260deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0),
+                linear-gradient(305deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0),
+                linear-gradient(350deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0);
     display: flex;
     align-items: center;
     justify-content: center;
 }
+.tile-item.song-item:hover .placeholder-song-image span {
+    animation: spinVertical 2s linear infinite;
+}
+
+.placeholder-song-image span {
+    display: inline-block; /* Necesario para que las transformaciones funcionen */
+    /* Mejora la calidad visual del giro */
+    backface-visibility: visible;
+    font-size   : 48px; 
+    line-height : 64px;
+    opacity     : 0.5; 
+}
+
+/* Definición de la animación en el eje Y */
+@keyframes spinVertical {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+
 .song-info {
     position:absolute;
     bottom: 4px;
