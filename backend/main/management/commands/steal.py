@@ -69,6 +69,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("url", nargs="+", type=str)
+        parser.add_argument("--search_only", nargs="*", type=bool)
 
     def searchSong(self, url):
         if not Command.initialized: Command.initialize()
@@ -123,6 +124,10 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         URL = options["url"][0]
-        print(("*"*80)+'\n'+f" Downloading {URL}..."+"\n"+("*"*80))
-        self.getSong(URL);        
+        if options['search_only'] is not None:
+            payload = self.searchSong(URL)
+        else:
+            print(("*"*80)+'\n'+f" Downloading {URL}..."+"\n"+("*"*80))
+            payload = self.getSong(URL)
+        return f"'''{payload}'''"
     
