@@ -6,10 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.db.models import Q
+import sys
+import subprocess
+from io import StringIO
+from django.core.management import execute_from_command_line
 import os
 from django.conf import settings            
 from main.management.commands.scan  import Command as Scan
-from main.management.commands.steal import Command as Steal
 
 import spotdl
 from spotdl import Spotdl
@@ -19,7 +22,6 @@ import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 scanner = Scan()
-stealer = Steal()
 
 
 def get_context( context ):
@@ -374,8 +376,14 @@ def steal_get(request):
             
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
-            songs = stealer.getSong(url)
-            return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : songs})
+            args = [ 'python', os.path.join('scripts', 'steal.py'), url]
+            result = subprocess.run(
+                args,
+                capture_output=True, 
+                text=True
+            )
+            songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
+            return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : json.loads(songs)})
 
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
@@ -396,13 +404,25 @@ def steal_search(request):
             
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
-            songs = stealer.searchSong(url)
-            return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : songs})
+
+            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+            args = [ 'python', os.path.join('scripts', 'steal.py'), url, '--search_only']
+            try:
+                result = subprocess.run(
+                    args,
+                    capture_output=True, 
+                    text=True
+                )
+                songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
+                return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})
+            except Exception as e:
+                print(str(e))
+                return JsonResponse({'status': 'error', 'message': str(e)})
 
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        # except Exception as e:
+            # return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)

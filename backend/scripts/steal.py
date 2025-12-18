@@ -19,7 +19,6 @@ spotdl          =  Spotdl(
     no_cache=True
 )
 
-
 def searchSong(url):
     song_objs = spotdl.search([url])
     payload = []
@@ -40,9 +39,6 @@ def getSong(url):
     payload = []
 
     for song in song_objs:
-        print(f'{song.artist}, {song.name}')
-        print("-"*80)
-        
         try:
             artists  = ", ".join(song.artists)
             artist   = artists.split(',')[0]
@@ -52,14 +48,11 @@ def getSong(url):
             dest     = os.path.join(LIBRARY_ROOT, letter, artist, album, title)
             dstpath  = os.path.join(LIBRARY_ROOT, letter, artist, album)
             if os.path.exists(os.path.join(dstpath,  title)):
-                print('Skipping download, song already exists.')
                 continue
             result   = spotdl.download_songs([song])[0]
             if result[1] is None:
-                print(result)
                 continue
             filename = clean(result[1].name)
-            print(f'Move "{filename}" ---> "{dest}"')
             try:
                 os.makedirs(dstpath)
             except:
@@ -79,6 +72,5 @@ if len(sys.argv) >2:
     if sys.argv[2]=='--search_only':
         payload = searchSong(URL)
 else:
-    print(("*"*80)+'\n'+f" Downloading {URL}..."+"\n"+("*"*80))
     payload = getSong(URL)
 print(f"'''{payload}'''")

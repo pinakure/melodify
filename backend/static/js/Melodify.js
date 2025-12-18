@@ -17,27 +17,6 @@ function Melodify(){
     this.search_term = '';
 };
 
-function hidePlaylists( ){ 
-    const div = document.getElementById('playlists-window');
-    div.style.display = 'none';
-}
-
-function showPlaylists( parent, song_id ){
-    const div = document.getElementById('playlists-window');
-    div.style.display = 'inline-block';
-    document.getElementById('playlists-window').setAttribute('data-song', song_id);
-}
-
-    
-function getCookie(name) {
-    var node = document.getElementsByName('csrfmiddlewaretoken')[0];
-    console.log(node);
-    return node.value;
-}
-
-
-
-
 Melodify.prototype = {
 
     saveState : function() {
@@ -78,6 +57,12 @@ Melodify.prototype = {
             alert(`Navigate: Network/Server Error ${error}`);
         });
     },
+       
+    getCookie : function(name) {
+        var node = document.getElementsByName('csrfmiddlewaretoken')[0];
+        console.log(node);
+        return node.value;
+    },
 
     request : function(url, json_data, done_callback) { 
         fetch(
@@ -86,7 +71,7 @@ Melodify.prototype = {
                 method: 'POST',
                 headers: {
                     'Content-Type'      : 'application/json',
-                    'X-CSRFToken'       : getCookie('csrftoken'), 
+                    'X-CSRFToken'       : melodify.getCookie('csrftoken'), 
                     'X-Requested-With'  : 'XMLHttpRequest'
                 }, body: JSON.stringify(json_data)
             }
@@ -157,11 +142,33 @@ Melodify.prototype = {
         }   
     },
 
+    showResults : function(data){
+        container = document.getElementById('results');
+        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
+        container.innerHTML += "<ul>";
+        for( d in data.songs ){
+            song = data.songs[d];
+            console.log(song);
+            container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })"><i class="fas fa-download "></i></button></li>`;
+        }
+        container.innerHTML += "</ul>";
+    },
+  
+    hidePlaylists : function(){ 
+        const div = document.getElementById('playlists-window');
+        div.style.display = 'none';
+    },
+
+    showPlaylists : function( parent, song_id ){
+        const div = document.getElementById('playlists-window');
+        div.style.display = 'inline-block';
+        document.getElementById('playlists-window').setAttribute('data-song', song_id);
+    },       
+
     addSongToPlaylist : function(playlist_id){
         song_id = document.getElementById('playlists-window').getAttribute('data-song');
         this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
-            hidePlaylists();
-            // location.reload(); 
+            melodify.hidePlaylists();
         });
     },
 
@@ -220,14 +227,11 @@ Melodify.prototype = {
         clearTimeout(melodify.searchTimeout);
         melodify.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, loadAlbums), 300);
     },
-
-
 };    
 
 const melodify = new Melodify();
 
 /* album list stuff */
-let albumCount = 0;
 
 function truncate(artist, n){
     return  (artist.split(', ').length == 2) ? artist.replace(', ', ' / ') : 
@@ -236,6 +240,7 @@ function truncate(artist, n){
 };
 
 function loadAlbums() {
+    let albumCount = 0;
     const loadingIndicator = document.getElementById('loading');
     const scrollbox     = document.getElementsByClassName('main-content')[0];
 
@@ -295,9 +300,10 @@ function loadAlbums() {
 }
 
 function loadPlaylists() {
+    let playlistCount = 0;
     const playlist_container = document.getElementById('tileContainer');
-    const countDisplay      = document.getElementById('playlist-count');
-    const scrollbox         = document.getElementsByClassName('main-content')[0];
+    const countDisplay       = document.getElementById('playlist-count');
+    const scrollbox          = document.getElementsByClassName('main-content')[0];
 
     if (melodify.is_loading) return;
     melodify.is_loading = true;
@@ -380,19 +386,6 @@ function triggerSearch( handler, callback ) {
         scrollbox.addEventListener('scroll', handler); // Asegurarse de que el scroll listener esté activo
         callback(); // Cargar la primera página de los resultados de la búsqueda
     }
-}
-
-function showResults(data){
-    container = document.getElementById('results');
-    container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
-    container.innerHTML += "<ul>";
-    data.songs = JSON.parse(data.songs.replaceAll("'''", '').replaceAll('\n', '').replaceAll("'", '"'));
-    for( d in data.songs ){
-        song = data.songs[d];
-        console.log(song);
-        container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })"><i class="fas fa-download "></i></button></li>`;
-    }
-    container.innerHTML += "</ul>";
 }
 
 function enable(node_id){
