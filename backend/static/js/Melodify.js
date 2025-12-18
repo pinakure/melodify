@@ -269,7 +269,7 @@ function loadAlbums() {
                 div.innerHTML = `
                     <a onclick="melodify.navigate('${album.url_detalle}')"> 
                         <div class="album-art">
-                            <div class="album-image" style="{% if album.url_picture %}background-image: url('${album.url_picture}'){% endif %}" alt="Album cover"></div>
+                            <div picture="${ album.url_picture }" class="album-image ${ album.url_picture=='None' ? 'nopicture' : ''}" style="${ album.url_picture!="None" ? 'background-image: url(\''+album.url_picture+'\')' : ''}" alt="Album cover"></div>
                         </div>
                         <div class="tile-info">
                             <h3 class="album-name">${album.nombre}</h3>

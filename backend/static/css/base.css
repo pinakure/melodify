@@ -351,7 +351,12 @@ a:hover {
     border: 2px ridge #888888;
 }
 
-.tile-item.playlist-item:nth-child(even) .album-image,
-.sidebar-entry:nth-child(even) .sidebar-entry-picture{
-    filter: hue-rotate(45deg);
-}
+.card-item:nth-child(2n)  a .circular-item, .tile-item.album-item:nth-child(2n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 2n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 2n) .album-image, .sidebar-entry:nth-child(2n) .sidebar-entry-picture{ filter: hue-rotate( 5deg); }
+.card-item:nth-child(3n)  a .circular-item, .tile-item.album-item:nth-child(3n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 3n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 3n) .album-image, .sidebar-entry:nth-child(3n) .sidebar-entry-picture{ filter: hue-rotate(25deg); }
+.card-item:nth-child(4n)  a .circular-item, .tile-item.album-item:nth-child(4n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 4n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 4n) .album-image, .sidebar-entry:nth-child(4n) .sidebar-entry-picture{ filter: hue-rotate(45deg); }
+.card-item:nth-child(5n)  a .circular-item, .tile-item.album-item:nth-child(5n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 5n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 5n) .album-image, .sidebar-entry:nth-child(5n) .sidebar-entry-picture{ filter: hue-rotate(65deg); }
+.card-item:nth-child(6n)  a .circular-item, .tile-item.album-item:nth-child(6n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 6n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 6n) .album-image, .sidebar-entry:nth-child(6n) .sidebar-entry-picture{ filter: hue-rotate(85deg); }
+.card-item:nth-child(7n)  a .circular-item, .tile-item.album-item:nth-child(7n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 7n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 7n) .album-image, .sidebar-entry:nth-child(7n) .sidebar-entry-picture{ filter: hue-rotate(105deg); }
+.card-item:nth-child(8n)  a .circular-item, .tile-item.album-item:nth-child(8n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 8n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 8n) .album-image, .sidebar-entry:nth-child(8n) .sidebar-entry-picture{ filter: hue-rotate(125deg); }
+.card-item:nth-child(9n)  a .circular-item, .tile-item.album-item:nth-child(9n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 9n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 9n) .album-image, .sidebar-entry:nth-child(9n) .sidebar-entry-picture{ filter: hue-rotate(145deg); }
+.card-item:nth-child(10n) a .circular-item, .tile-item.album-item:nth-child(10n) a .album-art .nopicture, .tile-item.song-item:nth-child(10n) > .album-image.nopicture, .tile-item.playlist-item:nth-child(10n) .album-image, .sidebar-entry:nth-child(10n) .sidebar-entry-picture{ filter: hue-rotate(165deg); }
