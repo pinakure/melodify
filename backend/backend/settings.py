@@ -108,8 +108,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-LIBRARY_ROOT = os.path.join("D:") # warning, this exposes your disk contents through /static/ URL
+with open('config/library-root.cfg', 'r') as f:
+    library_root = f.read()
+LIBRARY_ROOT = os.path.join(library_root) # warning, this exposes your disk contents through /static/ URL
 STATIC_FILES = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [ LIBRARY_ROOT, STATIC_FILES ]
 STATIC_URL = 'static/'
