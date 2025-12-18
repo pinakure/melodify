@@ -381,3 +381,28 @@ function triggerSearch( handler, callback ) {
         callback(); // Cargar la primera página de los resultados de la búsqueda
     }
 }
+
+function showResults(data){
+    container = document.getElementById('results');
+    container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
+    container.innerHTML += "<ul>";
+    data.songs = JSON.parse(data.songs.replaceAll("'''", '').replaceAll('\n', '').replaceAll("'", '"'));
+    for( d in data.songs ){
+        song = data.songs[d];
+        console.log(song);
+        container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })"><i class="fas fa-download "></i></button></li>`;
+    }
+    container.innerHTML += "</ul>";
+}
+
+function enable(node_id){
+    node = document.getElementById(`download-${node_id}`);
+    node.removeAttribute('readonly');
+    node.removeAttribute('disabled');
+}
+
+function disable(node_id){
+    node = document.getElementById(`download-${node_id}`)
+    node.setAttribute('readonly', 'readonly');
+    node.setAttribute('disabled', 'disabled');        
+}
