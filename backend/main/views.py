@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -223,6 +223,18 @@ class StealView(ListView):
         context = get_context(super().get_context_data(**kwargs))
         return context
     
+
+class LandingView(ListView):
+    model = Playlist
+    template_name = 'main/landing.html'  
+    context_object_name = 'playlists'         
+    queryset = Playlist.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        context['favorites'] = Song.objects.filter(bookmarked=True)
+        return context
+
 class HomeView(ListView):
     model = Song
     template_name = 'main/home.html'  
@@ -232,8 +244,9 @@ class HomeView(ListView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         context['favorites'] = Song.objects.filter(bookmarked=True)
+        context['playlists'] = Playlist.objects.all()
         return context
-    
+
 class TagDetailView(DetailView):
     model = Tag
     template_name = 'main/tag-detail.html'
@@ -308,6 +321,7 @@ class PlaylistDetailView(DetailView):
         context = get_context(super().get_context_data(**kwargs))
         playlist = self.object
         context['songs'] = playlist.songs.all()
+        context['back'] = self.request.GET.get('back', '')
         # context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
         
         return context
@@ -414,6 +428,7 @@ def scan_artist(request):
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
 
 def bookmark_song(request):
     if isinstance(request.user , AnonymousUser):

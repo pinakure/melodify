@@ -1,6 +1,5 @@
-{% extends 'base.html' %}
+{% load fontawesome_5 %}
 
-{% block header %}
 <style>
     .artist-profile {
         /* padding-top: 16px; */
@@ -75,7 +74,7 @@
         justify-content: center;
     }
     .tile-info {
-        position:absolute;
+        /* position:absolute; */
         bottom: 4px;
         left: 72px;
         display: inline-block;
@@ -102,13 +101,15 @@
         background-color: var(--bg-content);
     }
 </style>
-{% endblock %}
 
-{% block content-title %}{{ artist.name }} <span class="small blend-50" >Artista</span>{% endblock %}
+<h1 class="shadowed">{{ artist.name }} <span class="small blend-50" >Artista</span></h1>
 
-{% block background %}
-    {% if artist.picture.name %}style="background-image:url('{{ artist.picture.url }}');"{% endif %}
-{% endblock %}
+<button onclick="melodify.navigate(`{% url 'artist-list' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
+{% if artist.picture.name %}
+    <script>
+        document.getElementsByClassName('main-content')[0].style="background-image:url('{{ artist.picture.url }}');background-blend-mode:lighten;";
+    </script>
+{% endif %}
 
 {% block content %}
 <div class="artist-profile">
@@ -142,7 +143,7 @@
     <div class="album-grid">
         {% for album in albums_list %}
             <div class="album-item">
-                <a href="{% url 'album-detail' album.pk %}">
+                <a onclick="melodify.navigate(`{% url 'album-detail' album.pk %}`)">
                     {% if album.picture %}
                         <img src="{{ album.picture }}" alt="{{ album.name }} cover">
                     {% else %}

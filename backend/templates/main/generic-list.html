@@ -49,7 +49,7 @@
 <div class="list-container">
     <div class="grid" id="Grid">
         {% for item in items %}
-        <a href="{% url url_detail pk=item.pk %}">
+        <a onclick="melodify.navigate(`{% url url_detail pk=item.pk %}`)">
             <div class="card item" data-name="{{ item.name|lower }}">
                     <h3>{{ item.name }}</h3>
                 </div>

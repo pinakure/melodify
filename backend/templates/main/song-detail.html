@@ -1,17 +1,15 @@
-{% extends 'base.html' %}
 {% load static %}
 {% load utils %}
-
-{% block header %}
-
+{% load fontawesome_5 %}
 
 
-{% endblock %}
 
-{% block content-title %}<a style="color: var(--text-color) !important;" target="_blank" rel="noopener noreferrer"  href="/admin/main/song/{{ song.pk }}/change" title="Edit song details">{{ song.title }}</a> <span class="small blend-50" >Canción</span>{% endblock %}
+<h1 class="shadowed"><a style="color: var(--text-color) !important;" target="_blank" rel="noopener noreferrer"  href="/admin/main/song/{{ song.pk }}/change" title="Edit song details">{{ song.title }}</a> <span class="small blend-50" >Canción</span></h1>
+{% if song.album.pk %}
+    <button onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
+{% endif %}
 
-{% block content %}
-<a href="{% url 'artist-detail' song.artist.pk %}">
+<a onclick="melodify.navigate(`{% url 'artist-detail' song.artist.pk %}`)">
     {{ song.artist.name }}
 </a>
 
@@ -19,7 +17,7 @@
     
     <div class="album-info-section">
         {% if song.album.pk %}
-        <a href="{% url 'album-detail' song.album.pk %}">
+        <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
             <h4>{{ song.album.name }}</h4>
             <div class="album-art" style="justify-content: left !important;">
                 {% if song.album.picture %}
@@ -35,7 +33,7 @@
         <p class="labels">
             <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
             {% for artist in song.album.artists.all %}
-            <a href="{% url 'artist-detail' artist.pk %}">{{ artist.name }}</a>
+            <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
             {% endfor %}
         </p>
         {%endif%}
@@ -47,7 +45,7 @@
         
         {% if song.genre %}
             <p class="labels"><strong>Género: </strong>
-                <a href="{% url 'genre-detail' song.genre.pk %}">{{ song.genre }}</a>
+                <a onclick="melodify.navigate(`{% url 'genre-detail' song.genre.pk %}`)">{{ song.genre }}</a>
             </p>
         {% endif %}
         
@@ -59,12 +57,10 @@
         <!-- El reproductor de audio -->
         <p class="breathe">
             {% if song.filename %}
-                <div class="audio-player-container">                    
-                    <audio controls preload="none">
-                        <source src="{% static song.filename %}" type="audio/mpeg">
-                        Tu navegador no soporta el elemento de audio.
-                    </audio>
-                </div>
+                <audio controls preload="none">
+                    <source src="{% static song.filename %}" type="audio/mpeg">
+                    Tu navegador no soporta el elemento de audio.
+                </audio>
             {% else %}
                 <span class="no-track-available">Pista no disponible</span>
             {% endif %}
@@ -76,12 +72,3 @@
 <script>
 
 </script>
-
-{% endblock %}
-{% block back %}
-{% if song.album.pk %}
-    <a href="{% url 'album-detail' song.album.pk %}" class="back-link">
-        ← Volver al listado del álbum
-    </a>
-{% endif %}
-{% endblock %}

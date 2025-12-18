@@ -1,8 +1,5 @@
 <!-- templates/app/album_tiles.html -->
 
-{% comment %}{% extends 'base.html' %}{% endcomment %}
-
-{% block header %}
 <style>
     .tile-container {
         display: grid;
@@ -53,46 +50,30 @@
     }
 
 </style>
-{% endblock %}
 
-{% block search %}
-    <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes..." onkeyup="clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(triggerSearch, 300);">
-{% endblock %}
-
+<input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 
 <h1 class="shadowed">Álbumes (<span id="album-count">{{ albums.count }}</span>)</h1>
 
-
-{% block content %}
-
 <div id="loading" style="display: none;">Cargando albumes...</div>
 
-<div class="tile-container" id="tileContainer">
-    
-</div>
+<div class="tile-container" id="tileContainer"></div>
 
 <script>
-    console.log("REACH");
+    const scrollbox = document.getElementsByClassName('main-content')[0];
+    melodify.next_page = 1;
     loadAlbums();
 
-    const container = document.getElementById('tileContainer');
-    const scrollbox = document.getElementsByClassName('main-content')[0];
-    const loadingIndicator = document.getElementById('loading');
-    const countDisplay = document.getElementById('album-count');
-
     // Carga inicial y listeners
-    // window.addEventListener('DOMContentLoaded', (event) => {
-        scrollbox.addEventListener('scroll', handleScroll);
-        
-        searchInput.addEventListener('input', () => {
-            // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
-            
-        });
 
-        triggerSearch(); 
-        alert("OK");
-    // });
+    scrollbox.addEventListener('scroll', melodify.handleAlbumScroll);
+    
+    searchInput.addEventListener('input', () => {
+        // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
+        clearTimeout(this.searchTimeout); 
+        this.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, loadAlbums), 300);
+    });
+
+    triggerSearch(melodify.handleAlbumScroll, loadAlbums); 
     
 </script>
-
-{% endblock %}

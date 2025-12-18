@@ -1,14 +1,20 @@
 function Melodify(){
+    /* Restore initial melodigy state */
     const initial_state = {
         currentSongId   : null,
         currentTime     : 0,
         volume          : 0.5,
-        queue           : []
+        queue           : [],
+        current_page    : '',
     };
-    state = localStorage.getItem('player_activity');
+    state = localStorage.getItem('melodify');
     if(!state) state = initial_state;
     else state = JSON.parse(state);
-    this.state = state;
+    
+    this.next_page  = 1;
+    this.state      = state;
+    this.is_loading = false;
+    this.search_term = '';
 };
 
 function hidePlaylists( ){ 
@@ -35,14 +41,37 @@ function getCookie(name) {
 Melodify.prototype = {
 
     saveState : function() {
-        localStorage.setItem('player_activity', JSON.stringify(this.state));
+        localStorage.setItem('melodify', JSON.stringify(this.state));
+    },
+
+    reset_scroll : function(){
+        try{ scrollbox.scrollTop = 0;} catch{}
     },
 
     navigate : function(url){
-        fetch(url)
+        fetch(`${url}?back=${ melodify.state.current_page.replace('/','') }`)
         .then(response => response.text())
         .then(data => {
-            document.getElementsByClassName('main-content')[0].innerHTML = data;
+            /* Remove event listeners */
+            var search = document.getElementById('searchInput');
+            if(search){
+                search.removeEventListener('input', melodify.handlePlaylistFilter);
+                search.removeEventListener('input', melodify.handleAlbumFilter);
+            }
+            const content = document.getElementsByClassName('main-content')[0];
+            content.removeEventListener('scroll', melodify.handleAlbumScroll);
+            content.removeEventListener('scroll', melodify.handlePlaylistScroll);
+            content.scrollTop = 0;
+            content.innerHTML = "";
+            content.innerHTML = data;
+            content.style="";
+            melodify.next_page = 1;
+            melodify.search_term = '-';
+            var scripts = content.getElementsByTagName('script');
+            for(s in scripts){
+                eval(scripts[s].innerHTML);
+            }
+            melodify.state.current_page = url;
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);
@@ -132,7 +161,7 @@ Melodify.prototype = {
         song_id = document.getElementById('playlists-window').getAttribute('data-song');
         this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
             hidePlaylists();
-            location.reload(); 
+            // location.reload(); 
         });
     },
 
@@ -153,8 +182,8 @@ Melodify.prototype = {
 
         this.request('/playlists/new/', { name : playlistName }, ()=>{ 
             toggleNewListForm(); 
-            currentSearchTerm = ''; // Reseteamos el término de búsqueda si es necesario
-            nextPage = 1;
+            melodify.search_term = ''; // Reseteamos el término de búsqueda si es necesario
+            melodify.next_page = 1;
             container.innerHTML = '';
             loadPlaylists(); 
         });
@@ -166,16 +195,39 @@ Melodify.prototype = {
             document.getElementById(`unbookmark-song-${ song_id }`).classList.toggle("hidden")
         });
     },
+   
+    handleScroll : function( callback ) {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 200) {
+            callback();
+        }
+    },
+    
+    handleAlbumScroll : function( ) {
+        melodify.handleScroll( loadAlbums );
+    },
+    
+    handlePlaylistScroll : function(){
+        melodify.handleScroll( loadPlaylists );
+    },
+
+    handlePlaylistFilter : function(){
+        clearTimeout(melodify.searchTimeout);
+        melodify.searchTimeout = setTimeout(() => triggerSearch(melodify.handlePlaylistScroll, loadPlaylists), 300);
+    },
+
+    handleAlbumFilter : function(){
+        clearTimeout(melodify.searchTimeout);
+        melodify.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, loadAlbums), 300);
+    },
+
 
 };    
 
 const melodify = new Melodify();
 
 /* album list stuff */
-let nextPage = 1;
-let isLoading = false;
 let albumCount = 0;
-let currentSearchTerm = '-';
 
 function truncate(artist, n){
     return  (artist.split(', ').length == 2) ? artist.replace(', ', ' / ') : 
@@ -184,17 +236,18 @@ function truncate(artist, n){
 };
 
 function loadAlbums() {
-    if (isLoading) return;
-    isLoading = true;
+    const loadingIndicator = document.getElementById('loading');
+    const scrollbox     = document.getElementsByClassName('main-content')[0];
+
+    if (melodify.isLoading) return;
+    melodify.isLoading = true;
     loadingIndicator.style.display = 'block';
 
-    const url = new URL(`/albums/`, window.location.origin);
-    url.searchParams.set('page', nextPage);
-    if (currentSearchTerm) {
-        url.searchParams.set('search', currentSearchTerm);
-    }
-
-    fetch(url.toString(), {
+    var album_container = document.getElementById('tileContainer');
+    var album_count     = document.getElementById('album-count');
+    
+    
+    fetch(`/albums/?page=${melodify.next_page}${ melodify.search_term ? '&search=' : ''}${melodify.search_term}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         }
@@ -209,7 +262,7 @@ function loadAlbums() {
                 div.setAttribute('data-album-name', album.safename);
                 
                 div.innerHTML = `
-                    <a href="${album.url_detalle}"> 
+                    <a onclick="melodify.navigate('${album.url_detalle}')"> 
                         <div class="album-art">
                             <div class="album-image" style="background-image: url('${album.url_picture ? album.url_picture : ''}')" alt="Album cover"></div>
                         </div>
@@ -219,46 +272,112 @@ function loadAlbums() {
                         </div>
                     </a>
                 `;
-                container.appendChild(div);
+                album_container.appendChild(div);
             });
-            nextPage++;
-            isLoading = false;
+            melodify.next_page++;
             // Actualizamos el contador total si la respuesta lo incluye
             if (data.total_count !== undefined) {
                     albumCount = data.total_count;
-                    countDisplay.textContent = albumCount;
+                    album_count.textContent = albumCount;
             }
         } else {
-            scrollbox.removeEventListener('scroll', handleScroll);
-        }
+            scrollbox.removeEventListener('scroll', melodify.handleAlbumScroll);
+        }            
+        melodify.isLoading = false;
+
         loadingIndicator.style.display = 'none';
     })
     .catch(error => {
         console.error('Error fetching albums:', error);
-        isLoading = false;
+        melodify.isLoading = false;
         loadingIndicator.style.display = 'none';
     });
 }
 
-function handleScroll() {
-    console.log("HANDLING SCROLL");
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight - 200) {
-        loadAlbums();
+function loadPlaylists() {
+    const playlist_container = document.getElementById('tileContainer');
+    const countDisplay      = document.getElementById('playlist-count');
+    const scrollbox         = document.getElementsByClassName('main-content')[0];
+
+    if (melodify.is_loading) return;
+    melodify.is_loading = true;
+    const loadingIndicator  = document.getElementById('loading');
+
+    loadingIndicator.style.display = 'block';
+
+    fetch(`playlists/?page=${melodify.next_page}${ melodify.search_term ? '&search=' : ''}${melodify.search_term}` , {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.playlists.length > 0) {
+            data.playlists.forEach(playlist => {
+                const div = document.createElement('div');
+                div.className = "tile-item playlist-item";
+                div.setAttribute('data-playlist-artist', playlist.safeartist); 
+                div.setAttribute('data-playlist-name', playlist.safename);
+                
+                div.innerHTML = `
+                    <a onclick="melodify.navigate('${playlist.url_detalle}')"> 
+                        <div class="album-art">
+                            <div class="album-image" style="background-image: url('${playlist.url_picture ? playlist.url_picture : ''}')" alt="Playlist cover"></div>
+                        </div>
+                        <div class="tile-info">
+                            <h3 class="playlist-name">${playlist.nombre}</h3>
+                            <h6 class="playlist-artists">${truncate(playlist.artists, 3)}</h6>
+                            <h6 class="playlist-genres">${truncate(playlist.genres, 3)}</h6>
+                        </div>
+                    </a>
+                `;
+                playlist_container.appendChild(div);
+            });
+            melodify.next_page++;
+            // Actualizamos el contador total si la respuesta lo incluye
+            if (data.total_count !== undefined) {
+                    playlistCount = data.total_count;
+                    countDisplay.textContent = playlistCount;
+            }
+        } else {
+            scrollbox.removeEventListener('scroll', melodify.handlePlaylistScroll);
+        }
+        melodify.is_loading = false;
+        loadingIndicator.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error fetching playlists:', error);
+        melodify.is_loading = false;
+        loadingIndicator.style.display = 'none';
+    });
+}
+
+ function toggleNewListForm() {
+    const form = document.getElementById('new-list');
+    // Muestra u oculta el formulario
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'flex'; // o 'block', dependiendo de tus estilos 'new-list'
+        document.getElementById('new-list-name').focus();
+    } else {
+        form.style.display = 'none';
+        document.getElementById('new-list-name').value = ''; // Limpia el input al ocultar
     }
 }
 
-function triggerSearch() {
-    const searchInput = document.getElementById('searchInput'); 
+function triggerSearch( handler, callback ) {
+    const searchInput   = document.getElementById('searchInput'); 
+    const container     = document.getElementById('tileContainer');
+    const scrollbox     = document.getElementsByClassName('main-content')[0];
+
     const newSearchTerm = searchInput.value.toLowerCase().trim();
-    
-    if (newSearchTerm !== currentSearchTerm) {
+   
+    if (newSearchTerm !== melodify.search_term) {
         // Reiniciar el estado para una nueva búsqueda
-        currentSearchTerm = newSearchTerm;
-        nextPage = 1;
+        melodify.search_term = newSearchTerm;
+        melodify.next_page = 1;
         albumCount = 0;
         container.innerHTML = ''; // Limpiar álbumes anteriores
-        scrollbox.addEventListener('scroll', handleScroll); // Asegurarse de que el scroll listener esté activo
-        loadAlbums(); // Cargar la primera página de los resultados de la búsqueda
+        scrollbox.addEventListener('scroll', handler); // Asegurarse de que el scroll listener esté activo
+        callback(); // Cargar la primera página de los resultados de la búsqueda
     }
 }

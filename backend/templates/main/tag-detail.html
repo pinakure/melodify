@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-
-{% block header %}
+{% load fontawesome_5 %}
 <style>
     .tag-detail {
         /* padding-top: 16px; */
@@ -75,7 +73,7 @@
         justify-content: center;
     }
     .tile-info {
-        position:absolute;
+        /* position:absolute; */
         bottom: 4px;
         left: 72px;
         display: inline-block;
@@ -101,12 +99,15 @@
         background-color: var(--bg-content);
     }
 </style>
-{% endblock %}
 
-{% block content-title %}{{ tag.name }} <span class="small blend-50" >Etiqueta</span>{% endblock %}
+<h1 class="shadowed">{{ tag.name }} <span class="small blend-50" >Etiqueta</span></h1>
+
+<button onclick="melodify.navigate(`{% url 'tag-list' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
+<script>
+    document.getElementsByClassName('main-content')[0].style="background:linear-gradient('45deg, #123, #fec)";
+</script>
 
 {% block background %}
-    style="background:linear-gradient('45deg, #123, #fec)"
 {% endblock %}
 
 {% block content %}

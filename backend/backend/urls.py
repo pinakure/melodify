@@ -11,7 +11,8 @@ from django.views.static import serve # Import the standard file server view
 urlpatterns = [
     path('admin/'               , admin.site.urls),
     path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
-    path(''                     , HomeView.as_view()            , name='home'),
+    path('home'                 , HomeView.as_view()            , name='home'),
+    path(''                     , LandingView.as_view()         , name='tag-list'),
     path('steal/'               , StealView.as_view()           , name='steal'),
     path('stealget/'            , views.steal_get               , name='steal-get'),
     path('stealsearch/'         , views.steal_search            , name='steal-search'),

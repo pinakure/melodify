@@ -354,6 +354,10 @@ button.input:disabled{
     height: 100%;
 }
 
+a:hover { 
+    cursor: pointer;
+}
+
 #fullplayer {
     position: absolute;
     top: 25%;

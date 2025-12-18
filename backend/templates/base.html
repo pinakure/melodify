@@ -37,7 +37,7 @@
             {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
             <!-- <a href="#">Mi Música</a> -->
         </div>
-        <a href="/">
+        <a onclick="melodify.navigate('home')">
             <div id="melodify-logo">
                 <div class="benzene">⌬</div>
             </div>
@@ -85,6 +85,27 @@
                 {% block content %}{% endblock %}
             </div>
             <!-- <div class="main-overlay"></div> -->
+             <div id="playlists-window" class="playlists" style="z-index: 2000">
+                <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="hidePlaylists()">{% fa5_icon 'times'%}</button>
+                <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
+                <div class="wrapper">
+                    <ul>
+                        {% for playlist in playlists %}
+                            <!-- {% include 'main/playlist-entry.html' with index=forloop.counter title=playlist.title subtitle='Test' use_index=False picture=playlist.songs.0.picture.url %} -->
+                            <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
+                                <div class="playlist-entry-picture"></div>
+                                <div>
+                                    <!-- Playlist {{ forloop.counter }} -->
+                                    {{ playlist.title }}
+                                </div>
+                                <div>
+                                    <!-- Playlist {{ forloop.counter }} -->
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </main>
         
     </div>
