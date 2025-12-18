@@ -1,5 +1,5 @@
-<li class="sidebar-entry">
-    <div class="sidebar-entry-picture" style="background-image:url('{{ picture }}')"></div>
+<li onclick="melodify.navigate('{{ url }}')" class="sidebar-entry">
+    <div class="sidebar-entry-picture" style="{% if picture is not None %}background-image:url('{{ picture }}'){% endif %}"></div>
     <div class="sidebar-entry-content">
         <p class="sidebar-entry-primary">{% if use_index %}{{ index }} - {% endif %}{{ title }}</p>
         <p class="sidebar-entry-secondary">{{ subtitle }}</p>

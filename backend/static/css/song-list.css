@@ -54,11 +54,11 @@
     overflow: hidden;
     display: inline-block;
 }
+
+.album-image,
+.sidebar-entry-picture,
 .placeholder-song-image {
-    width: 64px !important;
-    height: 64px !important;
-    /* background-color: #f0f0f0; */
-    background: linear-gradient( 35deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
+   background: linear-gradient( 35deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
                 linear-gradient( 80deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
                 linear-gradient(125deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
                 linear-gradient(170deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0), 
@@ -66,6 +66,12 @@
                 linear-gradient(260deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0),
                 linear-gradient(305deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0),
                 linear-gradient(350deg, var(--accent-color), var(--link-color), #fff2, #fff0, #fff0);
+ }
+
+.placeholder-song-image {
+    width: 64px !important;
+    height: 64px !important;
+    /* background-color: #f0f0f0; */
     display: flex;
     align-items: center;
     justify-content: center;

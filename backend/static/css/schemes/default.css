@@ -1,0 +1,22 @@
+:root {
+    --bg-main               : #121212;
+    --bg-nav                : #1e1e1e;
+    --bg-sidebar            : #2c2c2c;
+    --bg-sidebar-selection  : #383838;
+    --bg-sidebar-hover      : #303030;
+    --bg-content-blend      : #222222C0;
+    --bg-content            : #222222;
+    --text-color            : #e0e0e0;
+    --secondary-color       : #b4b0ae;
+    --link-color            : #fcd08c;
+    --section-color         : #1d8eff;
+    --confirm-color         : #73bf00;
+    --accent-color          : #ff7300;
+    --bg-player-title       : #804000;
+    --shadow-color          : #442200;
+    --tile-placeholder      : #777;
+    --tile-info             : #030303;
+    --tile-info-text        : #666;
+    --nav-height            : 60px;
+    --sidebar-width         : 432px;
+}

@@ -27,74 +27,24 @@ scanner = Scan()
 def get_context( context ):
     # Enter global severside data here
     context['playlists'] = Playlist.objects.all()
-    context['sidebar'] = [
+    sidebar = [
         { 
             'picture'   : '/static/images/like.png',
-            'primary'   : 'Me Gusta',
-            'secondary' : 'Lista ⌬ Smiker Pinakure Mageek',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/albums/Blonde.png',
-            'primary'   : 'Blonde',
-            'secondary' : 'Album ⌬ Frank Ocean',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/artists/213.jpg',
-            'primary'   : '213',
-            'secondary' : 'Artista',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/podcast.png',
-            'primary'   : 'Terror para llevar',
-            'secondary' : 'Podcast ⌬ YoSoyPride',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/altlike.png',
-            'primary'   : 'Canciones que te gustan',
-            'secondary' : 'Lista ⌬ 119 canciones',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/podcast.png',
-            'primary'   : 'Tus Episodios',
-            'secondary' : 'Lista ⌬ Episodios guardados y descargados',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/like.png',
-            'primary'   : 'Me Gusta',
-            'secondary' : 'Lista ⌬ Smiker Pinakure Mageek',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/artists/2Pac.jpg',
-            'primary'   : '2Pac',
-            'secondary' : 'Artista ⌬ 1 Álbum',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/media/artists/Frank_Ocean.jpg',
-            'primary'   : 'Frank Ocean',
-            'secondary' : 'Artista ⌬ 3 Álbumes',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/podcast.png',
-            'primary'   : 'Terror para llevar',
-            'secondary' : 'Podcast ⌬ YoSoyPride',
-            'use_index' : False,
-        },
-        { 
-            'picture'   : '/static/images/altlike.png',
-            'primary'   : 'Canciones que te gustan',
-            'secondary' : 'Lista ⌬ 119 canciones',
+            'primary'   : 'Favoritos',
+            'secondary' : 'Lista',
+            'url'       : 'favorites',
             'use_index' : False,
         },
     ]
+    for playlist in context['playlists']:
+        sidebar.append({
+            'picture'   : playlist.picture.url if playlist.picture.name else None,  
+            'primary'   : playlist.title,
+            'secondary' : playlist.get_artists(),
+            'url'       : f'playlist/{playlist.id}',
+            'use_index' : False,
+        })
+    context['sidebar'] = sidebar
     return context
 
 class AlbumTileView(ListView):
@@ -225,7 +175,16 @@ class StealView(ListView):
         context = get_context(super().get_context_data(**kwargs))
         return context
     
+class FavoritesView(ListView):
+    model = Playlist
+    template_name = 'main/favorites.html'  
+    context_object_name = 'songs'
+    queryset = Song.objects.filter(bookmarked=True)
 
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+    
 class LandingView(ListView):
     model = Playlist
     template_name = 'main/landing.html'  

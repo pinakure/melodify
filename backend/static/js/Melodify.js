@@ -181,7 +181,7 @@ Melodify.prototype = {
     createPlaylist : function() {
         const playlistNameInput = document.getElementById('new-list-name');
         const playlistName = playlistNameInput.value.trim();
-
+        const container = document.getElementById('tileContainer');
         if (!playlistName) {
             alert("Por favor, introduce un nombre para la lista.");
             return;
@@ -269,7 +269,7 @@ function loadAlbums() {
                 div.innerHTML = `
                     <a onclick="melodify.navigate('${album.url_detalle}')"> 
                         <div class="album-art">
-                            <div class="album-image" style="background-image: url('${album.url_picture ? album.url_picture : ''}')" alt="Album cover"></div>
+                            <div class="album-image" style="{% if album.url_picture %}background-image: url('${album.url_picture}'){% endif %}" alt="Album cover"></div>
                         </div>
                         <div class="tile-info">
                             <h3 class="album-name">${album.nombre}</h3>
@@ -328,7 +328,7 @@ function loadPlaylists() {
                 div.innerHTML = `
                     <a onclick="melodify.navigate('${playlist.url_detalle}')"> 
                         <div class="album-art">
-                            <div class="album-image" style="background-image: url('${playlist.url_picture ? playlist.url_picture : ''}')" alt="Playlist cover"></div>
+                            <div class="album-image" style="{% if playlist.url_picture %}background-image: url('${playlist.url_picture}'){% endif %}" alt="Playlist cover"></div>
                         </div>
                         <div class="tile-info">
                             <h3 class="playlist-name">${playlist.nombre}</h3>

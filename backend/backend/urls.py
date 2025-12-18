@@ -10,14 +10,15 @@ from django.views.static import serve # Import the standard file server view
 
 urlpatterns = [
     path('admin/'               , admin.site.urls),
-    path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
-    path('home'                 , HomeView.as_view()            , name='home'),
     path(''                     , LandingView.as_view()         , name='tag-list'),
+    path('home'                 , HomeView.as_view()            , name='home'),
+    path('accounts/'            , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
     path('steal/'               , StealView.as_view()           , name='steal'),
     path('stealget/'            , views.steal_get               , name='steal-get'),
     path('stealsearch/'         , views.steal_search            , name='steal-search'),
     path('albums/'              , AlbumTileView.as_view()       , name='album-tiles'),
     path('albums/<int:pk>/'     , AlbumDetailView.as_view()     , name='album-detail'),
+    path('favorites/'           , FavoritesView.as_view()       , name='favorites'),
     path('genres/'              , GenreListView.as_view()       , name='genre-list'),
     path('genre/<int:pk>/'      , GenreDetailView.as_view()     , name='genre-detail'),
     path('artists/'             , ArtistListView.as_view()      , name='artist-list'),

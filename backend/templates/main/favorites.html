@@ -1,0 +1,8 @@
+<!-- templates/app/favorites.html -->
+
+{% load fontawesome_5 %}
+
+<input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
+<h1 class="shadowed">Favoritos</h1>
+<p></p>
+{% include 'main/song-list.html' with data=songs %}

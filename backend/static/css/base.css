@@ -1,26 +1,6 @@
 /* --- 1. Estilos Globales y Modo Oscuro --- */
-:root {
-    --bg-main: #121212;
-    --bg-nav: #1e1e1e;
-    --bg-sidebar: #2c2c2c;
-    --bg-sidebar-selection: #383838;
-    --bg-sidebar-hover: #303030;
-    --bg-content-blend: #222222C0;
-    --bg-content: #222222;
-    --text-color: #e0e0e0;
-    --secondary-color: #b4b0ae;
-    --link-color: #fcd08c;
-    --section-color: #1d8eff;
-    --confirm-color: #73bf00;
-    --accent-color: #ff7300;
-    --bg-player-title: #804000;
-    --shadow-color: #442200;
-    --tile-placeholder: #777;
-    --tile-info: #030303;
-    --tile-info-text: #666;
-    --nav-height: 60px;
-    --sidebar-width: 432px;
-}
+@import 'schemes/default.css';
+/* @import 'schemes/purple.css'; */
 
 html {
     height: 100%;
@@ -369,4 +349,9 @@ a:hover {
     border-radius: 7px;
     box-shadow: 0px 3px 2px #0006;
     border: 2px ridge #888888;
+}
+
+.tile-item.playlist-item:nth-child(even) .album-image,
+.sidebar-entry:nth-child(even) .sidebar-entry-picture{
+    filter: hue-rotate(45deg);
 }
