@@ -22,13 +22,25 @@ INDENT_SIZE = 2
 PATH_SEP = '\\' #os.path.sep
 
 def load_array(file):
+    if os.path.splitext(os.path.basename(__file__))[0] == 'main':
+        file = os.path.join(os.path.dirname(__file__), 'config', file)
+    else:
+        file = os.path.join('config', file)
+    
     payload = []
+    
     with open(file, "r") as file:
         payload = file.read().split('\n')
         return payload
 
 def load_dict(file):
+    if os.path.splitext(os.path.basename(__file__))[0] == 'main':
+        file = os.path.join(os.path.dirname(__file__), 'config', file)
+    else:
+        file = os.path.join('config', file)
+        
     payload = {}
+    
     with open(file, "r") as file:
         elements = file.read().split('\n')
     for element in elements:
@@ -39,11 +51,11 @@ def load_dict(file):
         payload[key] = [ x.strip() for x in value ]
     return payload
 
-FORBIDDEN_FOLDERS   = load_array('config/forbidden_folders.lst')
-FORBIDDEN_TAGS      = load_array('config/forbidden_tags.lst')
-FORBIDDEN_PREFIXES  = load_array('config/forbidden_prefixes.lst')
-CODENAME_PREFIXES   = load_array('config/codename_prefixes.lst')
-ARTIST_ALIASES      = load_dict('config/artist_aliases.lst')
+FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
+FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
+FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
+CODENAME_PREFIXES   = load_array('codename_prefixes.lst')
+ARTIST_ALIASES      = load_dict('artist_aliases.lst')
 
 EMOJI_REPLACEMENT = {
     '♥' : '❤',
@@ -529,8 +541,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         FORCE_ANALYSIS = False
-        MUSIC_FOLDER = options["scan_path"][0]
-        DRIVE = MUSIC_FOLDER.split(':')[0]
+        BASEPATH = options["scan_path"][0]
+        BASEPARTS = BASEPATH.split(':')
+        DRIVE = ''
+        PATH  = ''
+        if len(BASEPARTS)==1:
+            # Single location ( / , /home/user/music , D: , D , D:\ ....)
+            PATH = BASEPARTS
+        else:
+            # Drive and (optional) Path
+            [DRIVE, PATH] = BASEPARTS
+        # 1st branch : single unit / unit and path
+        print(f' --- DRIVE: {DRIVE}')
+        print(f' ---  PATH: {PATH}')
+        exit()
         print(MUSIC_FOLDER.split(':'))
         if len(DRIVE) == 1:
             MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, MUSIC_FOLDER.split(':')[1] )
