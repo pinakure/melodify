@@ -19,7 +19,7 @@ html {
 
 /* Customize Scrollbars */
 ::-webkit-scrollbar {
-    height: 8px;
+    height: 0px;
     width: 8px;  /* width: 0px;  */
     background: transparent;  /* Optional: just make scrollbar invisible */
     position: absolute;

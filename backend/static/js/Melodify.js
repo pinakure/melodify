@@ -71,6 +71,11 @@ MelodifyPlayer.prototype = {
         // console.table(this.playlist);
     },
     play: function(song) {
+        if(song==undefined){
+            this.howl.play();
+            playBtn.style.display = 'none';
+            return;
+        }
         // this.enqueue(song);
         melodify.player.pause();
 		var self = this;
