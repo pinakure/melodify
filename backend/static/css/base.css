@@ -397,7 +397,7 @@ a:hover {
 .album-item img, 
 .placeholder-image {
     width                   : 100%;
-    height                  : 180px;
+    /* height                  : 180px; */
     border-radius           : 8px;
     object-fit              : cover;
     display                 : block;
@@ -432,4 +432,42 @@ a:hover {
 
 button:hover {
     cursor: pointer;
+}
+
+.lyric {
+    position: absolute;
+    top:0px;
+    left:0px;
+    display: inline-block;
+    text-shadow: 2px 2px 0px #0008;
+}
+.lyric-animation {
+    text-shadow: 0px 0px 1px var(--accent-color);
+    display     : inline-block;
+    position    : absolute;
+    color       : var(--accent-color);
+    word-break  : break-all;
+    top         :0px;
+    left        :0px;
+    height      : 30px;
+    max-height  : 30px;
+    overflow    : hidden;
+    animation   : lyricAnimation 1.0s 1 linear;
+}
+
+@-webkit-keyframes lyricAnimation {
+    0% { 
+        width: 0%; 
+    }
+    100% {
+        width:100%;
+    }
+}
+@keyframes lyricAnimation {
+    0% { 
+        width:0%;
+    } 
+    100% {
+        width:100%;
+    }
 }

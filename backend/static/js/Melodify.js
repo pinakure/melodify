@@ -19,9 +19,12 @@ elms.forEach(function(elm) {
 // wave.start();
 
 function MelodifyPlayer() {
-    this.playlist   = [];
-    this.index      = 0;
-    this.howl       = null;
+    this.playlist       = [];
+    this.index          = 0;
+    this.howl           = null;
+    this.lyrics         = null;
+    this.lyrics_index   = 1;
+    this.lyrics_last    = 0;
     playBtn.addEventListener    ('click'      , function()      { melodify.player.play();});
     pauseBtn.addEventListener   ('click'      , function()      { melodify.player.pause();});
     prevBtn.addEventListener    ('click'      , function()      { melodify.player.skip('prev');});
@@ -38,8 +41,30 @@ function MelodifyPlayer() {
     volume.addEventListener     ('touchmove', move);
     window.addEventListener     ('resize', resize);
 }
+
 MelodifyPlayer.prototype = {
 
+    loadLyrics : function(lyrics){
+        lyrics = lyrics.split('\n\n');
+        this.lyrics = {};
+        for(l in lyrics){
+            var lyric = lyrics[l].split('\n');
+            var index = lyric[0];
+            var time  = lyric[1].split(' --&gt; ');
+            var start = time[0];
+            var end   = time[1];
+            var text  = lyric[2];
+            var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+            var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+            this.lyrics[ index ] = {
+                start : get_start_time(),
+                end   : get_end_time(),
+                text  : text, 
+            };
+        }
+        this.lyrics_index = 1;
+        this.lyrics_last  = 0;
+    },
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
@@ -48,7 +73,6 @@ MelodifyPlayer.prototype = {
     play: function(song) {
         // this.enqueue(song);
         melodify.player.pause();
-        
 		var self = this;
         index = this.playlist.indexOf(song);
         var data = self.playlist[index];
@@ -156,7 +180,6 @@ MelodifyPlayer.prototype = {
             index++;
 		});
 	},
-    
     skip: function(direction) {
 		// Get the next track based on the direction of the track.
 		var index = 0;
@@ -214,6 +237,34 @@ MelodifyPlayer.prototype = {
 
 		// If the howl is still playing, continue stepping.
 		if (this.howl.playing()) {
+
+            if(melodify.player.lyrics){
+                var lyric = melodify.player.lyrics[ melodify.player.lyrics_index ];
+                if( lyric == undefined ) return;
+                var next  = melodify.player.lyrics[ melodify.player.lyrics_index+1 ]==undefined ? '' : melodify.player.lyrics[ melodify.player.lyrics_index+1 ];
+                var now   = parseInt(seek+0.5);
+                // document.getElementById('debug').innerHTML=`${now} - ${start} - ${end}`;
+                if( (now >= lyric.start) && (now <= lyric.end)){
+                    if( melodify.player.lyrics_last != lyric.start){
+                        try {
+                                document.getElementById('lyrics').innerHTML = `
+                                <div style="position: relative;height: 32px;">
+                                    <p class="lyric">${ lyric.text }</p>
+                                    <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }s;">${ lyric.text }</p>
+                                </div>
+                                <p class="blend-50">${ next.text ?? ''}</p>
+                            `;
+                            melodify.player.lyrics_last = lyric.start;
+                        } catch{
+
+                        }
+                    }
+                }
+                if( (now > lyric.end)){
+                    melodify.player.lyrics_index++;
+                }
+            }
+
 			requestAnimationFrame(self.step.bind(self));
 		}
 	},
