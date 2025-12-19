@@ -21,12 +21,15 @@
 
     /* Player time counters, smaller */
     #timer,
-    #track,
-    #duration {
+    #duration{
+        margin-top: 4px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    #track {
         font-size: 14px;
         line-height: 16px;
-    }
-    #track {
         position: absolute;
         bottom: 0px;
         padding-left: 8px;

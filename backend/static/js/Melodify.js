@@ -301,6 +301,7 @@ function Melodify(){
         currentTime     : 0,
         volume          : 0.5,
         queue           : [],
+        history         : [],
         current_page    : '',
         first_song      : null,
         skin            : 'default',
@@ -322,7 +323,6 @@ Melodify.prototype = {
     reset_scroll : function(){
         try{ scrollbox.scrollTop = 0;} catch{}
     },
-    
     getSongDetails : function( buttonElement ){
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
@@ -345,7 +345,6 @@ Melodify.prototype = {
             next        : nextSong,
         };
     },
-
     playSong : function(buttonElement, only_enqueue=false) {
         const nextSong   = buttonElement.getAttribute('data-next-id');
         var song = this.getSongDetails( buttonElement );
@@ -367,7 +366,6 @@ Melodify.prototype = {
         }
         if( !only_enqueue ) melodify.player.play(melodify.first_song);
     },
-
     enqueueSong : function( buttonElement ){
         var song = this.getSongDetails( buttonElement );  
         song.next = melodify.player.playlist[ 0 ].id;
@@ -375,18 +373,12 @@ Melodify.prototype = {
         melodify.player.playlist.push(song);
         melodify.player.updatePlaylist();
     },
-
-    history : [],
-
-    /* TODO: Fix BACK bug!!! */
-    navigate : function(url, params=[]){
-        // var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
-        var target_url = `${url}?back=${this.history[this.history.length-1]}`;
-        this.history.push(url);
+    navigate : function(url, params=[], register_history=true){
+        if( register_history ) this.state.history.push(url);
         for(p in params){
             target_url += `&${ params[p]}`;
         }
-        fetch(target_url)
+        fetch(url)
         .then(response => response.text())
         .then(data => {
             /* Remove event listeners */
@@ -408,7 +400,8 @@ Melodify.prototype = {
             for(s in scripts){
                 eval(scripts[s].innerHTML);
             }
-            melodify.state.current_page = target_url;
+            melodify.state.current_page = url;
+            melodify.saveState();
             content.focus();
         })
         .catch(error => {
@@ -452,7 +445,6 @@ Melodify.prototype = {
             }
         });
     },
-    
     /* Callback functions */
     filter : function(type) {
         const input  = document.getElementById('search-Input');

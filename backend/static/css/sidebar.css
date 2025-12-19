@@ -83,7 +83,8 @@
     overflow: auto;
 }
 
-#sidebar-items{
+.sidebar-items li{
+    cursor: pointer;
 }
 
 .sidebar-entry {
