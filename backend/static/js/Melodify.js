@@ -126,12 +126,10 @@ MelodifyPlayer.prototype = {
         melodify.player.updatePlaylist(this.playlist);
 	},
     pause: function() {
-		var self = this;
-
 		// Get the Howl we want to manipulate.
-		if(!this.howl)return;
+		if(!melodify.player.howl)return;
 		// Puase the howl object.
-		this.howl.pause();
+		melodify.player.howl.pause();
 
 		// Show the play button.
 		playBtn.style.display = 'block';
@@ -272,15 +270,23 @@ Melodify.prototype = {
             file        : audioUrl,
             url_picture : pictureUrl,
             url_detalle : `/song/${songId}`,
-            howl        : melodify.player.howl,
             next        : nextSong,
             id          : songId,
             song_id     : songId,
             artist_name : artistName,
             song_name   : songName,
         };
+        
         if( !only_enqueue) {
             melodify.first_song = song;
+        }
+        /* check if song is on playlist already */
+        for(i in melodify.player.playlist){
+            var entry = melodify.player.playlist[i];
+            if(entry.id == song.id) {
+                if( !only_enqueue ) melodify.player.play(melodify.player.playlist[i]);
+                return;
+            }
         }
         melodify.player.enqueue( song );
         if( nextSong != "" && (nextSong != melodify.first_song.id) ){
