@@ -1,0 +1,35 @@
+<!-- main/sidebar.html -->
+<script>
+    function showTab(id){
+        var tabs = document.getElementsByClassName('tab');
+        for(t in tabs){
+            tabs[t].className = "tab hidden";
+        }
+        document.getElementById(id).className = "tab";
+    }
+</script>
+<aside class="sidebar">
+    <div class="sidebar-content">
+        <ul id="sidebar-categories" class="labels">
+            <li style="font-size: 16px; font-weight: 800;" onclick="showTab('library');">Tu Biblioteca</li>   
+            <li style="font-size: 16px; font-weight: 800;" onclick="showTab('playlist');">Reproduciendo</li>   
+        </ul>
+        <div class="tabs" >
+            <div id="sidebar-inner">
+                <div class="sidebar-items-wrapper">
+                    <div class="tab" id="library">
+                        <div class="sidebar-search"></div>
+                        <ul id="sidebar-items">
+                            {% for item in sidebar %}
+                                {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture url=item.url %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="tab hidden" id="playlist">
+                          <div id="list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>

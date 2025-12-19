@@ -1,33 +1,14 @@
-<!-- Top Info -->
-
-<style>
-
-a#track {
-  z-index: 1000;
-  color: var(--text-color) !important;
-}
-a#track:hover {
-  color: var(--link-color) !important;
-}
-
-</style>
-
+<!-- main/bottom-player.html  -->
 
 <div id="title">
     <div id="timer">0:00</div>
     <div id="duration">0:00</div>
 </div>
-<a id="track" onclick="var song_id = document.getElementById('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);" data-song-id=""></a>
+<a  id="track" 
+    onclick="var song_id = document.getElementById('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);" 
+    data-song-id="">
+</a>
 
-<!-- Controls -->
-<div class="controlsOuter">
-  <div class="controlsInner">
-    
-  </div>
-  
-</div>
-
-<!-- Progress -->
 <div id="waveform-wrapper">
   <div id="waveform"></div>
 </div>
@@ -41,11 +22,6 @@ a#track:hover {
     <div class="btn" id="pauseBtn"></div>
     <div class="btn" id="prevBtn"></div>
     <div class="btn" id="nextBtn"></div>
-<!-- Playlist -->
-<div id="playlist">
-  <div id="list"></div>
-</div>
-
 
 <!-- Volume -->
 <div id="volume" class="fadeout">
