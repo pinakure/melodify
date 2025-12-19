@@ -1,6 +1,6 @@
 /* --- 1. Estilos Globales y Modo Oscuro --- */
-@import 'schemes/default.css';
-/* @import 'schemes/purple.css'; */
+/* @import 'schemes/default.css'; */
+@import 'schemes/purple.css'; 
 
 html {
     height: 100%;
@@ -19,6 +19,7 @@ html {
 
 /* Customize Scrollbars */
 ::-webkit-scrollbar {
+    height: 8px;
     width: 8px;  /* width: 0px;  */
     background: transparent;  /* Optional: just make scrollbar invisible */
     position: absolute;
