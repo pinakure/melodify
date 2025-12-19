@@ -45,22 +45,24 @@ function MelodifyPlayer() {
 MelodifyPlayer.prototype = {
 
     loadLyrics : function(lyrics){
-        lyrics = lyrics.split('\n\n');
         this.lyrics = {};
-        for(l in lyrics){
-            var lyric = lyrics[l].split('\n');
-            var index = lyric[0];
-            var time  = lyric[1].split(' --&gt; ');
-            var start = time[0];
-            var end   = time[1];
-            var text  = lyric[2];
-            var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
-            var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
-            this.lyrics[ index ] = {
-                start : get_start_time(),
-                end   : get_end_time(),
-                text  : text, 
-            };
+        if(lyrics != undefined){
+            lyrics = lyrics.split('\n\n');
+            for(l in lyrics){
+                var lyric = lyrics[l].split('\n');
+                var index = lyric[0];
+                var time  = lyric[1].split(' --> ');
+                var start = time[0];
+                var end   = time[1];
+                var text  = lyric[2];
+                var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+                var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+                this.lyrics[ index ] = {
+                    start : get_start_time(),
+                    end   : get_end_time(),
+                    text  : text, 
+                };
+            }
         }
         this.lyrics_index = 1;
         this.lyrics_last  = 0;
@@ -82,8 +84,6 @@ MelodifyPlayer.prototype = {
         index = this.playlist.indexOf(song);
         var data = self.playlist[index];
 		if(!data)return;
-		// If we already loaded this track, use the current one.
-		// Otherwise, setup and load a new Howl.
 		this.howl = new Howl({
             src: [ data.file ],
             html5: false, // Force to HTML5 so that the audio can stream in (best for large files).
@@ -132,7 +132,6 @@ MelodifyPlayer.prototype = {
             }
         });
     
-
 		// Begin playing the howl object.
 		this.howl.play();
 
@@ -149,6 +148,8 @@ MelodifyPlayer.prototype = {
 			playBtn.style.display = 'none';
 			pauseBtn.style.display = 'none';
 		}
+    
+        this.loadLyrics( song.lyrics );
 
 		// Keep track of the index we are currently playing.
 		self.index = index;
@@ -231,6 +232,8 @@ MelodifyPlayer.prototype = {
 		if (this.howl.playing()) {
 			this.howl.seek(this.howl.duration() * per);
 		}
+        this.lyrics_index=1;
+        this.lyrics_last =0;
 	},
     step: function() {
 		var self = this;
@@ -248,12 +251,12 @@ MelodifyPlayer.prototype = {
                 if( lyric == undefined ) return;
                 var next  = melodify.player.lyrics[ melodify.player.lyrics_index+1 ]==undefined ? '' : melodify.player.lyrics[ melodify.player.lyrics_index+1 ];
                 var now   = parseInt(seek+0.5);
-                // document.getElementById('debug').innerHTML=`${now} - ${start} - ${end}`;
                 if( (now >= lyric.start) && (now <= lyric.end)){
+                    // document.getElementById('debug').innerHTML=`${now} - ${lyric.start} - ${lyric.end}`;
                     if( melodify.player.lyrics_last != lyric.start){
                         try {
                                 document.getElementById('lyrics').innerHTML = `
-                                <div style="position: relative;height: 32px;">
+                                <div class="lyric-wrapper" style="position: relative;height: 32px;">
                                     <p class="lyric">${ lyric.text }</p>
                                     <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }s;">${ lyric.text }</p>
                                 </div>
@@ -322,6 +325,7 @@ Melodify.prototype = {
     getSongDetails : function( buttonElement ){
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
+        const lyrics     = buttonElement.getAttribute('data-lyrics');
         const audioUrl   = buttonElement.getAttribute('data-src');
         const pictureUrl = buttonElement.getAttribute('data-picture');
         const songId     = buttonElement.getAttribute('data-id');
@@ -334,6 +338,7 @@ Melodify.prototype = {
             url_detalle : `/song/${songId}`,
             id          : songId,
             song_id     : songId,
+            lyrics      : lyrics,
             artist_name : artistName,
             song_name   : songName,
             next        : nextSong,

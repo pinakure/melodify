@@ -52,6 +52,7 @@
                     class           = "input confirm" 
                     id              = "song-{{ song.pk }}"          
                     data-artistname = "{{ song.artist.name }}" 
+                    data-lyrics     = "{{ song.lyrics }}" 
                     data-songname   = "{{ song.title }}" 
                     data-src        = "/static/{{ song.filename }}" 
                     data-picture    = "{{ song.picture }}" 
@@ -65,6 +66,7 @@
                     class           = "input confirm" 
                     id              = "enqueue-song"     
                     data-artistname = "{{ song.artist.name }}" 
+                    data-lyrics     = "{{ song.lyrics }}" 
                     data-songname   = "{{ song.title }}" 
                     data-src        = "/static/{{ song.filename }}" 
                     data-picture    = "{{ song.picture }}" 
@@ -105,9 +107,9 @@
         </div>
     </div>
     {% if song.lyrics %}
-        <div id="lyrics" class="italic breathe">
+        <div id="static-lyrics" class="italic breathe">
             <script>
-                var node = document.getElementById('lyrics');
+                var node = document.getElementById('static-lyrics');
                 var lyrics = `{{ song.lyrics }}`;
                 lyrics = lyrics.split('\n\n');
                 var payload = {};
