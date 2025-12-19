@@ -1,6 +1,4 @@
 // static/js/Melodify.js
-let soundPlayer = null; // Variable to hold the current Howler sound instance
-let currentButton = null; // Variable to track which button is active
 
 // Cache references to DOM elements.
 var elms = ['track', 'timer', 'duration', 'playBtn', 'pauseBtn', 'prevBtn', 'nextBtn', 'playlistBtn', 'volumeBtn', 'progress', 'bar', 'wave', 'loading', 'playlist', 'list', 'volume', 'barEmpty', 'barFull', 'sliderBtn'];
@@ -29,8 +27,6 @@ function MelodifyPlayer() {
     prevBtn.addEventListener    ('click'      , function()      { melodify.player.skip('prev');});
     nextBtn.addEventListener    ('click'      , function()      { melodify.player.skip('next');});
     waveform.addEventListener   ('click'      , function(event) { melodify.player.seek(event.clientX / window.innerWidth);});
-    playlistBtn.addEventListener('click'      , function()      { melodify.player.togglePlaylist();});
-    playlist.addEventListener   ('click'      , function()      { melodify.player.togglePlaylist();});
     volumeBtn.addEventListener  ('click'      , function()      { melodify.player.toggleVolume();});
     volume.addEventListener     ('click'      , function()      { melodify.player.toggleVolume();});
     barEmpty.addEventListener   ('click'      , function(event) { var per = event.layerX / parseFloat(barEmpty.scrollWidth); melodify.player.volume(per);});
@@ -42,88 +38,81 @@ function MelodifyPlayer() {
     volume.addEventListener     ('touchmove', move);
     window.addEventListener('resize', resize);
 }
-
 MelodifyPlayer.prototype = {
 
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
-        melodify.player.updatePlaylist(this.playlist)
         // console.table(this.playlist);
     },
-
     play: function(song) {
         // this.enqueue(song);
         melodify.player.pause();
-
+        
 		var self = this;
-		var sound;
         index = this.playlist.indexOf(song);
         var data = self.playlist[index];
 		if(!data)return;
 		// If we already loaded this track, use the current one.
 		// Otherwise, setup and load a new Howl.
-		if (data.howl) {
-			sound = data.howl;
-		} else {
-			sound = data.howl = new Howl({
-				src: [ data.file ],
-				html5: false, // Force to HTML5 so that the audio can stream in (best for large files).
-				onplay: function() {
-					// Display the duration.
-					duration.innerHTML = self.formatTime(Math.round(sound.duration()));
+		this.howl = new Howl({
+            src: [ data.file ],
+            html5: false, // Force to HTML5 so that the audio can stream in (best for large files).
+            onplay: function() {
+                // Display the duration.
+                duration.innerHTML = self.formatTime(Math.round(melodify.player.howl.duration()));
 
-					// Start updating the progress of the track.
-					requestAnimationFrame(self.step.bind(self));
+                // Start updating the progress of the track.
+                requestAnimationFrame(self.step.bind(self));
 
-					// Start the wave animation if we have already loaded
-					// wave.container.style.display = 'block';
-					bar.style.display = 'none';
-					pauseBtn.style.display = 'block';
-				},
-				onload: function() {
-					// Start the wave animation.
-					// wave.container.style.display = 'block';
-					bar.style.display = 'none';
-					loading.style.display = 'none';
-				},
-				onloaderror: function(id, error) {
-					console.log(`Error loading audio: ${error}`);
-					bar.style.display = 'none';
-					loading.style.display = 'none';
-				},
-				onend: function() {
-					// Stop the wave animation.
-					// wave.container.style.display = 'none';
-					bar.style.display = 'block';
-					self.skip('next');
-				},
-				onpause: function() {
-					// Stop the wave animation.
-					// wave.container.style.display = 'none';
-					bar.style.display = 'block';
-				},
-				onstop: function() {
-					// Stop the wave animation.
-					// wave.container.style.display = 'none';
-					bar.style.display = 'block';
-				},
-				onseek: function() {
-					// Start updating the progress of the track.
-					requestAnimationFrame(self.step.bind(self));
-				}
-			});
-		}
+                // Start the wave animation if we have already loaded
+                // wave.container.style.display = 'block';
+                bar.style.display = 'none';
+                pauseBtn.style.display = 'block';
+            },
+            onload: function() {
+                // Start the wave animation.
+                // wave.container.style.display = 'block';
+                bar.style.display = 'none';
+                loading.style.display = 'none';
+            },
+            onloaderror: function(id, error) {
+                console.log(`Error loading audio: ${error}`);
+                bar.style.display = 'none';
+                loading.style.display = 'none';
+            },
+            onend: function() {
+                // Stop the wave animation.
+                // wave.container.style.display = 'none';
+                bar.style.display = 'block';
+                self.skip('next');
+            },
+            onpause: function() {
+                // Stop the wave animation.
+                // wave.container.style.display = 'none';
+                bar.style.display = 'block';
+            },
+            onstop: function() {
+                // Stop the wave animation.
+                // wave.container.style.display = 'none';
+                bar.style.display = 'block';
+            },
+            onseek: function() {
+                // Start updating the progress of the track.
+                requestAnimationFrame(self.step.bind(self));
+            }
+        });
+    
 
-		// Begin playing the sound.
-		sound.play();
+		// Begin playing the howl object.
+		this.howl.play();
 
 		// Update the track display.
 		track.innerHTML = data.title;
 		track.setAttribute('data-song-id', data.song_id);
 
 		// Show the pause button.
-		if (sound.state() === 'loaded') {
+		if (this.howl.state() === 'loaded') {
 			playBtn.style.display = 'none';
 			pauseBtn.style.display = 'block';
 		} else {
@@ -134,71 +123,67 @@ MelodifyPlayer.prototype = {
 
 		// Keep track of the index we are currently playing.
 		self.index = index;
+        melodify.player.updatePlaylist(this.playlist);
 	},
-
-    /* updates entries drawn at sidebar playlist */
-    updatePlaylist : function(){
-		list.innerHTML = "";
-		this.playlist.forEach(function(song) {
-			var div = document.createElement('div');
-			div.className = 'list-song';
-			div.innerHTML = song.title;
-			div.onclick = function() {
-				melodify.player.skipTo(playlist.indexOf(song));
-			};
-			list.appendChild(div);
-		});
-	},
-
     pause: function() {
 		var self = this;
 
 		// Get the Howl we want to manipulate.
-		var sound = self.playlist.length ? self.playlist[self.index].howl : null;
-		if(!sound)return;
-		// Puase the sound.
-		sound.pause();
+		if(!this.howl)return;
+		// Puase the howl object.
+		this.howl.pause();
 
 		// Show the play button.
 		playBtn.style.display = 'block';
 		pauseBtn.style.display = 'none';
 	},
-
+    /* updates entries drawn at sidebar playlist */
+    updatePlaylist : function(){
+		list.innerHTML = "";
+        var index = 1;
+		this.playlist.forEach(function(song) {
+			var div = document.createElement('div');
+			div.className = 'list-song';
+			div.innerHTML = `<li onclick="melodify.navigate('${ song.url_detalle }')" class="sidebar-entry ${melodify.player.index == melodify.player.playlist.indexOf(song) ?'active':''}">
+                                <div class="sidebar-entry-picture" style="background-image:url('${ song.url_picture }')"></div>
+                                <div class="sidebar-entry-content">
+                                    <p class="sidebar-entry-primary">${ index } - ${ song.song_name }</p>
+                                    <p class="sidebar-entry-secondary">${ song.artist_name }</p>
+                                </div>
+                            </li>`;
+            div.onclick = function() {
+				melodify.player.skipTo(melodify.player.playlist.indexOf(song));
+			};
+			list.appendChild(div);
+            index++;
+		});
+	},
+    
     skip: function(direction) {
-		var self = this;
-
 		// Get the next track based on the direction of the track.
 		var index = 0;
 		if (direction === 'prev') {
-			index = self.index - 1;
-			if (index < 0) {
-				index = self.playlist.length - 1;
-			}
+			index = this.index-1;
 		} else {
-			index = self.index + 1;
-			if (index >= self.playlist.length) {
-				index = 0;
-			}
+            index = this.index+1;
 		}
-
-		self.skipTo(index);
+        index %= this.playlist.length;
+		this.skipTo(index);
 	},
-
     skipTo: function(index) {
 		var self = this;
 
 		// Stop the current track.
-		if (self.playlist[self.index].howl) {
-			self.playlist[self.index].howl.stop();
+		if (self.howl) {
+			self.howl.stop();
 		}
 
 		// Reset progress.
 		progress.style.width = '0%';
 
 		// Play the new track.
-		self.play(index);
+		self.play(self.playlist[index]);
 	},
-
     volume: function(val) {
 		var self = this;
 
@@ -210,37 +195,26 @@ MelodifyPlayer.prototype = {
 		barFull.style.width = (barWidth * 100) + '%';
 		sliderBtn.style.left = (window.innerWidth * barWidth + window.innerWidth * 0.05 - 25) + 'px';
 	},
-
     seek: function(per) {
 		var self = this;
-
-		// Get the Howl we want to manipulate.
-		var sound = self.playlist[self.index].howl;
-
 		// Convert the percent into a seek position.
-		if (sound.playing()) {
-			sound.seek(sound.duration() * per);
-			console.log(sound.duration(), per);
+		if (this.howl.playing()) {
+			this.howl.seek(this.howl.duration() * per);
 		}
 	},
-    
     step: function() {
 		var self = this;
 
-		// Get the Howl we want to manipulate.
-		var sound = self.playlist[self.index].howl;
-
 		// Determine our current seek position.
-		var seek = sound.seek() || 0;
+		var seek = this.howl.seek() || 0;
 		timer.innerHTML = self.formatTime(Math.round(seek));
-		progress.style.width = (((seek / sound.duration()) * 100) || 0) + '%';
+		progress.style.width = (((seek / this.howl.duration()) * 100) || 0) + '%';
 
-		// If the sound is still playing, continue stepping.
-		if (sound.playing()) {
+		// If the howl is still playing, continue stepping.
+		if (this.howl.playing()) {
 			requestAnimationFrame(self.step.bind(self));
 		}
 	},
-
     toggleVolume: function() {
 		var self = this;
 		var display = (volume.style.display === 'block') ? 'none' : 'block';
@@ -250,7 +224,6 @@ MelodifyPlayer.prototype = {
 		}, (display === 'block') ? 0 : 500);
 		volume.className = (display === 'block') ? 'fadein' : 'fadeout';
 	},
-
     formatTime: function(secs) {
 		var minutes = Math.floor(secs / 60) || 0;
 		var seconds = (secs - minutes * 60) || 0;
@@ -280,28 +253,26 @@ function Melodify(){
     this.search_term = '';
     this.player = new MelodifyPlayer();
 };
-
 Melodify.prototype = {
-
     saveState : function() {
         localStorage.setItem('melodify', JSON.stringify(this.state));
     },
-
     reset_scroll : function(){
         try{ scrollbox.scrollTop = 0;} catch{}
     },
-
     playSong : function(buttonElement, only_enqueue=false) {
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
         const audioUrl   = buttonElement.getAttribute('data-src');
+        const pictureUrl = buttonElement.getAttribute('data-picture');
         const songId     = buttonElement.getAttribute('data-id');
         const nextSong   = buttonElement.getAttribute('data-next-id');
-        var howl         = null;//melodify.player.playlist.length ? melodify.player.playlist[melodify.player.index].howl : null;
         var song         = {
             title       : `${artistName} - ${songName}`,
             file        : audioUrl,
-            howl        : howl,
+            url_picture : pictureUrl,
+            url_detalle : `/song/${songId}`,
+            howl        : melodify.player.howl,
             next        : nextSong,
             id          : songId,
             song_id     : songId,
@@ -317,7 +288,6 @@ Melodify.prototype = {
         }
         if( !only_enqueue ) melodify.player.play(melodify.first_song);
     },
-
     /* TODO: Fix BACK bug!!! */
     navigate : function(url, params=[]){
         var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
@@ -354,13 +324,11 @@ Melodify.prototype = {
             alert(`Navigate: Network/Server Error ${error}`);
         });
     },
-       
     getCookie : function(name) {
         var node = document.getElementsByName('csrfmiddlewaretoken')[0];
         console.log(node);
         return node.value;
     },
-
     request : function(url, json_data, done_callback) { 
         fetch(
             url, 
@@ -392,7 +360,6 @@ Melodify.prototype = {
             }
         });
     },
-    
     enqueueSong : function( artist, title, filename, node_id, song_id ){
         alert(`Enqueue ${title}...`);
         var song = {
@@ -405,7 +372,6 @@ Melodify.prototype = {
         melodify.player.playlist[ melodify.player.playlist.count-2 ].next = melodify.player.playlist[ melodify.player.playlist.count-2 ].next; 
         melodify.player.playlist[ melodify.player.index ].next = song;
     },
-
     filter : function(type) {
         const input  = document.getElementById('search-Input');
         const filter = input.value.toLowerCase();
@@ -428,7 +394,6 @@ Melodify.prototype = {
             noMessage.style.display = found ? "none" : "";
         }
     },
-
     scanSongs : function(artist_list){
         console.log("Scanning songs");
         console.log(artist_list);
@@ -436,7 +401,6 @@ Melodify.prototype = {
             this.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
         }   
     },
-
     showResults : function(data){
         container = document.getElementById('results');
         container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
@@ -448,31 +412,26 @@ Melodify.prototype = {
         }
         container.innerHTML += "</ul>";
     },
-  
     hidePlaylists : function(){ 
         const div = document.getElementById('playlists-window');
         div.style.display = 'none';
     },
-
     showPlaylists : function( parent, song_id ){
         const div = document.getElementById('playlists-window');
         div.style.display = 'inline-block';
         document.getElementById('playlists-window').setAttribute('data-song', song_id);
     },       
-
     addSongToPlaylist : function(playlist_id){
         song_id = document.getElementById('playlists-window').getAttribute('data-song');
         this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
             melodify.hidePlaylists();
         });
     },
-
     remSongFromPlaylist : function(playlist_id, song_id){
         this.request('/playlists/songs/remove/', { song : song_id, playlist : playlist_id }, ()=>{ 
             location.reload(); 
         });
     },
-
     createPlaylist : function() {
         const playlistNameInput = document.getElementById('new-list-name');
         const playlistName = playlistNameInput.value.trim();
@@ -490,39 +449,32 @@ Melodify.prototype = {
             melodify.loadPlaylists(); 
         });
     },
-
     bookmarkSong : function( song_id, enable ){
         this.request('/song/bookmark/', { song : song_id }, ()=>{ 
             document.getElementById(  `bookmark-song-${ song_id }`).classList.toggle("hidden"),
             document.getElementById(`unbookmark-song-${ song_id }`).classList.toggle("hidden")
         });
     },
-   
     handleScroll : function( callback ) {
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
         if (scrollTop + clientHeight >= scrollHeight - 200) {
             callback();
         }
     },
-    
     handleAlbumScroll : function( ) {
         melodify.handleScroll( melodify.loadAlbums );
     },
-    
     handlePlaylistScroll : function(){
         melodify.handleScroll( melodify.loadPlaylists );
     },
-
     handlePlaylistFilter : function(){
         clearTimeout(melodify.searchTimeout);
         melodify.searchTimeout = setTimeout(() => triggerSearch(melodify.handlePlaylistScroll, melodify.loadPlaylists), 300);
     },
-
     handleAlbumFilter : function(){
         clearTimeout(melodify.searchTimeout);
         melodify.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums), 300);
     },
-
     loadAlbums : function() {
         let albumCount = 0;
         const loadingIndicator = document.getElementById('loading');
@@ -581,7 +533,6 @@ Melodify.prototype = {
             loadingIndicator.style.display = 'none';
         });
     },
-
     loadPlaylists : function() {
         let playlistCount = 0;
         const playlist_container = document.getElementById('tileContainer');
@@ -646,7 +597,6 @@ const melodify = new Melodify();
 resize();
 /* album list stuff */
 
-
 function toggleNewListForm() {
     const form = document.getElementById('new-list');
     // Muestra u oculta el formulario
@@ -658,7 +608,6 @@ function toggleNewListForm() {
         document.getElementById('new-list-name').value = ''; // Limpia el input al ocultar
     }
 }
-
 function triggerSearch( handler, callback ) {
     const searchInput   = document.getElementById('searchInput'); 
     const container     = document.getElementById('tileContainer');

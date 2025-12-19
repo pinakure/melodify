@@ -23,10 +23,11 @@
         
         <button 
             class="play-button" 
+            id="song-{{ song.pk }}"
             data-artistname="{{ song.artist.name }}" 
             data-songname="{{ song.title }}" 
             data-src="/static/{{ song.filename }}" 
-            id="song-{{ song.pk }}"
+            data-picture="{{ song.picture }}" 
             data-id="{{ song.pk }}"
             {% if not forloop.last %}
                 data-next-id="{{ data|get_next_song_id:forloop.counter0 }}"

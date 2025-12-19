@@ -80,8 +80,11 @@
     border-radius: 6px;
     align-items: center;   
 }
+.sidebar-entry.active {
+    background-color: var(--bg-sidebar);
+}
 
-.sidebar-entry div:nth-child(1){
+sidebar-entry div:nth-child(1){
     width: 48px !important; 
     height: 48px !important;
     padding-left: 8px;
