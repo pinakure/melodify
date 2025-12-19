@@ -46,7 +46,7 @@ MelodifyPlayer.prototype = {
 
     loadLyrics : function(lyrics){
         this.lyrics = {};
-        if(lyrics != undefined){
+        if(lyrics.length > 0){
             lyrics = lyrics.split('\n\n');
             for(l in lyrics){
                 var lyric = lyrics[l].split('\n');
@@ -245,6 +245,7 @@ MelodifyPlayer.prototype = {
 
 		// If the howl is still playing, continue stepping.
 		if (this.howl.playing()) {
+			requestAnimationFrame(self.step.bind(self));
 
             if(melodify.player.lyrics){
                 var lyric = melodify.player.lyrics[ melodify.player.lyrics_index ];
@@ -273,7 +274,6 @@ MelodifyPlayer.prototype = {
                 }
             }
 
-			requestAnimationFrame(self.step.bind(self));
 		}
 	},
     toggleVolume: function() {
