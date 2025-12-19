@@ -104,7 +104,31 @@
             
         </div>
     </div>
-    <div id="lyrics" class="italic breathe">
-        Lyrics here
-    </div> 
+    {% if song.lyrics %}
+        <div id="lyrics" class="italic breathe">
+            <script>
+                var node = document.getElementById('lyrics');
+                var lyrics = `{{ song.lyrics }}`;
+                lyrics = lyrics.split('\n\n');
+                var payload = {};
+                html = '';
+                for(l in lyrics){
+                    var lyric = lyrics[l].split('\n');
+                    var index = lyric[0];
+                    var time  = lyric[1].split(' --&gt; ');
+                    var start = time[0];
+                    var end   = time[1];
+                    var text  = lyric[2];
+                    payload[ index ] = {
+                        start : start,
+                        end   : end,
+                        text  : text, 
+                    };
+                    html += (`<li style="margin-bottom: 4px;">${text}</li>`);
+                }
+                // melodify.player.lyrics = payload;
+                node.innerHTML=html;
+            </script>
+        </div>
+    {% endif %} 
 </div>
