@@ -29,6 +29,14 @@
     overflow-x: hidden;
 }
 
+.tab-selector {
+    border: none !important;
+}
+.tab-selector.active {
+    color: var(--accent-color);
+    background: var(--bg-player-title);
+}
+
 .sidebar-content {
     border-radius: 8px;
     background-color: var(--bg-content);
@@ -36,9 +44,11 @@
     width: 100%;
     height: 100%;
     padding-top: 20px;
-    overflow-y: auto; 
+    overflow-y: hidden; 
     overflow-x: hidden;
 }
+
+
 
 #sidebar-title {
     font-size: 16px !important;
@@ -61,10 +71,14 @@
     margin: 8px;
 }
 
+.tabs {
+    max-height: calc( 100% - 44px ) !important;
+    overflow-y: auto;
+}
+
 .sidebar-items-wrapper{
     width: 100%;
     padding: 0;
-    height: calc( 100% - 60px ) !important;
     margin: 0;
     overflow: auto;
 }

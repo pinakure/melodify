@@ -1,6 +1,11 @@
 <!-- main/sidebar.html -->
 <script>
-    function showTab(id){
+    function showTab(calling_node, id){
+        var selectors = document.getElementsByClassName('tab-selector');
+        for(s in selectors){
+            selectors[s].className = "tab-selector";
+        }
+        calling_node.className = "tab-selector active";
         var tabs = document.getElementsByClassName('tab');
         for(t in tabs){
             tabs[t].className = "tab hidden";
@@ -11,22 +16,24 @@
 <aside class="sidebar">
     <div class="sidebar-content">
         <ul id="sidebar-categories" class="labels">
-            <li style="font-size: 16px; font-weight: 800;" onclick="showTab('library');">Tu Biblioteca</li>   
-            <li style="font-size: 16px; font-weight: 800;" onclick="showTab('playlist');">Reproduciendo</li>   
+            <li class="tab-selector" style="font-size: 16px; font-weight: 800;" onclick="showTab(this, 'library');">Tu Biblioteca</li>   
+            <li class="tab-selector" style="font-size: 16px; font-weight: 800;" onclick="showTab(this, 'playlist');">Reproduciendo</li>   
         </ul>
         <div class="tabs" >
             <div id="sidebar-inner">
-                <div class="sidebar-items-wrapper">
-                    <div class="tab" id="library">
+                <div class="tab" id="library">
+                    <div class="sidebar-items-wrapper">
                         <div class="sidebar-search"></div>
-                        <ul id="sidebar-items">
+                        <ul class="sidebar-items">
                             {% for item in sidebar %}
                                 {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture url=item.url %}
                             {% endfor %}
                         </ul>
                     </div>
-                    <div class="tab hidden" id="playlist">
-                          <div id="list"></div>
+                </div>
+                <div class="tab hidden" id="playlist">
+                    <div class="sidebar-items-wrapper">
+                        <div id="list"></div>
                     </div>
                 </div>
             </div>
