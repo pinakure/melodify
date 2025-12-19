@@ -3,21 +3,16 @@
 {% load utils %}
 {% load fontawesome_5 %}
 
-{% include "main/widget-title.html" with caption=song.title subcaption="Canción" link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+{% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
 {% if song.album.pk %}
     {% include "main/widget-back.html" with url="album-detail" hardcoded_url=False url_params=song.album.pk %}
 {% endif %}
 
-<a onclick="melodify.navigate(`{% url 'artist-detail' song.artist.pk %}`)">
-    {{ song.artist.name }}
-</a>
-
 <div class="song-detail-container">
     
-    <div class="album-info-section">
+    <div class="album-item">
         {% if song.album.pk %}
         <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
-            <h4>{{ song.album.name }}</h4>
             <div class="album-art" style="justify-content: left !important;">
                 {% if song.album.picture %}
                 <div class="album-image" style="background-image: url('{{ song.album.picture }}')" alt="{{ song.album.name }} cover"></div>
@@ -25,6 +20,7 @@
                 <div class="placeholder-image">💿</div>
                 {% endif %}
             </div>
+            <h4>{{ song.album.name }}</h4>
         </a>
         
         <!-- lista de artistas -->

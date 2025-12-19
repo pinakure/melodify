@@ -382,7 +382,34 @@ a:hover {
     color           : var(--tile-info-text);
     font-size       : 0.9em;
 }
-
+.album-grid {
+    grid-template-columns   : repeat(auto-fill, minmax(180px, 1fr));
+    display                 : grid;
+    gap                     : 20px;
+}
+.album-item {
+    /* text-align              : center; */
+    border                  : none;
+    padding                 : 10px;
+    border-radius           : 5px;
+}
+.album-item img, 
+.placeholder-image {
+    width                   : 100%;
+    height                  : 180px;
+    border-radius           : 8px;
+    object-fit              : cover;
+    display                 : block;
+    margin-bottom           : 10px;
+}
+.album-image,
+.placeholder-image {
+    background-color        : #f0f0f0;
+    /* display                 : flex; */
+    background-size         : contain !important; 
+    align-items             : center;
+    justify-content         : center;
+}
 /* Artist detail styling  */
 .aka,
 .aka *{
@@ -399,5 +426,5 @@ a:hover {
 }
 
 .album-image {
-    background-size: cover;
+    background-size: contain;
 }
