@@ -53,7 +53,7 @@
 
 <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 
-<h1 class="shadowed">Álbumes (<span id="album-count">{{ albums.count }}</span>)</h1>
+{% include "main/widget-title.html" with caption='Álbumes' counter_id='album-count' counter_value=albums.count %}
 
 <div id="loading" style="display: none;">Cargando albumes...</div>
 

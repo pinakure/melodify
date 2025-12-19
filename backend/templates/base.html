@@ -2,115 +2,114 @@
 {% load fontawesome_5 %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="/static/css/fonts.css">
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/sidebar.css">
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-    <link rel="stylesheet" href="/static/css/player-styles.css">
-    <link rel="stylesheet" href="/static/css/song-list.css">
-    <!-- Esta linea de estilos debe ser la última para que los estilos responsivos tengan efecto  -->
-    <link rel="stylesheet" href="/static/css/vertical.css">
-    <title>Melodify {% block title %}{% endblock %}</title>
-    {% fontawesome_5_static %}
-    <script src="/static/js/howler.min.js"></script>
-    <script src="/static/js/siriwave.js"></script>
-    <script src="/static/js/Melodify.js"></script>
-    {% block header %}{% endblock %}
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="/static/css/fonts.css">
+        <link rel="stylesheet" href="/static/css/base.css">
+        <link rel="stylesheet" href="/static/css/sidebar.css">
+        <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="stylesheet" href="/static/css/player-styles.css">
+        <link rel="stylesheet" href="/static/css/song-list.css">
+        <!-- Esta linea de estilos debe ser la última para que los estilos responsivos tengan efecto  -->
+        <link rel="stylesheet" href="/static/css/vertical.css">
+        <title>Melodify {% block title %}{% endblock %}</title>
+        {% fontawesome_5_static %}
+        <script src="/static/js/howler.min.js"></script>
+        <script src="/static/js/siriwave.js"></script>
+        <script src="/static/js/Melodify.js"></script>
+        {% block header %}{% endblock %}
+    </head>
+    <body>
 
-<div class="main-container">
+    <div class="main-container">
 
-    <!-- Barra Superior -->
-    <header class="navbar">
-        
-        <div class="navbar-links">
-            {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      %}
-            {% include 'main/link.html' with url='artist-list'   caption="Artistas"     %}
-            {% include 'main/link.html' with url='genre-list'    caption="Géneros"      %}
-            {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    %}
-            {% include 'main/link.html' with url='playlist-list' caption="Listas"       %}
-            {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
-            <!-- <a href="#">Mi Música</a> -->
-        </div>
-        <a onclick="melodify.navigate('home')">
-            <div id="melodify-logo">
-                <div class="benzene">⌬</div>
+        <!-- Barra Superior -->
+        <header class="navbar">
+            
+            <div class="navbar-links">
+                {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      %}
+                {% include 'main/link.html' with url='artist-list'   caption="Artistas"     %}
+                {% include 'main/link.html' with url='genre-list'    caption="Géneros"      %}
+                {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    %}
+                {% include 'main/link.html' with url='playlist-list' caption="Listas"       %}
+                {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
+                <!-- <a href="#">Mi Música</a> -->
             </div>
-        </a>
-        <div class="search-box">
-            <!-- Formulario de búsqueda -->
-            {% block search %}{% endblock %}
-        </div>
-        {% block back %}{% endblock %}
-    </header>
+            <a onclick="melodify.navigate('home')">
+                <div id="melodify-logo">
+                    <div class="benzene">⌬</div>
+                </div>
+            </a>
+            <div class="search-box">
+                <!-- Formulario de búsqueda -->
+                {% block search %}{% endblock %}
+            </div>
+            {% block back %}{% endblock %}
+        </header>
 
-    <!-- Contenedor del Panel Doble -->
-    <div class="content-container">
+        <!-- Contenedor del Panel Doble -->
+        <div class="content-container">
 
-        <!-- Lado Izquierdo -->
-        <aside class="sidebar">
-            <div class="sidebar-content">
-                <div class="margin-8">
-                    <h3 id="sidebar-title" class="bold">{% block sidebar-title %}Tu biblioteca{% endblock %}</h3>
-                </div> 
-                <div id="sidebar-inner">{% block sidebar-content %}
-                    <ul id="sidebar-categories" class="labels">
-                        <li>Listas</li>   
-                        <li>Artistas</li>   
-                        <li>Albumes</li>   
-                        <li>Podcasts</li>   
-                    </ul>
-                    
-                    <div class="sidebar-items-wrapper">
-                        <div class="sidebar-search"></div>
-                        <ul id="sidebar-items">
-                            {% for item in sidebar %}
-                                {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture url=item.url %}
+            <!-- Lado Izquierdo -->
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <div class="margin-8">
+                        <h3 id="sidebar-title" class="bold">{% block sidebar-title %}Tu biblioteca{% endblock %}</h3>
+                    </div> 
+                    <div id="sidebar-inner">{% block sidebar-content %}
+                        <ul id="sidebar-categories" class="labels">
+                            <li>Listas</li>   
+                            <li>Artistas</li>   
+                            <li>Albumes</li>   
+                            <li>Podcasts</li>   
+                        </ul>
+                        
+                        <div class="sidebar-items-wrapper">
+                            <div class="sidebar-search"></div>
+                            <ul id="sidebar-items">
+                                {% for item in sidebar %}
+                                    {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture url=item.url %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </aside>
+
+            <!-- Lado Derecho -->
+            <main class="main">
+                <div class="main-content" {% block background %}{% endblock %}>
+                    {% block content %}{% endblock %}
+                </div>
+                <!-- <div class="main-overlay"></div> -->
+                <div id="playlists-window" class="playlists" style="z-index: 2000">
+                    <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="hidePlaylists()">{% fa5_icon 'times'%}</button>
+                    <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
+                    <div class="wrapper">
+                        <ul>
+                            {% for playlist in playlists %}
+                                <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
+                                    <div class="playlist-entry-picture"></div>
+                                    <div>
+                                        {{ playlist.title }}
+                                    </div>
+                                    <div>
+                                    </div>
+                                </li>
                             {% endfor %}
                         </ul>
                     </div>
                 </div>
-                {% endblock %}
-            </div>
-        </aside>
-
-        <!-- Lado Derecho -->
-        <main class="main">
-            <div class="main-content" {% block background %}{% endblock %}>
-                {% block content %}{% endblock %}
-            </div>
-            <!-- <div class="main-overlay"></div> -->
-             <div id="playlists-window" class="playlists" style="z-index: 2000">
-                <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="hidePlaylists()">{% fa5_icon 'times'%}</button>
-                <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
-                <div class="wrapper">
-                    <ul>
-                        {% for playlist in playlists %}
-                            <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
-                                <div class="playlist-entry-picture"></div>
-                                <div>
-                                    {{ playlist.title }}
-                                </div>
-                                <div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </main>
-        
+            </main>
+            
+        </div>
+        <!-- Barra Inferior -->
+        <div class="playbar">
+            {% include 'main/bottom-player.html' %}
+        </div>
     </div>
-    <!-- Barra Inferior -->
-    <div class="playbar">
-        {% include 'main/bottom-player.html' %}
-    </div>
-</div>
-
-</body>
+    </body>
 </html>

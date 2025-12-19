@@ -4,9 +4,9 @@
 {% load fontawesome_5 %}
 
 
-<h1 class="shadowed"><a style="color: var(--text-color) !important;" target="_blank" rel="noopener noreferrer"  href="/admin/main/song/{{ song.pk }}/change" title="Edit song details">{{ song.title }}</a> <span class="small blend-50" >Canción</span></h1>
+{% include "main/widget-title.html" with caption=song.title subcaption="Canción" link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
 {% if song.album.pk %}
-    <button onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
+    {% include "main/widget-back.html" with url="album-detail" hardcoded_url=False url_params=song.album.pk %}
 {% endif %}
 
 <a onclick="melodify.navigate(`{% url 'artist-detail' song.artist.pk %}`)">

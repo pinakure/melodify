@@ -190,6 +190,10 @@ class PlayerView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
+        song_id = self.request.GET.get('song')
+        song    = Song.objects.filter(id=song_id).get()
+        context['song']     = song
+        context['artist']   = song.artist
         return context
     
 class LandingView(ListView):

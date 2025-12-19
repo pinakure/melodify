@@ -102,9 +102,9 @@
     }
 </style>
 
-<h1 class="shadowed">{{ artist.name }} <span class="small blend-50" >Artista</span></h1>
+{% include "main/widget-title.html" with caption=artist.name subcaption="Artista" %}
+{% include "main/widget-back.html" with url="artist-list" hardcoded_url=False %}
 
-<button onclick="melodify.navigate(`{% url 'artist-list' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
 {% if artist.picture.name %}
     <script>
         document.getElementsByClassName('main-content')[0].style="background-image:url('{{ artist.picture.url }}');background-blend-mode:lighten;";

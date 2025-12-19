@@ -102,9 +102,9 @@
 </style>
 {% endblock %}
 
-<button onclick="melodify.navigate(`{% url 'genre-list' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
 
-<h1 class="shadowed">{{ genre.name }} <span class="small blend-50" >Género</span></h1>
+{% include "main/widget-title.html" with caption=genre.name subcaption="Género" %}
+{% include "main/widget-back.html" with url="genre-list" hardcoded_url=False %}
 
 {% block content %}
 <div class="artist-profile">

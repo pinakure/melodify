@@ -68,10 +68,13 @@ Melodify.prototype = {
         const nextSong   = buttonElement.getAttribute('data-next-id');
         var howl = null;//player.playlist.length ? player.playlist[player.index].howl : null;
         var song = {
-            title   : `${artistName} - ${songName}`,
-            file    : audioUrl,
-            howl    : howl,
-            next    : nextSong,
+            title       : `${artistName} - ${songName}`,
+            file        : audioUrl,
+            howl        : howl,
+            next        : nextSong,
+            song_id     : songId,
+            artist_name : artistName,
+            song_name   : songName,
         };
         if( !only_enqueue) {
             melodify.first_song = songId;
@@ -83,8 +86,12 @@ Melodify.prototype = {
         if( !only_enqueue ) melodify.player.start();
     },
 
-    navigate : function(url){
-        fetch(`${url}?back=${ melodify.state.current_page.replace('/','') }`)
+    navigate : function(url, params=[]){
+        var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
+        for(p in params){
+            target_url += `&${ params[p]}`;
+        }
+        fetch(target_url)
         .then(response => response.text())
         .then(data => {
             /* Remove event listeners */
@@ -106,7 +113,7 @@ Melodify.prototype = {
             for(s in scripts){
                 eval(scripts[s].innerHTML);
             }
-            melodify.state.current_page = url;
+            melodify.state.current_page = target_url;
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);

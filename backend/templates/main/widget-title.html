@@ -1,0 +1,27 @@
+<!-- main/widget-title.html  -->
+<h1 class="shadowed">
+    {% if link_url %}
+        <a  href="{{ link_url }}{{ link_object }}{{ link_suffix }}" 
+            style="color: var(--text-color) !important;" 
+            {% if link_newtab %}
+                target="_blank" 
+                rel="noopener noreferrer"  
+            {% endif %}
+            {% if link_hint %}
+                title="{{ link_hint }}"
+            {% endif %}
+        >
+    {% endif %}
+    {{ caption }}
+    {% if link_url %}
+        </a> 
+    {% endif %}
+    {% if counter_id %}
+        (<span id="{{ counter_id }}">{{ counter_value }}</span>)
+    {% endif %}
+    {% if subcaption %}
+        <span class="small blend-50" >
+            {{ subcaption }}
+        </span>
+    {% endif %}    
+</h1>

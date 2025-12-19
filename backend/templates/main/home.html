@@ -3,7 +3,9 @@
 {% load fontawesome_5 %}
 
 <input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
-<h1 class="shadowed">Tu Biblioteca</h1>
+
+{% include "main/widget-title.html" with caption='Tu Biblioteca' subcaption=user.username %}
+
 <div id="loading" style="display: none;">Cargando playlists...</div>
 <p></p>
 <h2 class="section">{% fa5_icon "list"  color="var(--accent-color)" %}&nbsp;Listas (<span id="playlist-count"></span>)</h2>

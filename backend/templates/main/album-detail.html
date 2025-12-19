@@ -42,10 +42,8 @@
 </style>
 {% endblock %}
 
-<h1>{{ album.name }} <span class="small blend-50" >Álbum</span></h1>
-
-
-<button onclick="melodify.navigate(`{% url 'album-tiles' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
+{% include "main/widget-title.html" with caption=album.name subcaption="Álbum" %}
+{% include "main/widget-back.html" with url="album-tiles" hardcoded_url=False %}
 {% if album.picture %}
     <script>
         document.getElementsByClassName('main-content')[0].style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ album.picture }}');";

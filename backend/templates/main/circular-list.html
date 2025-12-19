@@ -48,7 +48,7 @@
     <input type="text" id="search-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="melodify.filter('{{type}}')">
 {% endblock %}
 
-<h1 class="shadowed">{{title}}</h1>
+{% include "main/widget-title.html" with caption=title counter_id='item-count' counter_value=items.count %}
                 
 {% block content %}
 <div class="list-container">

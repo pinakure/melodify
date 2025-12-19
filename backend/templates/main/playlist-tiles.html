@@ -99,8 +99,9 @@
 
 <input type="text" id="searchInput" style="margin-right: 64px;margin-top: 6px;" class="searchInput" placeholder="Filtrar listas...">
 
-<h1 class="shadowed">Listas (<span id="playlist-count">{{ playlists.count }}</span>)<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button></h1>
+{% include "main/widget-title.html" with caption='Listas' counter_id='playlist-count' counter_value=playlists.count %}
 
+<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>
 
 {% csrf_token %}
 <div id="loading" style="display: none;">Cargando playlists...</div>

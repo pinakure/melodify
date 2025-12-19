@@ -1,10 +1,23 @@
 <!-- Top Info -->
 
+<style>
+
+a#track {
+  z-index: 1000;
+  color: var(--text-color) !important;
+}
+a#track:hover {
+  color: var(--link-color) !important;
+}
+
+</style>
+
+
 <div id="title">
     <div id="timer">0:00</div>
     <div id="duration">0:00</div>
 </div>
-<span id="track"></span>
+<a id="track" onclick="var song_id = document.getElementById('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);" data-song-id=""></a>
 
 <!-- Controls -->
 <div class="controlsOuter">

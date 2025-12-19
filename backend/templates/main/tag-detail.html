@@ -100,9 +100,9 @@
     }
 </style>
 
-<h1 class="shadowed">{{ tag.name }} <span class="small blend-50" >Etiqueta</span></h1>
+{% include "main/widget-title.html" with caption=tag.name subcaption="Etiqueta" %}
+{% include "main/widget-back.html"  with url="tag-list" hardcoded_url=False %}
 
-<button onclick="melodify.navigate(`{% url 'tag-list' %}`)" title="Go back" class="back-link input confirm" style="position:absolute; top: 0px; right: 16px;">{% fa5_icon "arrow-left" color="#000"%}</button>
 <script>
     document.getElementsByClassName('main-content')[0].style="background:linear-gradient('45deg, #123, #fec)";
 </script>
