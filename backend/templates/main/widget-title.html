@@ -22,6 +22,11 @@
     {% if subcaption %}
         <span class="small blend-50" >
             {{ subcaption }}
+            {% if subcaption_suffix is not none %}
+                <a onclick="melodify.navigate('{{ subcaption_link }}{{ subcaption_link_suffix }}/');">
+                    {{ subcaption_suffix }}
+                </a>    
+            {% endif %}
         </span>
     {% endif %}    
 </h1>

@@ -1,4 +1,4 @@
-{% block header %}
+<!-- main/album-detail.html -->
 {% load fontawesome_5 %}
 <style>
     .album-detail-container {
@@ -28,28 +28,12 @@
         margin-top: 0;
         font-size: 2.5em;
     }
-    .artist-list {
-        margin-bottom: 20px;
-    }
-    .main-content {
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-blend-mode: luminosity;
-        background-blend-mode: overlay;
-        background-color: var(--bg-content);
-    }
 </style>
-{% endblock %}
-
 {% include "main/widget-title.html" with caption=album.name subcaption="Álbum" %}
 {% include "main/widget-back.html" with url="album-tiles" hardcoded_url=False %}
 {% if album.picture %}
-    <script>
-        document.getElementsByClassName('main-content')[0].style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ album.picture }}');";
-    </script>
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='overlay' picture=album.picture %}
 {% endif %}
-
 <span class="">
     <!-- ARTIST OR VARIOUS ARTISTS -->
     {% if album.artists.all.count > 1 %}
@@ -83,19 +67,9 @@
             <p> <strong>Fecha de lanzamiento:</strong> {{ album.release|date:"F d, Y" }}</p>
         {% endif %}
         
-        <!-- FEATURED ARTISTS -->
-        {% if album.genres.all.count > 0 %}
-        <p>
-            <strong>Género{% if album.genres.all.count > 1 %}s{% endif %}:</strong> 
-            <ul class="labels">
-                {% for genre in album.genres.all %}
-                    <a onclick="melodify.navigate(`{% url 'genre-detail' genre.pk %}`)">
-                        {{ genre.name }}{% if not forloop.last %}, {% endif %}
-                    </a>
-                {% endfor %}
-            </ul> 
-        </p>
-        {% endif %}
+        <!-- GENRES -->
+        {% include 'main/widget-genres.html' with data=album.genres %}
+
         
         <!-- FEATURED ARTISTS -->
         <p>
@@ -108,6 +82,6 @@
         </p>
     </div>
 </div>
-{% include 'main/song-list.html' with data=songs %}
+{% include 'main/song-list.html' with data=songs header=True %}
 
 </div>

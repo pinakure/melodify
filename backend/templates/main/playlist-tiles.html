@@ -1,6 +1,4 @@
 <!-- templates/app/playlist_tiles.html -->
-
-{% comment %}{% extends 'base.html' %}{% endcomment %} 
 {% load fontawesome_5 %}
 <style>
     .tile-container {
@@ -25,30 +23,6 @@
         display: block;
     }
 
-    .album-image {
-        background: var(--bg-sidebar);
-        background-size: cover;
-        background-color: var(--bg-main); 
-        background: linear-gradient(-45deg, #fcce, #8868, #3340), 
-                    linear-gradient(-135deg, #cfce, #8668, #4430), 
-                    linear-gradient(-225deg, #ccfe, #6868, #3340), 
-                    linear-gradient(-315deg, #ffce, #6688, #3430) 
-                    !important;
-    }
-
-    .tile-info {
-        padding-left: 15px;
-        padding-right: 15px;
-        padding-bottom: 10px;
-        background-color: var(--bg-content);
-    }
-
-    .tile-info p {
-        margin: 0;
-        color: var(--tile-info-text);
-        font-size: 0.9em;
-    }
-
     h3.playlist-name {
         margin: 0 0 5px 0;
         font-size: 16px !important;   
@@ -57,6 +31,15 @@
         text-align: left;
         padding-left: 14px;
         overflow: hidden;
+    }
+
+    .album-image {
+        background-color: var(--bg-main); 
+        background: linear-gradient(-45deg, #fcce, #8868, #3340), 
+                    linear-gradient(-135deg, #cfce, #8668, #4430), 
+                    linear-gradient(-225deg, #ccfe, #6868, #3340), 
+                    linear-gradient(-315deg, #ffce, #6688, #3430) 
+                    !important;
     }
 
     .playlist-genres,
@@ -69,22 +52,20 @@
         margin-top: 16px;
         width: 90%;
     }
+
     #new-list-name {
         width: 75%;
     }
+
     #new-list-send {
-        color: var(--bg-main);
-        
+        color: var(--bg-main);    
     }
 
-    /* Estilo para ocultar el formulario por defecto */
     #new-list {
         display: none; 
     }
     
     .new-list-toggle {
-        /* Estilo para el botón flotante o fijo que abre el form */
-        /* Puedes ajustarlo a tu diseño (p. ej., un botón + en la esquina superior derecha) */
         cursor: pointer;
         padding: 5px 10px;
         background-color: var(--bg-sidebar);
@@ -97,9 +78,8 @@
 
 </style>
 
-<input type="text" id="searchInput" style="margin-right: 64px;margin-top: 6px;" class="searchInput" placeholder="Filtrar listas...">
-
 {% include "main/widget-title.html" with caption='Listas' counter_id='playlist-count' counter_value=playlists.count %}
+{% include "main/widget-search.html" with type='listas' %}
 
 <button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>
 

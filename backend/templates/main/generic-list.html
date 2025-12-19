@@ -1,51 +1,49 @@
-{% comment %}{% extends 'base.html' %}{% endcomment %}
-    <style>
-        .grid {
-            display: flex;
-            flex-wrap: wrap;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            padding-top: 20px;
-        }
-        .card {
-            padding: 15px;
-            height: 64px;
-            max-height: 64px;
-            align-items: center;
-            vertical-align: middle;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-sidebar);
-            border-radius: 5px;
-            transition: background-color 0.2s;
-            overflow:  hidden;
-        }
-        .card:hover {
-            background-color: var(--border-color);
-        }
-        .card a {
-            text-decoration: none;
-            /* display: block; */
-        }
-        .card h3 {
-            overflow: hidden;
-            width: 100%;
-            margin: 0 0 5px 0;
-            color: var(--accent-color);
-        }
-        .card p {
-            margin: 0;
-            font-size: 0.8em;
-            color: var(--text-color);
-        }
-    </style>
+<!-- main/generic-list.html -->
+<style>
+    .grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+        gap: 15px;
+        padding-top: 20px;
+    }
+    .card {
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-sidebar);
+        border-radius: 5px;
+        height: 54px;
+        max-height: 54px;
+        align-items: center;
+        vertical-align: middle;
+        transition: background-color 0.2s;
+        overflow:  hidden;
+    }
+    .card:hover {
+        background-color: var(--border-color);
+    }
+    .card a {
+        text-decoration: none;
+        /* display: block; */
+    }
+    .card h3 {
+        overflow: hidden;
+        width: 100%;
+        margin: 0 0 5px 0;
+        color: var(--accent-color);
+    }
+    .card p {
+        margin: 0;
+        font-size: 0.8em;
+        color: var(--text-color);
+    }
+</style>
 
-{% block search %}
-    <input type="text" id="search-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="melodify.filter('{{type}}')">
-{% endblock %}
 
+<input type="text" id="search-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="melodify.filter('{{type}}')">
 {% include "main/widget-title.html" with caption=title counter_id='item-count' counter_value=items.count %}
 
-{% block content %}
 <div class="list-container">
     <div class="grid" id="Grid">
         {% for item in items %}
@@ -59,4 +57,3 @@
         {% endfor %}
     </div>
 </div>
-{% endblock %}

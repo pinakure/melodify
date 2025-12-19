@@ -1,5 +1,5 @@
 <!-- templates/app/album_tiles.html -->
-
+{% load fontawesome_5 %}
 <style>
     .tile-container {
         display: grid;
@@ -23,24 +23,6 @@
         display: block;
     }
 
-    .album-image {
-        /* background: var(--bg-sidebar); */
-        background-size: cover;
-    }
-
-    .tile-info {
-        padding-left: 15px;
-        padding-right: 15px;
-        padding-bottom: 10px;
-        background-color: var(--bg-content);
-    }
-
-    .tile-info p {
-        margin: 0;
-        color: var(--tile-info-text);
-        font-size: 0.9em;
-    }
-
     h3.album-name {
         margin: 0 0 5px 0;
         font-size: 16px !important;   
@@ -48,12 +30,11 @@
         height: 18px;
         overflow: hidden;
     }
-
 </style>
 
-<input type="text" id="searchInput" class="searchInput" placeholder="Filtrar álbumes...">
 
 {% include "main/widget-title.html" with caption='Álbumes' counter_id='album-count' counter_value=albums.count %}
+{% include "main/widget-search.html" with type='álbumes' %}
 
 <div id="loading" style="display: none;">Cargando albumes...</div>
 

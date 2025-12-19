@@ -33,6 +33,7 @@ urlpatterns = [
     path('song/<int:pk>/'       , SongDetailView.as_view()      , name='song-detail'),
     path('song/bookmark/'       , views.bookmark_song           , name='bookmark-song'),
     path('scan/artist/'         , views.scan_artist             , name='scan-artist'),
+    path('user/<int:pk>/'       , UserView.as_view()            , name='user'),
 ]
 
 if settings.DEBUG:

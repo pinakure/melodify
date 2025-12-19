@@ -1,56 +1,49 @@
-{% comment %}{% extends 'base.html' %}{% endcomment %}
-{% block header %}
-   
-    <style>
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            padding-top: 20px;
-        }
-        .card {
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            background-color: transparent;
-            border-radius: 5px;
-            height: 280px;
-            max-height: 280px;
-            transition: background-color 0.2s;
-        }
-        .card:hover {
-            background-color: var(--border-color);
-        }
-        .card a {
-            text-decoration: none;
-            display: block;
-        }
-        .card h3 {
-            margin: 0 0 5px 0;
-            color: var(--accent-color);
-        }
-        .card p {
-            margin: 0;
-            font-size: 0.8em;
-            color: var(--text-color);
-        }
-        .circular-item {
-            width: 200px;
-            height: 200px;
-            border-radius: 100px;
-            /* border: 2px solid #fcfcfc; */
-            background: var(--bg-sidebar);
-            background-size: cover;
-        }
-    </style>
-{% endblock %}
+<!-- main/circular-list.html  -->
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        padding-top: 20px;
+    }
+    .card {
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        background-color: transparent;
+        border-radius: 5px;
+        height: 280px;
+        max-height: 280px;
+        transition: background-color 0.2s;
+    }
+    .card:hover {
+        background-color: var(--border-color);
+    }
+    .card a {
+        text-decoration: none;
+        display: block;
+    }
+    .card h3 {
+        margin: 0 0 5px 0;
+        color: var(--accent-color);
+    }
+    .card p {
+        margin: 0;
+        font-size: 0.8em;
+        color: var(--text-color);
+    }
+    .circular-item {
+        width: 200px;
+        height: 200px;
+        border-radius: 100px;
+        /* border: 2px solid #fcfcfc; */
+        background: var(--bg-sidebar);
+        background-size: cover;
+    }
+</style>
 
-{% block search %}
-    <input type="text" id="search-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="melodify.filter('{{type}}')">
-{% endblock %}
-
+<input type="text" id="search-Input" class="searchInput" placeholder="Filtrar {{title}}..." onkeyup="melodify.filter('{{type}}')">
 {% include "main/widget-title.html" with caption=title counter_id='item-count' counter_value=items.count %}
                 
-{% block content %}
 <div class="list-container">
     <div class="grid" id="Grid">
         {% for item in items %}
@@ -70,8 +63,3 @@
         {% endfor %}
     </div>
 </div>
-<script>
-    document.getElementsByClassName('main-content')[0].focus();
-</script>
-
-{% endblock %}

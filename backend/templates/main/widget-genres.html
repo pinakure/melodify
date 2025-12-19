@@ -1,0 +1,11 @@
+<!-- main/widget-genres.html -->
+{% if data.all.count %}
+    <div class="genres medium labels">
+        <strong>Género{% if data.all.count > 1 %}s{% endif %}: </strong>
+        {% for genre in data.all %}
+            <a onclick="melodify.navigate('/genre/{{ genre.id }}/');" >{{genre}}</a>
+        {% endfor %}
+    </div>
+{% else %}
+    <strong>Sin género asociado.</strong>
+{% endif %}

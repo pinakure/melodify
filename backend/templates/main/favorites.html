@@ -1,10 +1,5 @@
 <!-- templates/app/favorites.html -->
-
 {% load fontawesome_5 %}
-
-<input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
-
 {% include "main/widget-title.html" with caption='Favoritos' counter_id='bookmark-count' counter_value=songs.count %}
-
-<p></p>
-{% include 'main/song-list.html' with data=songs %}
+{% include "main/widget-search.html" with type='favoritos' %}
+{% include 'main/song-list.html' with data=songs header=True %}

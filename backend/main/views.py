@@ -195,7 +195,7 @@ class PlayerView(TemplateView):
         context['song']     = song
         context['artist']   = song.artist
         return context
-    
+
 class LandingView(ListView):
     model = Playlist
     template_name = 'main/landing.html'  
@@ -208,6 +208,18 @@ class LandingView(ListView):
         return context
 
 class HomeView(ListView):
+    model = Song
+    template_name = 'main/home.html'  
+    context_object_name = 'songs'         
+    queryset = Song.objects.order_by('?')[:25]
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        context['favorites'] = Song.objects.filter(bookmarked=True)
+        context['playlists'] = Playlist.objects.all()
+        return context
+
+class UserView(ListView):
     model = Song
     template_name = 'main/home.html'  
     context_object_name = 'songs'         

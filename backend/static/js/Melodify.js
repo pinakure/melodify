@@ -114,6 +114,7 @@ Melodify.prototype = {
                 eval(scripts[s].innerHTML);
             }
             melodify.state.current_page = target_url;
+            content.focus();
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);

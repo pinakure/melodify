@@ -1,0 +1,47 @@
+<!-- main/album-list.html -->
+<style>
+    .album-grid {
+        grid-template-columns   : repeat(auto-fill, minmax(180px, 1fr));
+        display                 : grid;
+        gap                     : 20px;
+    }
+    .album-item {
+        text-align              : center;
+        border                  : none;
+        padding                 : 10px;
+        border-radius           : 5px;
+    }
+    .album-item img, 
+    .placeholder-image {
+        width                   : 100%;
+        height                  : 180px;
+        border-radius           : 8px;
+        object-fit              : cover;
+        display                 : block;
+        margin-bottom           : 10px;
+    }
+    .placeholder-image {
+        background-color        : #f0f0f0;
+        display                 : flex;
+        align-items             : center;
+        justify-content         : center;
+    }
+</style>
+{% include 'main/widget-section.html' with caption="Albumes" icon="compact-disc" counter_id='albums-count' counter_value=data.all.count %}
+<div class="album-grid">
+    {% for album in data %}
+        <div class="album-item">
+            <a onclick="melodify.navigate(`{% url 'album-detail' album.pk %}`);">
+                {% if album.picture %}
+                    <img src="{{ album.picture }}" alt="{{ album.name }} cover">
+                {% else %}
+                    <div class="placeholder-image">💿</div>
+                {% endif %}
+                <h4>{{ album.name }}</h4>
+                <p>{{ album.release|date:"Y" }}</p>
+            </a>
+        </div>
+    {% empty %}
+        <p class="small">No hay álbumes.</p>
+    {% endfor %}
+</div>

@@ -2,21 +2,20 @@
 
 {% load fontawesome_5 %}
 
-<input type="text" id="searchInput" class="searchInput" placeholder="Filtrar...">
-
-{% include "main/widget-title.html" with caption='Tu Biblioteca' subcaption=user.username %}
-
-<div id="loading" style="display: none;">Cargando playlists...</div>
+{% include "main/widget-title.html"  with caption='Tu Biblioteca' subcaption=user.username %}
+{% include "main/widget-search.html" with type='' %}
 <p></p>
-<h2 class="section">{% fa5_icon "list"  color="var(--accent-color)" %}&nbsp;Listas (<span id="playlist-count"></span>)</h2>
+<!-- Listas -->
+<div id="loading" style="display: none;">Cargando playlists...</div>
+{% include 'main/widget-section.html' with caption="Listas" icon="list" counter_id='playlist-count' counter_value=0 %}
 <div class="tile-container" style="display: flex; gap: 20px; margin-top: 16px; margin-bottom: 32px;" id="tileContainer"></div>
-<h2 class="section">{% fa5_icon "heart" color="var(--accent-color)" %}&nbsp;Favoritos</h2>
-{% include 'main/song-list.html' with data=favorites %}
-<h2 class="section">{% fa5_icon "random" color="var(--accent-color)" %}&nbsp;Selección Aleatoria</h2>
-{% include 'main/song-list.html' with data=songs %}
+<!-- Favoritos -->
+{% include 'main/song-list.html' with data=favorites header=True caption="Favoritos" icon="heart" %}
+<!-- Seleccion aleatoria -->
+{% include 'main/song-list.html' with data=songs header=True caption="Selección Aleatoria" icon="random" %}
 
 <script>
-    const searchInput       = document.getElementById('searchInput'); 
+    const searchInput = document.getElementById('searchInput'); 
     searchInput.addEventListener('input', melodify.handlePlaylistFilter);
     triggerSearch(melodify.handlePlaylistScroll, loadPlaylists); 
 </script>

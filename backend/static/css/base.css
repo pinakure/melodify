@@ -171,13 +171,16 @@ body, html {
 
 
 .main-content {
-    border-radius: 8px;
-    background-color: var(--bg-content);
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; 
-    overflow-x: hidden;
+    border-radius       : 8px;
+    background-color    : var(--bg-content);
+    padding             : 20px;
+    width               : 100%;
+    height              : 100%;
+    overflow-y          : auto; 
+    overflow-x          : hidden;
+    background-position : center;
+    background-size     : cover;
+    background-repeat   : no-repeat;
 }
 .main-overlay {
     position: absolute;
@@ -207,13 +210,12 @@ body, html {
 }
 
 .placeholder-image {
-    width: 200px;
-    height: 200px;
-    background-color: var(--bg-content);
-    font-size: 128px;
-    color: var(--tile-placeholder);
-    border-radius: 8px;
-    /* filter: opacity(0.5); */
+    width               : 200px;
+    height              : 200px;
+    background-color    : var(--bg-content);
+    font-size           : 128px;
+    color               : var(--tile-placeholder);
+    border-radius       : 8px;
 }
 
 /* Hyperlink customization */
@@ -361,3 +363,41 @@ a:hover {
 .card-item:nth-child(8n)  a .circular-item, .tile-item.album-item:nth-child(8n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 8n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 8n) .album-image, .sidebar-entry:nth-child(8n) .sidebar-entry-picture{ filter: hue-rotate(288deg); }
 .card-item:nth-child(9n)  a .circular-item, .tile-item.album-item:nth-child(9n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 9n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 9n) .album-image, .sidebar-entry:nth-child(9n) .sidebar-entry-picture{ filter: hue-rotate(324deg); }
 .card-item:nth-child(10n) a .circular-item, .tile-item.album-item:nth-child(10n) a .album-art .nopicture, .tile-item.song-item:nth-child(10n) > .album-image.nopicture, .tile-item.playlist-item:nth-child(10n) .album-image, .sidebar-entry:nth-child(10n) .sidebar-entry-picture{ filter: hue-rotate(360deg); }
+
+/* Album / Playlist list styling */
+.tile-info {
+    /* bottom          : 4px;
+    left            : 72px;
+    display         : inline-block;
+    padding-bottom  : 4px; */
+}  
+.tile-info {
+    padding-left    : 15px;
+    padding-right   : 15px;
+    padding-bottom  : 10px;
+    background-color: var(--bg-content);
+}
+.tile-info p {
+    margin          : 0;
+    color           : var(--tile-info-text);
+    font-size       : 0.9em;
+}
+
+/* Artist detail styling  */
+.aka,
+.aka *{
+    color           : var(--accent-color);
+    font-size       : 13px;
+}
+.aka *{
+    margin          : 8px;
+}
+
+.bio *{
+    color: var(--secondary-color);
+    margin: 16px;
+}
+
+.album-image {
+    background-size: cover;
+}

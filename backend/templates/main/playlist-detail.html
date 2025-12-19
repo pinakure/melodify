@@ -1,70 +1,8 @@
+<!-- main/playlist-detail.html  -->
 {% load fontawesome_5 %}
-<style>
-    .playlist-detail { position: relative; }
-
-    .playlist-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 20px;
-    }
-    .playlist-item {
-        text-align: center;
-        border: none;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .playlist-item img, .placeholder-image {
-        width: 100%;
-        height: 180px;
-        border-radius: 8px;
-        object-fit: cover;
-        display: block;
-        margin-bottom: 10px;
-    }
-    .placeholder-image {
-        background-color: #f0f0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .main-content {
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-blend-mode: luminosity;
-        background-color: var(--bg-content);
-    }
-</style>
-
-{% include "main/widget-title.html" with caption=playlist.title subcaption="Lista" counter_id='songs-count' counter_value=songs.count %}
+{% include "main/widget-title.html" with caption=playlist.title subcaption="Lista de" subcaption_suffix=playlist.usuario.username subcaption_link="/user/" subcaption_link_suffix=playlist.usuario.id counter_id='songs-count' counter_value=songs.count %}
 {% include "main/widget-back.html"  with url=back hardcoded_url=True add_slash=True %}
-
 <div class="playlist-detail">
-    <p class="bold medium">Lista de <a>{{ user.username }}</a></p>    
-    {% if albums_list.all.count %}
-    <div class="counter medium">
-        <h3>{{ albums_list.count }} Álbumes</h3> 
-    </div>
-    <div class="playlist-grid">
-        {% for album in albums_list %}
-            <div class="playlist-item">
-                <a href="{% url 'album-detail' album.pk %}">
-                    {% if album.picture %}
-                        <img src="{{ album.picture }}" alt="{{ album.name }} cover">
-                    {% else %}
-                        <div class="placeholder-image">💿</div>
-                    {% endif %}
-                    <h4>{{ album.name }}</h4>
-                    <p>{{ album.release|date:"Y" }}</p>
-                </a>
-            </div>
-            {% empty %}
-            <p>Esta lista no tiene álbumes registrados.</p>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    {% include 'main/song-list.html' with data=songs %}
-
+    {% include 'main/album-list.html' with data=albums_list %}
+    {% include 'main/song-list.html' with data=songs header=True %}
 </div>

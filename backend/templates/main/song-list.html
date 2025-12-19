@@ -1,11 +1,19 @@
 {% load static %}
 {% load fontawesome_5 %}
 {% load utils %}
-
 <div class="song-list">
-    <div class="counter medium">
-        <h3>{{ data.count }} Pistas</h3> 
-    </div>    
+    {% if header is not None %}
+        {% if caption is not None %}
+            {% include 'main/widget-section.html' with caption=caption icon=icon counter_id='song-counter' counter_value=data.count %}
+        {% else %}
+            {% include 'main/widget-section.html' with caption="Pistas" icon="music" counter_id='song-counter' counter_value=data.count %}
+        {% endif %}
+        <br/>    
+    {% else %}
+        <div class="counter medium">
+            <h3>{{ data.count }} Pistas</h3> 
+        </div>
+    {% endif %}
     {% csrf_token %}
     {% for song in data %}
     <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
