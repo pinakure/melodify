@@ -31,7 +31,7 @@
 <div class="song-detail-container" >
     
     <div class="album-item">
-        <div style="display: inline-block">
+        <div style="display: inline-block;display: inline-block;word-break: break-all;word-wrap: break-word;width: 200px;">
             <!-- cover art  -->
             {% if song.album.pk %}
             <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
