@@ -36,7 +36,7 @@ function MelodifyPlayer() {
     volume.addEventListener     ('touchend'   , function()      { window.sliderDown = false; });
     volume.addEventListener     ('mousemove', move);
     volume.addEventListener     ('touchmove', move);
-    window.addEventListener('resize', resize);
+    window.addEventListener     ('resize', resize);
 }
 MelodifyPlayer.prototype = {
 
@@ -170,6 +170,10 @@ MelodifyPlayer.prototype = {
 	},
     skipTo: function(index) {
 		var self = this;
+
+        if( this.index == index ){
+            return;
+        }
 
 		// Stop the current track.
 		if (self.howl) {
