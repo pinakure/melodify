@@ -17,6 +17,8 @@
     --tile-placeholder      : #777;
     --tile-info             : #030303;
     --tile-info-text        : #666;
+    --gradient-begin        : #ff8000;
+    --gradient-end          : #805020;
     --nav-height            : 60px;
     --sidebar-width         : 432px;
 }

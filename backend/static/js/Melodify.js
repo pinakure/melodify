@@ -445,6 +445,11 @@ Melodify.prototype = {
             }
         });
     },
+    loadScheme : function(scheme){
+        this.request(`/scheme/${ scheme }/`,{}, (data)=>{ 
+            document.getElementById('scheme').innerHTML = data.values;
+        });
+    },
     /* Callback functions */
     filter : function(type) {
         const input  = document.getElementById('search-Input');

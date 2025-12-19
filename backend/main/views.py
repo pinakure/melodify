@@ -219,6 +219,12 @@ class HomeView(ListView):
         context['playlists'] = Playlist.objects.all()
         return context
 
+class SettingsView(TemplateView):
+    template_name = 'main/settings.html'  
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
+
 class UserView(ListView):
     model = Song
     template_name = 'main/home.html'  
@@ -319,6 +325,13 @@ class SongDetailView(DetailView):
         context = get_context(super().get_context_data(**kwargs))
         obj = self.object
         return context
+    
+    
+def scheme_view_ajax(request, scheme):
+    scheme = scheme.strip('.')
+    with open(f'templates/schemes/{ scheme }.css', 'r') as f:
+        values = f.read()
+    return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
     
 def create_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):

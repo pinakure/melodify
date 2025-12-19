@@ -1,0 +1,12 @@
+<!-- main/widget-refresh.html  -->
+ {% load fontawesome_5 %}
+<button 
+    type    = "button" 
+    id      = "refresh-{{ type }}" 
+    class   = "input secondary"  
+    title   = "{{ info }}" 
+    onclick = "{{ callback }}('{{ parameter }}')"
+    style   = "position:absolute; top: 20px; right: 64px;margin-bottom: 32px;"
+>
+{% fa5_icon 'sync' %}
+</button>

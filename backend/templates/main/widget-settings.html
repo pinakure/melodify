@@ -1,0 +1,12 @@
+<!-- main/widget-settings.html  -->
+ {% load fontawesome_5 %}
+<button 
+    type    = "button" 
+    id      = "button-settings" 
+    class   = "input secondary"  
+    title   = "Ajustes" 
+    onclick = "melodify.navigate('/settings/');"
+    style   = "position:absolute; top: 10px; right: 8px;"
+>
+{% fa5_icon 'cogs' %}
+</button>
