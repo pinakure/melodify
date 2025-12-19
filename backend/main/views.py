@@ -184,6 +184,13 @@ class FavoritesView(ListView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
+
+class PlayerView(TemplateView):
+    template_name = 'main/full-player.html'  
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
     
 class LandingView(ListView):
     model = Playlist

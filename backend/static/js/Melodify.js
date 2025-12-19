@@ -1,11 +1,43 @@
+let soundPlayer = null; // Variable to hold the current Howler sound instance
+let currentButton = null; // Variable to track which button is active
+
+function MelodifyPlayer() {
+    this.playlist = [];
+    this.index    = 0;
+}
+
+MelodifyPlayer.prototype = {
+
+    enqueue : function(song){
+        this.playlist.push(song);
+        this.index = this.playlist.length-1;
+        // console.table(this.playlist);
+    },
+
+    play    : function(song){
+        this.enqueue(song);
+        this.start();
+    },
+    
+    start   : function(){
+        player.pause();
+        player.playlist = this.playlist;
+        player.play();
+    },
+};
+
+
+
 function Melodify(){
-    /* Restore initial melodigy state */
+    /* Restore initial melodify state */
     const initial_state = {
         currentSongId   : null,
         currentTime     : 0,
         volume          : 0.5,
         queue           : [],
         current_page    : '',
+        first_song      : null,
+        skin            : 'default',
     };
     state = localStorage.getItem('melodify');
     if(!state) state = initial_state;
@@ -15,6 +47,7 @@ function Melodify(){
     this.state      = state;
     this.is_loading = false;
     this.search_term = '';
+    this.player = new MelodifyPlayer();
 };
 
 Melodify.prototype = {
@@ -25,6 +58,29 @@ Melodify.prototype = {
 
     reset_scroll : function(){
         try{ scrollbox.scrollTop = 0;} catch{}
+    },
+
+    playSong : function(buttonElement, only_enqueue=false) {
+        const artistName = buttonElement.getAttribute('data-artistname');
+        const songName   = buttonElement.getAttribute('data-songname');
+        const audioUrl   = buttonElement.getAttribute('data-src');
+        const songId     = buttonElement.getAttribute('data-id');
+        const nextSong   = buttonElement.getAttribute('data-next-id');
+        var howl = null;//player.playlist.length ? player.playlist[player.index].howl : null;
+        var song = {
+            title   : `${artistName} - ${songName}`,
+            file    : audioUrl,
+            howl    : howl,
+            next    : nextSong,
+        };
+        if( !only_enqueue) {
+            melodify.first_song = songId;
+        }
+        melodify.player.enqueue( song );
+        if( nextSong != "" && (nextSong != melodify.first_song) ){
+            melodify.playSong( document.getElementById(`song-${ nextSong }`) , true );
+        }
+        if( !only_enqueue ) melodify.player.start();
     },
 
     navigate : function(url){
@@ -103,12 +159,11 @@ Melodify.prototype = {
             title   : `${artist}`,
             file    : filename,
             howl    : null,
-            next    : melodify_player.playlist[ melodify_player.index ].next ?? null,
+            next    : melodify.player.playlist[ melodify.player.index ].next ?? null,
         };
-        melodify_player.enqueue(song); 
-        melodify_player.playlist[ melodify_player.playlist.count-2 ].next = melodify_player.playlist[ melodify_player.playlist.count-2 ].next; 
-        
-        melodify_player.playlist[ melodify_player.index ].next = song;
+        melodify.player.enqueue(song); 
+        melodify.player.playlist[ melodify.player.playlist.count-2 ].next = melodify.player.playlist[ melodify.player.playlist.count-2 ].next; 
+        melodify.player.playlist[ melodify.player.index ].next = song;
     },
 
     filter : function(type) {

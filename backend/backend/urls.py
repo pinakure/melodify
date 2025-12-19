@@ -16,6 +16,7 @@ urlpatterns = [
     path('steal/'               , StealView.as_view()           , name='steal'),
     path('stealget/'            , views.steal_get               , name='steal-get'),
     path('stealsearch/'         , views.steal_search            , name='steal-search'),
+    path('player/'              , PlayerView.as_view()          , name='player'),
     path('albums/'              , AlbumTileView.as_view()       , name='album-tiles'),
     path('albums/<int:pk>/'     , AlbumDetailView.as_view()     , name='album-detail'),
     path('favorites/'           , FavoritesView.as_view()       , name='favorites'),

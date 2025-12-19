@@ -91,15 +91,12 @@
                 <div class="wrapper">
                     <ul>
                         {% for playlist in playlists %}
-                            <!-- {% include 'main/playlist-entry.html' with index=forloop.counter title=playlist.title subtitle='Test' use_index=False picture=playlist.songs.0.picture.url %} -->
                             <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
                                 <div class="playlist-entry-picture"></div>
                                 <div>
-                                    <!-- Playlist {{ forloop.counter }} -->
                                     {{ playlist.title }}
                                 </div>
                                 <div>
-                                    <!-- Playlist {{ forloop.counter }} -->
                                 </div>
                             </li>
                         {% endfor %}
@@ -111,10 +108,8 @@
     </div>
     <!-- Barra Inferior -->
     <div class="playbar">
-        {% include 'main/player.html' %}
         {% include 'main/bottom-player.html' %}
     </div>
-    <!-- <  div id="fullplayer"></div> -->
 </div>
 
 </body>
