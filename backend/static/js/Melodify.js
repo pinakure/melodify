@@ -258,24 +258,31 @@ Melodify.prototype = {
     reset_scroll : function(){
         try{ scrollbox.scrollTop = 0;} catch{}
     },
-    playSong : function(buttonElement, only_enqueue=false) {
+    
+    getSongDetails : function( buttonElement ){
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
         const audioUrl   = buttonElement.getAttribute('data-src');
         const pictureUrl = buttonElement.getAttribute('data-picture');
         const songId     = buttonElement.getAttribute('data-id');
         const nextSong   = buttonElement.getAttribute('data-next-id');
-        var song         = {
+        // @song instanciation
+        return {
             title       : `${artistName} - ${songName}`,
             file        : audioUrl,
             url_picture : pictureUrl,
             url_detalle : `/song/${songId}`,
-            next        : nextSong,
             id          : songId,
             song_id     : songId,
             artist_name : artistName,
             song_name   : songName,
+            next        : nextSong,
         };
+    },
+
+    playSong : function(buttonElement, only_enqueue=false) {
+        const nextSong   = buttonElement.getAttribute('data-next-id');
+        var song = this.getSongDetails( buttonElement );
         
         if( !only_enqueue) {
             melodify.first_song = song;
@@ -294,6 +301,15 @@ Melodify.prototype = {
         }
         if( !only_enqueue ) melodify.player.play(melodify.first_song);
     },
+
+    enqueueSong : function( buttonElement ){
+        var song = this.getSongDetails( buttonElement );  
+        song.next = melodify.player.playlist[ 0 ].id;
+        melodify.player.playlist[ melodify.player.playlist.length-1 ].next = song.id; 
+        melodify.player.playlist.push(song);
+        melodify.player.updatePlaylist();
+    },
+
     /* TODO: Fix BACK bug!!! */
     navigate : function(url, params=[]){
         var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
@@ -366,18 +382,8 @@ Melodify.prototype = {
             }
         });
     },
-    enqueueSong : function( artist, title, filename, node_id, song_id ){
-        alert(`Enqueue ${title}...`);
-        var song = {
-            title   : `${artist}`,
-            file    : filename,
-            howl    : null,
-            next    : melodify.player.playlist[ melodify.player.index ].next ?? null,
-        };
-        melodify.player.enqueue(song); 
-        melodify.player.playlist[ melodify.player.playlist.count-2 ].next = melodify.player.playlist[ melodify.player.playlist.count-2 ].next; 
-        melodify.player.playlist[ melodify.player.index ].next = song;
-    },
+    
+    /* Callback functions */
     filter : function(type) {
         const input  = document.getElementById('search-Input');
         const filter = input.value.toLowerCase();

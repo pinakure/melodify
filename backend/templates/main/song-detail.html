@@ -60,8 +60,19 @@
                     title           = "Reproducir" 
                     onclick         = "melodify.playSong(this)"
                 >{% fa5_icon 'play' color="#000"%}</button>
-                <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista de reproducción"    onclick="melodify.enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'clock' color="#000"%}</button>
-                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+                <button 
+                    type            = "button" 
+                    class           = "input confirm" 
+                    id              = "enqueue-song"     
+                    data-artistname = "{{ song.artist.name }}" 
+                    data-songname   = "{{ song.title }}" 
+                    data-src        = "/static/{{ song.filename }}" 
+                    data-picture    = "{{ song.picture }}" 
+                    data-id         = "{{ song.pk }}"
+                    title           = "Agregar a la cola" 
+                    onclick         = "melodify.enqueueSong(this)"
+                >{% fa5_icon 'clock' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"    onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
             </div>
         </div>
         <div style="display: inline-block">
