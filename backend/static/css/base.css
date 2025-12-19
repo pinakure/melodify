@@ -428,3 +428,7 @@ a:hover {
 .album-image {
     background-size: contain;
 }
+
+button:hover {
+    cursor: pointer;
+}

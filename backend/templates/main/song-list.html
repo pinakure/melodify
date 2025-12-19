@@ -1,3 +1,4 @@
+<!-- main/song-list.html  -->
 {% load static %}
 {% load fontawesome_5 %}
 {% load utils %}
@@ -58,7 +59,9 @@
                 <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
                 <!-- <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista actual"    onclick="melodify.enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'plus' color="#000"%}</button> -->
                 <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
-                <button type="button" id="delete-entry"     class="input accent"  title="Eliminar de la lista"      onclick="melodify.remSongFromPlaylist('{{ playlist.id }}', '{{ song.pk }}')">{% fa5_icon 'trash' color="#000"%}</button>
+                {% if delete_button is not None %}
+                    <button type="button" id="delete-entry"     class="input accent"  title="Eliminar de la lista"      onclick="melodify.remSongFromPlaylist('{{ playlist.id }}', '{{ song.pk }}')">{% fa5_icon 'trash' color="#000"%}</button>
+                {% endif %}
             </div>
         </div>
 

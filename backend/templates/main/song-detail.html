@@ -8,62 +8,92 @@
     {% include "main/widget-back.html" with url="album-detail" hardcoded_url=False url_params=song.album.pk %}
 {% endif %}
 
-<div class="song-detail-container">
+<style>
+
+.album-item div {
+    display         : flex;
+}
+
+.album-item {
+    display: flex;             /* Activa el modo horizontal */
+    flex-direction: row;       /* Asegura que los hijos vayan de izquierda a derecha */
+    align-items: flex-start;   /* Alinea los hijos al borde superior */
+    gap: 20px;                 /* Espacio entre la imagen y el texto (ajusta a tu gusto) */
+    width: 100%;    
+}
+.album-item > div:last-child {
+    flex: 1;                   /* Hace que el texto ocupe el resto del espacio */
+}
+
+</style>
+{% csrf_token %}
+
+<div class="song-detail-container" >
     
     <div class="album-item">
-        {% if song.album.pk %}
-        <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
-            <div class="album-art" style="justify-content: left !important;">
-                {% if song.album.picture %}
-                <div class="album-image" style="background-image: url('{{ song.album.picture }}')" alt="{{ song.album.name }} cover"></div>
-                {% else %}
-                <div class="placeholder-image">💿</div>
-                {% endif %}
+        <div style="display: inline-block">
+            <!-- cover art  -->
+            {% if song.album.pk %}
+            <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
+                <div class="album-art" style="justify-content: left !important;">
+                    {% if song.album.picture %}
+                        <div class="album-image" style="background-image: url('{{ song.album.picture }}')" alt="{{ song.album.name }} cover"></div>
+                    {% else %}
+                        <div class="placeholder-image">💿</div>
+                    {% endif %}
+                </div>
+                <h4>{{ song.album.name }}</h4>
+            </a>
+            {%endif%}
+            <div style="display: flex; justify-content: space-around; margin-top: 8px;gap:4px;" >
+                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
+                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
+                <button 
+                    type            = "button" 
+                    class           = "input confirm" 
+                    id              = "song-{{ song.pk }}"          
+                    data-artistname = "{{ song.artist.name }}" 
+                    data-songname   = "{{ song.title }}" 
+                    data-src        = "/static/{{ song.filename }}" 
+                    data-id         = "{{ song.pk }}"
+                    data-next-id    = "{{ song.pk }}"
+                    title           = "Reproducir" 
+                    onclick         = "melodify.playSong(this)"
+                >{% fa5_icon 'play' color="#000"%}</button>
+                <button type="button" id="enqueue-song"     class="input confirm" title="Agregar a lista de reproducción"    onclick="melodify.enqueueSong('{{ song.artist.name }}', '{{ song.title }}' ,'/static/{{ song.filename }}' ,'song-{{ song.pk }}', '{{ song.pk }}')">{% fa5_icon 'clock' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
             </div>
-            <h4>{{ song.album.name }}</h4>
-        </a>
-        
-        <!-- lista de artistas -->
-        
-        <p class="labels">
-            <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
-            {% for artist in song.album.artists.all %}
-            <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
-            {% endfor %}
-        </p>
-        {%endif%}
-        
-        <!-- Datos de cancion -->
-        {% if song.tags.all.count > 0 %}
-        <p class="labels"><strong>Tags:</strong>{% for tag in song.tags.all %}<a>{{ tag }}</a>{% endfor %}</p>
-        {% endif %}
-        
-        {% if song.genre %}
-            <p class="labels"><strong>Género: </strong>
-                <a onclick="melodify.navigate(`{% url 'genre-detail' song.genre.pk %}`)">{{ song.genre }}</a>
-            </p>
-        {% endif %}
-        
-        <p>
-            <strong>Duración:</strong> 
-            {{ song.duration|strftime:'' }}
-        </p> 
-        
-        <!-- El reproductor de audio -->
-        <p class="breathe">
-            {% if song.filename %}
-                <audio controls preload="none">
-                    <source src="{% static song.filename %}" type="audio/mpeg">
-                    Tu navegador no soporta el elemento de audio.
-                </audio>
-            {% else %}
-                <span class="no-track-available">Pista no disponible</span>
+        </div>
+        <div style="display: inline-block">
+            <!-- lista de artistas -->
+            {% if song.album.pk %}
+                <p class="labels">
+                    <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
+                    {% for artist in song.album.artists.all %}
+                    <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
+                    {% endfor %}
+                </p>
+            {%endif%}
+
+            <!-- Datos de cancion -->
+            {% if song.tags.all.count > 0 %}
+            <p class="labels"><strong>Tags:</strong>{% for tag in song.tags.all %}<a onclick="melodify.navigate(`{% url 'tag-detail' tag.pk %}`)">{{ tag }}</a>{% endfor %}</p>
             {% endif %}
-        </p>
+            
+            {% if song.genre %}
+                <p class="labels"><strong>Género: </strong>
+                    <a onclick="melodify.navigate(`{% url 'genre-detail' song.genre.pk %}`)">{{ song.genre }}</a>
+                </p>
+            {% endif %}
+            
+            <p>
+                <strong>Duración:</strong> 
+                {{ song.duration|strftime:'' }}
+            </p> 
+            
+        </div>
     </div>
-
+    <div id="lyrics" class="italic breathe">
+        Lyrics here
+    </div> 
 </div>
-
-<script>
-
-</script>

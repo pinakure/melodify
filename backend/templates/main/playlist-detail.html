@@ -4,5 +4,5 @@
 {% include "main/widget-back.html"  with url=back hardcoded_url=True add_slash=True %}
 <div class="playlist-detail">
     {% include 'main/album-list.html' with data=albums_list %}
-    {% include 'main/song-list.html' with data=songs header=True %}
+    {% include 'main/song-list.html' with data=songs header=True delete_button=True %}
 </div>
