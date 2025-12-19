@@ -15,76 +15,70 @@
         <!-- Esta linea de estilos debe ser la última para que los estilos responsivos tengan efecto  -->
         <link rel="stylesheet" href="/static/css/vertical.css">
         <title>Melodify {% block title %}{% endblock %}</title>
-        {% fontawesome_5_static %}
-        <script src="/static/js/howler.min.js"></script>
-        <script src="/static/js/siriwave.js"></script>
-        <script src="/static/js/Melodify.js"></script>
+        {% fontawesome_5_static %}        
         {% block header %}{% endblock %}
     </head>
     <body>
-
-    <div class="main-container">
-
-        <!-- Barra Superior -->
-        <header class="navbar">
-            
-            <div class="navbar-links">
-                {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      %}
-                {% include 'main/link.html' with url='artist-list'   caption="Artistas"     %}
-                {% include 'main/link.html' with url='genre-list'    caption="Géneros"      %}
-                {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    %}
-                {% include 'main/link.html' with url='playlist-list' caption="Listas"       %}
-                {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
-            </div>
-            <a onclick="melodify.navigate('home')">
-                <div id="melodify-logo">
-                    <div class="benzene">⌬</div>
+        <div class="main-container">
+            <!-- Barra Superior -->
+            <header class="navbar">
+                <div class="navbar-links">
+                    {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      %}
+                    {% include 'main/link.html' with url='artist-list'   caption="Artistas"     %}
+                    {% include 'main/link.html' with url='genre-list'    caption="Géneros"      %}
+                    {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    %}
+                    {% include 'main/link.html' with url='playlist-list' caption="Listas"       %}
+                    {% include 'main/link.html' with url='steal'         caption="Buscar"       %} 
                 </div>
-            </a>
-            <div class="search-box">
-                <!-- Formulario de búsqueda -->
-                {% block search %}{% endblock %}
-            </div>
-            {% block back %}{% endblock %}
-        </header>
-
-        <!-- Contenedor del Panel Doble -->
-        <div class="content-container">
-
-            <!-- Lado Izquierdo -->
-            {% include 'main/sidebar.html' %}
-
-            <!-- Lado Derecho -->
-            <main class="main">
-                <div class="main-content" {% block background %}{% endblock %}>
-                    {% block content %}{% endblock %}
-                </div>
-                <!-- <div class="main-overlay"></div> -->
-                <div id="playlists-window" class="playlists" style="z-index: 2000">
-                    <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="melodify.hidePlaylists()">{% fa5_icon 'times'%}</button>
-                    <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
-                    <div class="wrapper">
-                        <ul>
-                            {% for playlist in playlists %}
-                                <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
-                                    <div class="playlist-entry-picture"></div>
-                                    <div>
-                                        {{ playlist.title }}
-                                    </div>
-                                    <div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                <a onclick="melodify.navigate('home')">
+                    <div id="melodify-logo">
+                        <div class="benzene">⌬</div>
                     </div>
+                </a>
+                <div class="search-box">
+                    <!-- Formulario de búsqueda -->
+                    {% block search %}{% endblock %}
                 </div>
-            </main>
-            
+                {% block back %}{% endblock %}
+            </header>
+            <!-- Contenedor del Panel Doble -->
+            <div class="content-container">
+                <!-- Lado Izquierdo -->
+                {% include 'main/sidebar.html' %}
+                <!-- Lado Derecho -->
+                <main class="main">
+                    <div class="main-content" {% block background %}{% endblock %}>
+                        {% block content %}{% endblock %}
+                    </div>
+                    <!-- <div class="main-overlay"></div> -->
+                    <div id="playlists-window" class="playlists" style="z-index: 2000">
+                        <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="melodify.hidePlaylists()">{% fa5_icon 'times'%}</button>
+                        <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
+                        <div class="wrapper">
+                            <ul>
+                                {% for playlist in playlists %}
+                                    <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
+                                        <div class="playlist-entry-picture"></div>
+                                        <div>
+                                            {{ playlist.title }}
+                                        </div>
+                                        <div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <!-- Barra Inferior -->
+            <div class="playbar">
+                {% include 'main/bottom-player.html' %}
+            </div>
         </div>
-        <!-- Barra Inferior -->
-        <div class="playbar">
-            {% include 'main/bottom-player.html' %}
-        </div>
-    </div>
+        <script src="/static/js/howler.min.js"></script>
+        <script src="/static/js/siriwave.js"></script>
+        <script src="/static/js/utils.js" defer></script>
+        <script src="/static/js/Melodify.js" defer></script>
     </body>
 </html>

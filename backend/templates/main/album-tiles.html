@@ -43,7 +43,7 @@
 <script>
     const scrollbox = document.getElementsByClassName('main-content')[0];
     melodify.next_page = 1;
-    loadAlbums();
+    melodify.loadAlbums();
 
     // Carga inicial y listeners
 
@@ -52,9 +52,9 @@
     searchInput.addEventListener('input', () => {
         // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
         clearTimeout(this.searchTimeout); 
-        this.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, loadAlbums), 300);
+        this.searchTimeout = setTimeout(() => triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums), 300);
     });
 
-    triggerSearch(melodify.handleAlbumScroll, loadAlbums); 
+    triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums); 
     
 </script>
