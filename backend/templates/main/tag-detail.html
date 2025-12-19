@@ -1,6 +1,6 @@
 <!-- main/tag-detail.html  -->
 {% include "main/widget-title.html" with caption=tag.name subcaption="Etiqueta" %}
-{% include "main/widget-back.html"  with url="tag-list" hardcoded_url=False %}
+{% include "main/widget-back.html"  %}
 {% include "main/background.html"   with value="linear-gradient(45deg, #1234, #fec4);" %}
 <div class="tag-detail">
     {% include 'main/album-list.html' with data=albums_list %}

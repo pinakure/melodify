@@ -78,6 +78,7 @@ MelodifyPlayer.prototype = {
             playBtn.style.display = 'none';
             return;
         }
+        document.title = song.title;
         // this.enqueue(song);
         melodify.player.pause();
 		var self = this;
@@ -375,9 +376,13 @@ Melodify.prototype = {
         melodify.player.updatePlaylist();
     },
 
+    history : [],
+
     /* TODO: Fix BACK bug!!! */
     navigate : function(url, params=[]){
-        var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
+        // var target_url = `${url}?back=${ melodify.state.current_page.replace('/','') }`;
+        var target_url = `${url}?back=${this.history[this.history.length-1]}`;
+        this.history.push(url);
         for(p in params){
             target_url += `&${ params[p]}`;
         }

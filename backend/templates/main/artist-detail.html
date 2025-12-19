@@ -1,7 +1,7 @@
 <!-- main/artist-detail.html -->
 {% load fontawesome_5 %}
 {% include "main/widget-title.html" with caption=artist.name subcaption="Artista" %}
-{% include "main/widget-back.html" with url="artist-list" hardcoded_url=False %}
+{% include "main/widget-back.html" %}
 {% if artist.picture.name %}
     {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='lighten' picture=artist.picture.url %}
 {% endif %}

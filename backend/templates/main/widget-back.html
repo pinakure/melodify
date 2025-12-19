@@ -1,15 +1,7 @@
 <!-- main/widget-back.html  -->
  {% load fontawesome_5 %}
 <button 
-    {% if hardcoded_url %}
-        onclick="melodify.navigate('{% if add_slash %}/{% endif %}{{ url }}')" 
-    {% else %}
-        {% if url_params is None %}
-            onclick="melodify.navigate('{% url url %}')" 
-        {% else %}
-            onclick="melodify.navigate('{% url url url_params %}')" 
-        {% endif %}
-    {% endif %}
+    onclick="melodify.history.pop(); melodify.navigate(melodify.history.pop())" 
     title="Volver" 
     class="back-link input confirm" 
     style="position:absolute; top: 0px; right: 16px;margin-bottom: 32px;">
