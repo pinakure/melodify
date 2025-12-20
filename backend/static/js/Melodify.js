@@ -368,8 +368,9 @@ Melodify.prototype = {
     },
     enqueueSong : function( buttonElement ){
         var song = this.getSongDetails( buttonElement );  
-        song.next = melodify.player.playlist[ 0 ].id;
-        melodify.player.playlist[ melodify.player.playlist.length-1 ].next = song.id; 
+        song.next = melodify.player.playlist.length ? melodify.player.playlist[ 0 ].id : song.id;
+        if(melodify.player.playlist.length)
+            melodify.player.playlist[ melodify.player.playlist.length-1 ].next = song.id; 
         melodify.player.playlist.push(song);
         melodify.player.updatePlaylist();
     },
