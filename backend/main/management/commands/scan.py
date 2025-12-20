@@ -551,14 +551,22 @@ class Command(BaseCommand):
         else:
             # Drive and (optional) Path
             [DRIVE, PATH] = BASEPARTS
-        # 1st branch : single unit / unit and path
-        print(f' --- DRIVE: {DRIVE}')
-        print(f' ---  PATH: {PATH}')
-        exit()
-        print(MUSIC_FOLDER.split(':'))
-        if len(DRIVE) == 1:
-            MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, MUSIC_FOLDER.split(':')[1] )
-        MUSIC_FOLDER = MUSIC_FOLDER + (os.path.sep if not MUSIC_FOLDER.endswith('/') else '')
+            PATH = PATH.lstrip(os.path.sep)
+            PATH = PATH.rstrip(os.path.sep)
+        if PATH == '': 
+            PATH = os.path.sep
+
+        PATH_PIECES = PATH.split(os.path.sep)
+        PATH = ''
+        for p in PATH_PIECES:
+            if not len(p): continue 
+            PATH += p
+            PATH += os.path.sep
+        MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, PATH )
+        print(f' ---  os.path.sep: {os.path.sep}')
+        print(f' ---        DRIVE: {DRIVE}')
+        print(f' ---         PATH: {PATH}')
+        print(f' --- MUSIC_FOLDER: {MUSIC_FOLDER}')
         if options['force'] is not False:
             print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
             force = True

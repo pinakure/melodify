@@ -375,10 +375,11 @@ Melodify.prototype = {
     },
     navigate : function(url, params=[], register_history=true){
         if( register_history ) this.state.history.push(url);
+        target_url = url+'?'
         for(p in params){
             target_url += `&${ params[p]}`;
         }
-        fetch(url)
+        fetch(target_url)
         .then(response => response.text())
         .then(data => {
             /* Remove event listeners */
