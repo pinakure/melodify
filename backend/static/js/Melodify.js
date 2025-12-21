@@ -59,8 +59,8 @@ MelodifyPlayer.prototype = {
                     var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
                     var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
                     this.lyrics[ index ] = {
-                        start : get_start_time(),
-                        end   : get_end_time(),
+                        start : (get_start_time()*1000)+parseInt(start.split(',')[1]),
+                        end   : (get_end_time()  *1000)+parseInt(end.split(',')[1]),
                         text  : text, 
                     };
                 }
@@ -254,7 +254,7 @@ MelodifyPlayer.prototype = {
                 var lyric = melodify.player.lyrics[ melodify.player.lyrics_index ];
                 if( lyric == undefined ) return;
                 var next  = melodify.player.lyrics[ melodify.player.lyrics_index+1 ]==undefined ? '' : melodify.player.lyrics[ melodify.player.lyrics_index+1 ];
-                var now   = parseInt(seek+0.5);
+                var now   = parseInt(seek*1000);// parseInt(seek+0.5);
                 if( (now >= lyric.start) && (now <= lyric.end)){
                     // document.getElementById('debug').innerHTML=`${now} - ${lyric.start} - ${lyric.end}`;
                     if( melodify.player.lyrics_last != lyric.start){
@@ -262,7 +262,7 @@ MelodifyPlayer.prototype = {
                                 document.getElementById('lyrics').innerHTML = `
                                 <div class="lyric-wrapper" style="position: relative;height: 32px;">
                                     <p class="lyric">${ lyric.text }</p>
-                                    <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }s;">${ lyric.text }</p>
+                                    <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }ms;">${ lyric.text }</p>
                                 </div>
                                 <p class="blend-50">${ next.text ?? ''}</p>
                             `;
