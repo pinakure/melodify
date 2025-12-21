@@ -345,12 +345,12 @@ def search_ajax(request):
     print(f"  Searching term {topic} ")
     print("*"*80)
     results = {
-        'albums'  : list(Album.objects.filter(name__icontains=topic      ).values('id', 'name'  , 'picture')),
-        'artists' : list(Artist.objects.filter(name__icontains=topic     ).values('id', 'name'  , 'picture')),
-        'songs'   : list(Song.objects.filter(title__icontains=topic      ).values('id', 'title' , 'picture')),
-        'lists'   : list(Playlist.objects.filter(title__icontains=topic  ).values('id', 'title' , 'picture')),
-        'genres'  : list(Genre.objects.filter(name__icontains=topic      ).values('id', 'name'  )),
-        'tags'    : list(Tag.objects.filter(name__icontains=topic        ).values('id', 'name'  )),
+        'albums'  : list(Album.objects.filter(name__icontains=topic      )[:50].values('id', 'name'  , 'picture')),
+        'artists' : list(Artist.objects.filter(name__icontains=topic     )[:50].values('id', 'name'  , 'picture')),
+        'songs'   : list(Song.objects.filter(title__icontains=topic      )[:50].values('id', 'title' , 'picture')),
+        'lists'   : list(Playlist.objects.filter(title__icontains=topic  )[:50].values('id', 'title' , 'picture')),
+        'genres'  : list(Genre.objects.filter(name__icontains=topic      )[:50].values('id', 'name'  )),
+        'tags'    : list(Tag.objects.filter(name__icontains=topic        )[:50].values('id', 'name'  )),
         'users'   : [],
     }
     return JsonResponse({'status': 'success', 'results': results })

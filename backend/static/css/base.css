@@ -254,9 +254,9 @@ a:hover {
     margin-bottom: 2px;
     font-size: 14px;
     font-family: 'lunchtype-medium';
-    border: 1px solid #6668;
+    border: 1px solid var(--tile-info-text);
     border-radius: 16px;
-    background-color: #6668;
+    background-color: var(--tile-info-text);
     user-select: none !important;
     cursor: pointer;
     margin-right: 4px;
