@@ -1,6 +1,7 @@
 <!-- main/artist-detail.html -->
 {% load fontawesome_5 %}
 {% include "main/widget-title.html" with caption=artist.name subcaption="Artista" %}
+{% include "main/widget-admin.html" with object='artist' id=artist.pk %}
 {% include "main/widget-back.html" %}
 {% include "main/widget-refresh.html" with type="artist" callback="melodify.scanArtist" parameter=artist.id info="Forzar reescaneado de artista" %}
 {% if artist.picture.name %}
@@ -25,9 +26,6 @@
                 {{ artist.bio|linebreaksbr }}
             {% else %}
                 No hay información de este artista disponible.
-                {% if user.is_superuser %}
-                    <a href="/admin/main/artist/{{ artist.id }}/" target="_blank" title="Edit">{% fa5_icon "edit" %}</a>
-                {% endif %}
             {% endif %}
         </p>
     </div>

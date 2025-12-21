@@ -147,6 +147,9 @@ body, html {
     color: var(--link-color);
     transition: color 0.3s;
 }
+* {
+    transition: color 0.3s, background-color 0.3s;
+}
 .navbar-links a:hover {
     color: var(--accent-color);
 }
@@ -304,6 +307,9 @@ button.input:active {
     background-color: var(--accent-color) !important;
 }
 
+.searchInput::placeholder {
+    color: var(--tile-placeholder);
+}
 .searchInput {
     left: auto;
     right: 8px;
@@ -315,7 +321,9 @@ button.input:active {
     position: absolute;
     background-color: var(--bg-sidebar);
 }
-
+.mega-search::placeholder {
+    color: var(--tile-placeholder);
+}
 .mega-search {
     left: auto;
     right: 0px;
@@ -448,6 +456,7 @@ button:hover {
     top:0px;
     left:0px;
     display: inline-block;
+    overflow: hidden;
     text-shadow: 2px 2px 0px #0008;
 }
 .lyric-animation {

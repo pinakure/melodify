@@ -10,8 +10,10 @@
     {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.picture %}
 {% elif song.album.picture.name %}
     {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.album.picture %}
-{% else %}
+{% elif song.artist.picture.name %}
     {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.artist.picture.url %}
+{% else %}
+
 {% endif %}
 
 <style>
@@ -65,7 +67,7 @@
                     data-id         = "{{ song.pk }}"
                     data-next-id    = "{{ song.pk }}"
                     title           = "Reproducir" 
-                    onclick         = "melodify.playSong(this)"
+                    onclick         = "melodify.playSong(this); melodify.navigate(`/player/?&song={{ song.pk }}&`)"
                 >{% fa5_icon 'play' color="#000"%}</button>
                 <button 
                     type            = "button" 
@@ -120,21 +122,24 @@
                 lyrics = lyrics.split('\n\n');
                 var payload = {};
                 html = '';
-                for(l in lyrics){
-                    var lyric = lyrics[l].split('\n');
-                    var index = lyric[0];
-                    var time  = lyric[1].split(' --&gt; ');
-                    var start = time[0];
-                    var end   = time[1];
-                    var text  = lyric[2];
-                    payload[ index ] = {
-                        start : start,
-                        end   : end,
-                        text  : text, 
-                    };
-                    html += (`<li style="margin-bottom: 4px;">${text}</li>`);
+                try{
+                    for(l in lyrics){
+                        var lyric = lyrics[l].split('\n');
+                        var index = lyric[0];
+                        var time  = lyric[1].split(' --&gt; ');
+                        var start = time[0];
+                        var end   = time[1];
+                        var text  = lyric[2];
+                        payload[ index ] = {
+                            start : start,
+                            end   : end,
+                            text  : text, 
+                        };
+                        html += (`<li style="margin-bottom: 4px;">${text}</li>`);
+                    }
+                } catch{
+
                 }
-                // melodify.player.lyrics = payload;
                 node.innerHTML=html;
             </script>
         </div>

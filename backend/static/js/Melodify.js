@@ -48,21 +48,23 @@ MelodifyPlayer.prototype = {
         this.lyrics = {};
         if(lyrics.length > 0){
             lyrics = lyrics.split('\n\n');
-            for(l in lyrics){
-                var lyric = lyrics[l].split('\n');
-                var index = lyric[0];
-                var time  = lyric[1].split(' --> ');
-                var start = time[0];
-                var end   = time[1];
-                var text  = lyric[2];
-                var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
-                var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
-                this.lyrics[ index ] = {
-                    start : get_start_time(),
-                    end   : get_end_time(),
-                    text  : text, 
-                };
-            }
+            try{
+                for(l in lyrics){
+                    var lyric = lyrics[l].split('\n');
+                    var index = lyric[0];
+                    var time  = lyric[1].split(' --> ');
+                    var start = time[0];
+                    var end   = time[1];
+                    var text  = lyric[2];
+                    var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+                    var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+                    this.lyrics[ index ] = {
+                        start : get_start_time(),
+                        end   : get_end_time(),
+                        text  : text, 
+                    };
+                }
+            } catch {}
         }
         this.lyrics_index = 1;
         this.lyrics_last  = 0;

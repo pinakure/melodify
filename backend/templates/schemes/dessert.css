@@ -1,0 +1,24 @@
+:root {
+    --bg-main               : #3c352a;
+    --bg-nav                : #4e4435;
+    --bg-sidebar            : #5d513f;
+    --bg-sidebar-selection  : #766851;
+    --bg-sidebar-hover      : #6b5d49;
+    --bg-content-blend      : #3c352aC0;
+    --bg-content            : #453d30;
+    --text-color            : #e3dccb;
+    --secondary-color       : #a39681;
+    --link-color            : #c2b280;
+    --section-color         : #8b7d6b;
+    --confirm-color         : #6b704c;
+    --accent-color          : #b87333;
+    --bg-player-title       : #383228;
+    --shadow-color          : #24201a;
+    --tile-placeholder      : #544a3a;
+    --tile-info             : #2d2820;
+    --tile-info-text        : #8a7e6a;
+    --gradient-begin        : #766851;
+    --gradient-end          : #4e4435;
+    --nav-height            : 60px;
+    --sidebar-width         : 432px;
+}

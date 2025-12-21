@@ -57,8 +57,8 @@
         <div class="tile-buttons" style="float: right; z-index: 1000;">
             <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
             <div style="display: flex" >
-                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
-                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
+                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="var(--accent-color); opacity: 0.5"%}</button>
+                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="var(--accent-color)"%}</button>
                 <button 
                     type            = "button" 
                     class           = "input confirm" 

@@ -400,7 +400,7 @@ class Command(BaseCommand):
         song.hash    = hash
         song.errors  = ''
         song.error   = False
-        song.lyrics  = lyrics
+        song.lyrics  = lyrics.replace('"', "'")
         song.comment = ''
         try:
             song.title = info.get('title')
