@@ -56,9 +56,10 @@
                 {% include 'main/sidebar.html' %}
                 <!-- Lado Derecho -->
                 <main class="main">
-                    <div class="main-content" {% block background %}{% endblock %}>
+                    <div class="main-content" {% block background %}{% endblock %} id="main-content">
                         {% block content %}{% endblock %}
                     </div>
+                    <div class="search-results" id="search-results"></div>
                     <!-- <div class="main-overlay"></div> -->
                     <div id="playlists-window" class="playlists" style="z-index: 2000">
                         <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="melodify.hidePlaylists()">{% fa5_icon 'times'%}</button>

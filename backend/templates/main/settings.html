@@ -21,7 +21,8 @@
    
 </style>
 
-<select onchange="melodify.loadScheme( this.value )" class="input breathe" style="width: 50%" id="schemes">
+<select onchange="melodify.loadScheme( this.value ); melodify.saveState();" class="input breathe" style="width: 50%" id="schemes">
+    <option value="">-------------</option>
     <option value="default">Default</option>
     <option value="purple">Purple</option>
 </select>

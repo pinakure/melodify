@@ -334,6 +334,27 @@ def scheme_view_ajax(request, scheme):
         values = f.read()
     return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
     
+@csrf_exempt
+def search_ajax(request):
+    if request.content_type == 'application/json':
+        data = json.loads(request.body)
+        topic = data.get('topic', '')
+    else:
+        topic = request.POST.get('topic', '')
+    print("*"*80)
+    print(f"  Searching term {topic} ")
+    print("*"*80)
+    results = {
+        'albums'  : list(Album.objects.filter(name__icontains=topic      ).values('id', 'name'  , 'picture')),
+        'artists' : list(Artist.objects.filter(name__icontains=topic     ).values('id', 'name'  , 'picture')),
+        'songs'   : list(Song.objects.filter(title__icontains=topic      ).values('id', 'title' , 'picture')),
+        'lists'   : list(Playlist.objects.filter(title__icontains=topic  ).values('id', 'title' , 'picture')),
+        'genres'  : list(Genre.objects.filter(name__icontains=topic      ).values('id', 'name'  )),
+        'tags'    : list(Tag.objects.filter(name__icontains=topic        ).values('id', 'name'  )),
+        'users'   : [],
+    }
+    return JsonResponse({'status': 'success', 'results': results })
+
 def create_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
@@ -444,7 +465,6 @@ def scan_artist(request):
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
-
 
 def bookmark_song(request):
     if isinstance(request.user , AnonymousUser):

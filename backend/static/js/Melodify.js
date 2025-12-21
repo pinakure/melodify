@@ -166,7 +166,7 @@ MelodifyPlayer.prototype = {
 		playBtn.style.display = 'block';
 		pauseBtn.style.display = 'none';
 	},
-    /* updates entries drawn at sidebar playlist */
+    /* updates entries drawn at si ar playlist */
     updatePlaylist : function(){
 		list.innerHTML = "";
         var index = 1;
@@ -470,7 +470,7 @@ Melodify.prototype = {
         this.state.settings.scheme = scheme;
     },
     /* Callback functions */
-    filter : function(type) {
+    filter: function(type) {
         const input  = document.getElementById('search-Input');
         const filter = input.value.toLowerCase();
         const cards = document.querySelectorAll('.item');
@@ -491,6 +491,54 @@ Melodify.prototype = {
         if (noMessage) {
             noMessage.style.display = found ? "none" : "";
         }
+    },
+    search_timeout :null,
+    search: function(value) {
+        const input  = document.getElementById('megasearch');
+        const filter = input.value.toLowerCase();
+        if(this.search_timeout) clearTimeout( this.search_timeout );
+        this.search_timeout = setTimeout(()=>{
+            melodify.request(`/search/`, {topic : value}, (data)=>{
+                const urls = {
+                    'albums'    : '/album/',
+                    'artists'   : '/artist/',
+                    'songs'     : '/song/',
+                    'genre'     : '/genre/',
+                    'tags'      : '/tag/',
+                    'lists'     : '/playlist/',
+                    'users'     : '/user/',
+                };
+                const icons = {
+                    'albums'    : 'compact-disc',
+                    'artists'   : 'users',
+                    'songs'     : 'music',
+                    'genre'     : 'shapes',
+                    'tags'      : 'tag',
+                    'lists'     : 'list',
+                    'users'     : 'user',
+                };
+                var html =`<div id="search-results">`;
+                for( category in data.results){
+                    var items = data.results[ category ];
+                    if( items.length == 0 ) continue;
+                    html += `<h2 class="section" style="text-transform: capitalize "><i class="fas fa-${ icons[ category ] }" style="color:var(--accent-color);"></i>&nbsp;${ category }&nbsp;<span class="small">(${ items.length })</span></h2>`;
+                    html +=`<ul class="sidebar-items">`;
+                    for( i in items ){
+                        var item = items[i];
+                        html += `<li class="sidebar-entry" onclick="melodify.navigate('${ urls[ category ] }${ item.id }')">
+                            <div class="sidebar-entry-picture" style="background-image:url('${ item.picture!='' ? item.picture : '/static/images/like.png' }')"></div>
+                            <div class="sidebar-entry-content">
+                                <p class="sidebar-entry-primary">${ item.name ?? item.title }</p>
+                                <p class="sidebar-entry-secondary" style="text-transform: capitalize">${ category.substring(0, category.length-1) }</p>
+                            </div>
+                        </li>`;
+                    }
+                    html +=`</ul>`;
+                }
+                html +=`</div>`;
+                melodify.node('main-content').innerHTML = html;
+            }, true);
+        }, 500);
     },
     scanSongs : function(artist_list){
         console.log("Scanning songs");
