@@ -396,10 +396,11 @@ class Command(BaseCommand):
         if error:
             song.error = error
 
-    def setup_song(self, song, info : dict, hash : str):
+    def setup_song(self, song, info : dict, hash : str, lyrics : str):
         song.hash    = hash
         song.errors  = ''
         song.error   = False
+        song.lyrics  = lyrics
         song.comment = ''
         try:
             song.title = info.get('title')
@@ -499,16 +500,23 @@ class Command(BaseCommand):
 
         song.save()
 
-    def update_song(self, path : str, info : dict, hash : str):
+    def update_song(self, path : str, info : dict, hash : str, lyrics : str):
         song = Song.objects.filter(filename=path).get()
-        self.setup_song( song, info , hash)
+        self.setup_song( song, info , hash, lyrics)
         self.echo(f'Updated song {path}', indent=1)
 
-    def create_song(self, path : str, info : dict, hash : str):
+    def create_song(self, path : str, info : dict, hash : str, lyrics : str):
         song = Song()
         song.filename = path
-        self.setup_song( song, info , hash)
+        self.setup_song( song, info , hash, lyrics)
         self.echo(f'Created song "{path}"', indent=1)
+
+    def getLyrics(self, path):
+        lyric_file = path.rstrip('mp3')+'srt'
+        if os.path.exists(lyric_file):
+            with open(lyric_file, 'r') as f:
+                return f.read()
+        return ''
 
     def scan(self, folder, force=False):
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
@@ -532,10 +540,11 @@ class Command(BaseCommand):
                     if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
                         continue
                     info = extract_id3_tags(path)
+                    lyrics = self.getLyrics(path)
                     if song is None:
-                        self.create_song(id , info, hash)
+                        self.create_song(id , info, hash, lyrics)
                     else:
-                        self.update_song(id, info, hash)
+                        self.update_song(id, info, hash, lyrics)
                     results.append(info)
         return results
 

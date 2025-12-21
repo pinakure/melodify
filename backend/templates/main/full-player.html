@@ -3,7 +3,11 @@
 {% load utils %}
 {% load fontawesome_5 %}
 
-{% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+{% if not song %}
+    {% include "main/widget-title.html" with caption="Reproduciendo" subcaption="Nada en la lista" %}
+{% else %}
+    {% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+{% endif %}
 {% if song.album.pk %}
     {% include "main/widget-back.html" %}
 {% endif %}
@@ -28,7 +32,15 @@
 </style>
 {% csrf_token %}
 
+
+
 <div class="song-detail-container" >    
+    {% if not song %}
+        <br/>    
+        <p class="small">
+            Selecciona una canción o lista para empezar.
+        </p>
+    {% else %}
     <div class="album-item">
         <div style="display: inline-block;display: inline-block;word-break: break-word;word-wrap: break-word;width: 200px;">
             <!-- cover art  -->
@@ -109,5 +121,6 @@
     {% if song.lyrics %}
         <div id="debug" class="italic breathe"></div>
         <div id="lyrics" class="italic breathe" style="font-size: 24px; font-weight: 800;"></div>  
+    {% endif %}
     {% endif %}
 </div>
