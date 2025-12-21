@@ -32,7 +32,7 @@
 {% include "main/widget-title.html" with caption=album.name subcaption="Álbum" %}
 {% include "main/widget-back.html" %}
 {% if album.picture %}
-    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='overlay' picture=album.picture %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=album.picture %}
 {% endif %}
 <span class="">
     <!-- ARTIST OR VARIOUS ARTISTS -->
