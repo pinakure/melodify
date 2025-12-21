@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
@@ -326,7 +327,7 @@ class SongDetailView(DetailView):
         obj = self.object
         return context
     
-    
+@csrf_exempt
 def scheme_view_ajax(request, scheme):
     scheme = scheme.strip('.')
     with open(f'templates/schemes/{ scheme }.css', 'r') as f:
