@@ -302,9 +302,12 @@ function Melodify(){
         volume          : 0.5,
         queue           : [],
         history         : [],
+        settings        : {
+            background_blend_style  : 'soft-light',
+            scheme                  : 'default',
+        },
         current_page    : '',
         first_song      : null,
-        skin            : 'default',
     };
     state = localStorage.getItem('melodify');
     if(!state) state = initial_state;
@@ -317,6 +320,11 @@ function Melodify(){
     this.player = new MelodifyPlayer();
 };
 Melodify.prototype = {
+    
+    initialize : function(){
+        this.loadScheme(this.state.settings.scheme);
+        resize();
+    },
     saveState : function() {
         localStorage.setItem('melodify', JSON.stringify(this.state));
     },
@@ -416,16 +424,18 @@ Melodify.prototype = {
         console.log(node);
         return node.value;
     },
-    request : function(url, json_data, done_callback) { 
+    request : function(url, json_data, done_callback, no_csrf=false) { 
+        var headers = {
+            'Content-Type'      : 'application/json',
+        };
+        if(!no_csrf) headers['X-CSRFToken'] = this.getCookie('csrftoken');
+        if(!no_csrf) headers['X-Requested-With'] = 'XMLHttpRequest';
         fetch(
             url, 
             { 
                 method: 'POST',
-                headers: {
-                    'Content-Type'      : 'application/json',
-                    'X-CSRFToken'       : melodify.getCookie('csrftoken'), 
-                    'X-Requested-With'  : 'XMLHttpRequest'
-                }, body: JSON.stringify(json_data)
+                headers: headers, 
+                body: JSON.stringify(json_data)
             }
         )
         .then(response => response.json())
@@ -450,7 +460,8 @@ Melodify.prototype = {
     loadScheme : function(scheme){
         this.request(`/scheme/${ scheme }/`,{}, (data)=>{ 
             document.getElementById('scheme').innerHTML = data.values;
-        });
+        }, true);
+        this.state.settings.scheme = scheme;
     },
     /* Callback functions */
     filter : function(type) {
@@ -675,7 +686,7 @@ Melodify.prototype = {
 };    
 
 const melodify = new Melodify();
-resize();
+melodify.initialize();
 /* album list stuff */
 
 function toggleNewListForm() {
