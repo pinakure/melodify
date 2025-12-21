@@ -1,5 +1,6 @@
 <!-- main/genre-detail.html  -->
 {% include "main/widget-title.html" with caption=genre.name subcaption="Género" %}
+{% include "main/widget-admin.html" with object='genre' id=genre.pk %}
 {% include "main/widget-back.html"  %}
 {% include "main/background.html"   with value="linear-gradient(45deg, #1234, #fec4);" %}
 <div class="genre-detail">

@@ -1,0 +1,5 @@
+<!-- main/widget-admin.html -->
+{% load fontawesome_5 %}
+{% if user.is_superuser %}
+    <a href="/admin/main/{{ object }}/{{ id }}/" target="_blank" title="Edit">{% fa5_icon "edit" %}</a>
+{% endif %}

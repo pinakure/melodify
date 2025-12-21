@@ -140,11 +140,11 @@ body, html {
 }
 
 /* Nav Link Customization */
-.navbar-links a {
+.navbar-links a, .navbar-links a span {
     margin-right: 20px;
     text-decoration: none;
     font-family: 'lunchtype-medium';
-    color: var(--text-color);
+    color: var(--link-color);
     transition: color 0.3s;
 }
 .navbar-links a:hover {
@@ -316,6 +316,14 @@ button.input:active {
     background-color: var(--bg-sidebar);
 }
 
+.mega-search {
+    left: auto;
+    right: 0px;
+    top: 4px;
+    position: absolute;
+    background-color: var(--bg-sidebar);
+}
+
 
 button.input.transparent:active,
 button.input.transparent:hover,
@@ -471,4 +479,18 @@ button:hover {
     100% {
         width:100%;
     }
+}
+#logo-no-link { display: none; }
+#logo-link { display: inline-block;}
+#curtain {
+    position: absolute;
+    display: none;
+    top: 0px;
+    left: 0px;  
+    width: 100%;
+    height: 100%;
+    z-index: 3000;
+}
+#menu {
+    display: none;
 }

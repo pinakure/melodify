@@ -321,17 +321,22 @@ function Melodify(){
 };
 Melodify.prototype = {
     
-    initialize : function(){
+    node : function(id){
+        return document.getElementById(id);
+    },
+
+    initialize: function(){
         this.loadScheme(this.state.settings.scheme);
+        this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
         resize();
     },
-    saveState : function() {
+    saveState: function() {
         localStorage.setItem('melodify', JSON.stringify(this.state));
     },
-    reset_scroll : function(){
+    reset_scroll: function(){
         try{ scrollbox.scrollTop = 0;} catch{}
     },
-    getSongDetails : function( buttonElement ){
+    getSongDetails: function( buttonElement ){
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
         const lyrics     = buttonElement.getAttribute('data-lyrics');
@@ -374,7 +379,7 @@ Melodify.prototype = {
         }
         if( !only_enqueue ) melodify.player.play(melodify.first_song);
     },
-    enqueueSong : function( buttonElement ){
+    enqueueSong: function( buttonElement ){
         var song = this.getSongDetails( buttonElement );  
         song.next = melodify.player.playlist.length ? melodify.player.playlist[ 0 ].id : song.id;
         if(melodify.player.playlist.length)
@@ -382,7 +387,7 @@ Melodify.prototype = {
         melodify.player.playlist.push(song);
         melodify.player.updatePlaylist();
     },
-    navigate : function(url, params=[], register_history=true){
+    navigate: function(url, params=[], register_history=true){
         if( register_history ) this.state.history.push(url);
         target_url = url+'?'
         for(p in params){
@@ -413,18 +418,19 @@ Melodify.prototype = {
             melodify.state.current_page = url;
             melodify.saveState();
             content.focus();
+            document.getElementById('curtain').click();
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);
             alert(`Navigate: Network/Server Error ${error}`);
         });
     },
-    getCookie : function(name) {
+    getCookie: function(name) {
         var node = document.getElementsByName('csrfmiddlewaretoken')[0];
         console.log(node);
         return node.value;
     },
-    request : function(url, json_data, done_callback, no_csrf=false) { 
+    request: function(url, json_data, done_callback, no_csrf=false) { 
         var headers = {
             'Content-Type'      : 'application/json',
         };
