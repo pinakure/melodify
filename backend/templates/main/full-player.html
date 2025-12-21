@@ -8,9 +8,17 @@
 {% else %}
     {% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
 {% endif %}
-{% if song.album.pk %}
-    {% include "main/widget-back.html" %}
+{% include "main/widget-back.html" %}
+{% if song.picture %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.picture %}
+{% elif song.album.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.album.picture %}
+{% elif song.artist.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.artist.picture.url %}
+{% else %}
+d
 {% endif %}
+
 
 <style>
 
