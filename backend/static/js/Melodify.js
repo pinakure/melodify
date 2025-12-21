@@ -168,6 +168,8 @@ MelodifyPlayer.prototype = {
 		playBtn.style.display = 'block';
 		pauseBtn.style.display = 'none';
 	},
+
+
     /* updates entries drawn at si ar playlist */
     updatePlaylist : function(){
 		list.innerHTML = "";
@@ -176,7 +178,7 @@ MelodifyPlayer.prototype = {
 			var div = document.createElement('div');
 			div.className = 'list-song';
 			div.innerHTML = `<li onclick="melodify.navigate('${ song.url_detalle }')" class="sidebar-entry ${melodify.player.index == melodify.player.playlist.indexOf(song) ?'active':''}">
-                                <div class="sidebar-entry-picture" style="background-image:url('${ song.url_picture }')"></div>
+                                <div class="sidebar-entry-picture" style="background-image:url('${ song.url_picture!='' && song.url_picture!=null  ? song.url_picture : '/static/images/song.png' }')"></div>
                                 <div class="sidebar-entry-content">
                                     <p class="sidebar-entry-primary">${ index } - ${ song.song_name }</p>
                                     <p class="sidebar-entry-secondary">${ song.artist_name }</p>
@@ -305,7 +307,8 @@ function Melodify(){
         currentSongId   : null,
         currentTime     : 0,
         volume          : 0.5,
-        queue           : [],
+        playlist        : [],
+        playlist_index  : 0,
         history         : [],
         settings        : {
             background_blend_style  : 'soft-light',
@@ -317,28 +320,44 @@ function Melodify(){
     state = localStorage.getItem('melodify');
     if(!state) state = initial_state;
     else state = JSON.parse(state);
-    
-    this.next_page          = 1;
     this.state              = state;
+    this.next_page          = 1;
     this.search_timeout     = null;
     this.is_loading         = false;
     this.search_term        = '';
     this.player             = new MelodifyPlayer();
+    this.player.playlist    = this.state.playlist;
 };
 Melodify.prototype = {
     initialize: function(){
         this.loadScheme(this.state.settings.scheme);
         this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
+        /* Restore playlist */
+        this.player.updatePlaylist(this.state.playlist);
+        /* Restore playlist playback index */
+        this.player.index = this.state.playlist_index;
+        /* Begin playback */
+        if(this.state.playlist.length>1){
+            this.player.play(this.state.playlist[this.player.index]);
+        }
         resize();
     },
     node : function(id){
         return document.getElementById(id);
     },
     saveState: function() {
+        this.state.playlist = this.player.playlist;
+        this.state.playlist_index = this.player.index;
         localStorage.setItem('melodify', JSON.stringify(this.state));
     },
     reset_scroll: function(){
         try{ scrollbox.scrollTop = 0;} catch{}
+    },
+    emptyQueue : function(){
+        this.player.playlist = [];
+        this.player.updatePlaylist();
+        this.player.index = 0;
+        this.saveState();
     },
     getSongDetails: function( buttonElement ){
         const artistName = buttonElement.getAttribute('data-artistname');

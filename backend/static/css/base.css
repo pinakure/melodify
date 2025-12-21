@@ -451,25 +451,31 @@ button:hover {
     cursor: pointer;
 }
 
-.lyric {
-    position: absolute;
-    top:0px;
-    left:0px;
-    display: inline-block;
-    overflow: hidden;
-    text-shadow: 2px 2px 0px #0008;
+#lyrics{
+    /* width: fit-content; */
+    /* display: inline-block; */
 }
-.lyric-animation {
-    text-shadow: 0px 0px 1px var(--accent-color);
-    display     : inline-block;
+
+.lyric, .lyric-animation {
     position    : absolute;
-    color       : var(--accent-color);
+    overflow    : hidden;
+    display     : inline-block;
+    top         : 0px;
+    left        : 0px;
+    /* width       : fit-content; */
     word-break  : break-all;
-    top         :0px;
-    left        :0px;
     height      : 30px;
     max-height  : 30px;
-    overflow    : hidden;
+    /* font-size   : 8vw; */
+}
+.lyric {
+    text-shadow : 2px 2px 0px #0008;
+}
+.lyric-animation {
+    text-shadow : 0px 0px 1px var(--accent-color);
+    color       : var(--accent-color);
+    height      : 30px;
+    max-height  : 30px;
     animation   : lyricAnimation 1.0s 1 linear;
 }
 

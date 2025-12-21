@@ -1,3 +1,4 @@
+{% load fontawesome_5 %}
 <!-- main/sidebar.html -->
 <script>
     function showTab(calling_node, id){
@@ -32,6 +33,7 @@
                     </div>
                 </div>
                 <div class="tab hidden" id="playlist">
+                    <button type="button" class="input secondary" style="float: right; margin-right: 8px;font-size: 16px; font-weight: 800;" title="Vaciar cola de reproducción" onclick="melodify.emptyQueue()">{% fa5_icon "trash" color="#000" %}</button>   
                     <div class="sidebar-items-wrapper">
                         <div id="list"></div>
                     </div>
