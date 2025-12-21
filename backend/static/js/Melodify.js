@@ -313,22 +313,21 @@ function Melodify(){
     if(!state) state = initial_state;
     else state = JSON.parse(state);
     
-    this.next_page  = 1;
-    this.state      = state;
-    this.is_loading = false;
-    this.search_term = '';
-    this.player = new MelodifyPlayer();
+    this.next_page          = 1;
+    this.state              = state;
+    this.search_timeout     = null;
+    this.is_loading         = false;
+    this.search_term        = '';
+    this.player             = new MelodifyPlayer();
 };
 Melodify.prototype = {
-    
-    node : function(id){
-        return document.getElementById(id);
-    },
-
     initialize: function(){
         this.loadScheme(this.state.settings.scheme);
         this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
         resize();
+    },
+    node : function(id){
+        return document.getElementById(id);
     },
     saveState: function() {
         localStorage.setItem('melodify', JSON.stringify(this.state));
@@ -492,7 +491,6 @@ Melodify.prototype = {
             noMessage.style.display = found ? "none" : "";
         }
     },
-    search_timeout :null,
     search: function(value) {
         const input  = document.getElementById('megasearch');
         const filter = input.value.toLowerCase();
@@ -529,7 +527,7 @@ Melodify.prototype = {
                             <div class="sidebar-entry-picture" style="background-image:url('${ item.picture!='' && item.picture!=null  ? category=='artists' ? 'media/'+item.picture : item.picture : '/static/images/'+ category.substring(0, category.length-1) +'.png' }')"></div>
                             <div class="sidebar-entry-content">
                                 <p class="sidebar-entry-primary">${ item.name ?? item.title }</p>
-                                <p class="sidebar-entry-secondary" style="text-transform: capitalize">${ category.substring(0, category.length-1) }</p>
+                                <p class="sidebar-entry-secondary" style="text-transform: capitalize">${ item.artist__name ?? item.artists__name ?? category.substring(0, category.length-1) }</p>
                             </div>
                         </li>`;
                     }
@@ -704,7 +702,6 @@ Melodify.prototype = {
                     div.className = "tile-item playlist-item";
                     div.setAttribute('data-playlist-artist', playlist.safeartist); 
                     div.setAttribute('data-playlist-name', playlist.safename);
-                    
                     div.innerHTML = `
                         <a onclick="melodify.navigate('${playlist.url_detalle}')"> 
                             <div class="album-art">
@@ -715,8 +712,7 @@ Melodify.prototype = {
                                 <h6 class="playlist-artists">${truncate(playlist.artists, 3)}</h6>
                                 <h6 class="playlist-genres">${truncate(playlist.genres, 3)}</h6>
                             </div>
-                        </a>
-                    `;
+                        </a>`;
                     playlist_container.appendChild(div);
                 });
                 melodify.next_page++;

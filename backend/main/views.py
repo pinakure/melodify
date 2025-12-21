@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Case, When, Count, Value, F, Subquery, Min, Max
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -15,15 +16,10 @@ import os
 from django.conf import settings            
 from main.management.commands.scan  import Command as Scan
 
-import spotdl
-from spotdl import Spotdl
-
-
 import json
 from .models import Album, Song, Artist, Genre, Playlist, Tag
 
 scanner = Scan()
-
 
 def get_context( context ):
     # Enter global severside data here
@@ -349,9 +345,21 @@ def search_ajax(request):
     print(f"  Searching term {topic} ")
     print("*"*80)
     results = {
-        'albums'  : list(Album.objects.filter(name__icontains=topic      )[:50].values('id', 'name'  , 'picture')),
+        'albums' : list(
+            Album.objects.filter(name__icontains=topic)
+            .annotate(artist_count=Count('artists', distinct=True)) # Importante el distinct=True aquí
+            .annotate(
+                artist__name=Case(
+                    When(artist_count__gt=1, then=Value('Varios Artistas')),
+                    # Min('artists__name') agrupa todos los nombres y elige uno solo (el primero alfabéticamente)
+                    default=Min('artists__name'), 
+                )
+            )
+            .values('id', 'name', 'picture', 'artist__name')
+            .distinct()[:50]
+        ),
         'artists' : list(Artist.objects.filter(name__icontains=topic     )[:50].values('id', 'name'  , 'picture')),
-        'songs'   : list(Song.objects.filter(title__icontains=topic      )[:50].values('id', 'title' , 'picture')),
+        'songs'   : list(Song.objects.filter(title__icontains=topic      )[:50].values('id', 'title' , 'picture', 'artist__name')),
         'lists'   : list(Playlist.objects.filter(title__icontains=topic  )[:50].values('id', 'title' , 'picture')),
         'genres'  : list(Genre.objects.filter(name__icontains=topic      )[:50].values('id', 'name'  )),
         'tags'    : list(Tag.objects.filter(name__icontains=topic        )[:50].values('id', 'name'  )),
