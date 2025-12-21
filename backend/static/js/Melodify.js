@@ -500,10 +500,10 @@ Melodify.prototype = {
         this.search_timeout = setTimeout(()=>{
             melodify.request(`/search/`, {topic : value}, (data)=>{
                 const urls = {
-                    'albums'    : '/album/',
+                    'albums'    : '/albums/',
                     'artists'   : '/artist/',
                     'songs'     : '/song/',
-                    'genre'     : '/genre/',
+                    'genres'    : '/genre/',
                     'tags'      : '/tag/',
                     'lists'     : '/playlist/',
                     'users'     : '/user/',
@@ -512,7 +512,7 @@ Melodify.prototype = {
                     'albums'    : 'compact-disc',
                     'artists'   : 'users',
                     'songs'     : 'music',
-                    'genre'     : 'shapes',
+                    'genres'    : 'shapes',
                     'tags'      : 'tag',
                     'lists'     : 'list',
                     'users'     : 'user',
@@ -526,7 +526,7 @@ Melodify.prototype = {
                     for( i in items ){
                         var item = items[i];
                         html += `<li class="sidebar-entry" onclick="melodify.navigate('${ urls[ category ] }${ item.id }')">
-                            <div class="sidebar-entry-picture" style="background-image:url('${ item.picture!='' ? item.picture : '/static/images/like.png' }')"></div>
+                            <div class="sidebar-entry-picture" style="background-image:url('${ item.picture!='' && item.picture!=null  ? category=='artists' ? 'media/'+item.picture : item.picture : '/static/images/'+ category.substring(0, category.length-1) +'.png' }')"></div>
                             <div class="sidebar-entry-content">
                                 <p class="sidebar-entry-primary">${ item.name ?? item.title }</p>
                                 <p class="sidebar-entry-secondary" style="text-transform: capitalize">${ category.substring(0, category.length-1) }</p>
