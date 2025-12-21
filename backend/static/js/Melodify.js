@@ -199,6 +199,9 @@ MelodifyPlayer.prototype = {
 		}
         index %= this.playlist.length;
 		this.skipTo(index);
+        if(melodify.state.current_page.split('/')[1] == 'player'){
+            melodify.navigate(`/player/?song=${ melodify.player.playlist[index].id }&`);
+        }
 	},
     skipTo: function(index) {
 		var self = this;
