@@ -109,7 +109,8 @@ MelodifyPlayer.prototype = {
                 loading.style.display = 'none';
             },
             onloaderror: function(id, error) {
-                console.log(`Error loading audio: ${error}`);
+                melodify.toast.log(`Error loading audio: ${error}`, 5, true);
+                console.error(`Error loading audio: ${error}`);
                 bar.style.display = 'none';
                 loading.style.display = 'none';
             },
@@ -249,13 +250,23 @@ MelodifyPlayer.prototype = {
 		// Determine our current seek position.
 		var seek = this.howl.seek() || 0;
 		timer.innerHTML = self.formatTime(Math.round(seek));
-		progress.style.width = (((seek / this.howl.duration()) * 100) || 0) + '%';
-
-		// If the howl is still playing, continue stepping.
+        var pc = (((seek / this.howl.duration()) * 100) || 0) + '%';
+		progress.style.width = pc;
+        
+        // If the howl is still playing, continue stepping.
 		if (this.howl.playing()) {
 			requestAnimationFrame(self.step.bind(self));
 
-            if(melodify.player.lyrics){
+            if(melodify.lyrics_editor){
+                
+                var song_position = melodify.node('songPosition');
+                if(!song_position) melodify.lyrics_editor = false;
+                else {
+                    song_position.style.width = pc;
+                    // melodify.node('timelineContainer').scrollTo({ left: pc, behavior:'smooth'}); 
+                }
+            } else if(melodify.player.lyrics){
+                
                 var lyric = melodify.player.lyrics[ melodify.player.lyrics_index ];
                 if( lyric == undefined ) return;
                 var next  = melodify.player.lyrics[ melodify.player.lyrics_index+1 ]==undefined ? '' : melodify.player.lyrics[ melodify.player.lyrics_index+1 ];
@@ -327,8 +338,32 @@ function Melodify(){
     this.search_term        = '';
     this.player             = new MelodifyPlayer();
     this.player.playlist    = this.state.playlist;
+    this.lyrics_editor      = false;
 };
 Melodify.prototype = {
+    toast: function(message, timeout=5, error=false){
+        const id = Math.floor(Math.random() * 1000000);
+        const fadeDuration = 500;
+        const toastHTML = `
+            <div class="toast ${ error ? 'error' : ''}" id="toast-${id}">
+                ${ error ? '<i class="fas fa-times" style="color: #fd0;"></i>&nbsp;' : '' }
+                ${message}
+            </div>
+        `;
+        const toaster = this.node('toaster');
+        toaster.insertAdjacentHTML('beforeend', toastHTML);
+        const currentToast = document.getElementById(`toast-${id}`);
+        setTimeout(() => {
+            if (currentToast) {
+                currentToast.classList.add('toast-fade');
+            }
+        }, (timeout*1000) - fadeDuration);
+        setTimeout(() => {
+            if (currentToast) {
+                currentToast.remove();
+            }
+        }, timeout*1000);
+    },
     initialize: function(){
         this.loadScheme(this.state.settings.scheme);
         this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
@@ -445,12 +480,11 @@ Melodify.prototype = {
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);
-            alert(`Navigate: Network/Server Error ${error}`);
+            melodify.toast(`Navigate: Network/Server Error ${error}`);
         });
     },
     getCookie: function(name) {
         var node = document.getElementsByName('csrfmiddlewaretoken')[0];
-        console.log(node);
         return node.value;
     },
     request: function(url, json_data, done_callback, no_csrf=false) { 
@@ -474,15 +508,15 @@ Melodify.prototype = {
             } else if (data.status === 'login') {
                 window.location = `/accounts/login/?next=${window.location}`;
             } else {
-                alert('Error: ' + data.message);
+                melodify.toast('Error: ' + data.message, 5, true);
             }
         })
         .catch(error => {
             if( error == "TypeError: done_callback is not a function"){
-                alert("You forgot to write the done callback.")
+                melodify.toast("You forgot to write the done callback.", 5, true)
             } else {
                 console.error('Fetch error:', error);
-                alert('Ocurrió un error de red o del servidor.');
+                melodify.toast('Ocurrió un error de red o del servidor.', 5, true);
             }
         });
     },
@@ -563,8 +597,7 @@ Melodify.prototype = {
         }, 500);
     },
     scanSongs : function(artist_list){
-        console.log("Scanning songs");
-        console.log(artist_list);
+        melodify.toast("Scanning songs");
         for(artist in artist_list){
             this.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
         }   
@@ -575,7 +608,6 @@ Melodify.prototype = {
         container.innerHTML += "<ul>";
         for( d in data.songs ){
             song = data.songs[d];
-            console.log(song);
             container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })"><i class="fas fa-download "></i></button></li>`;
         }
         container.innerHTML += "</ul>";
@@ -605,7 +637,7 @@ Melodify.prototype = {
         const playlistName = playlistNameInput.value.trim();
         const container = document.getElementById('tileContainer');
         if (!playlistName) {
-            alert("Por favor, introduce un nombre para la lista.");
+            melodify.toast("Por favor, introduce un nombre para la lista.");
             return;
         }
 
@@ -701,7 +733,7 @@ Melodify.prototype = {
             loadingIndicator.style.display = 'none';
         });
     },
-    loadPlaylists : function() {
+    loadPlaylists: function() {
         let playlistCount = 0;
         const playlist_container = document.getElementById('tileContainer');
         const countDisplay       = document.getElementById('playlist-count');
@@ -756,6 +788,44 @@ Melodify.prototype = {
             melodify.is_loading = false;
             loadingIndicator.style.display = 'none';
         });
+    },
+    saveSrt: function() {
+        // 1. Seleccionamos todos los contenedores de edición (edit-item)
+        const blocks = document.querySelectorAll('.edit-item');
+        let srtResult = '';
+
+        blocks.forEach((block, index) => {
+            const id = index + 1;
+            
+            // 2. Obtenemos los valores de los inputs y textareas específicos
+            // Usamos los nombres de clase que definimos en la creación dinámica
+            const time = block.querySelector('.time-field').value.trim();
+            const text = block.querySelector('.text-field').value.trim();
+
+            // 3. Solo agregamos el bloque si tiene contenido para evitar bloques vacíos
+            if (time && text) {
+                // El formato SRT requiere: ID, Tiempo, Texto y una línea en blanco
+                srtResult += `${id}\n${time}\n${text}\n\n`;
+            }
+        });
+
+        // 4. Verificación de seguridad
+        if (srtResult.length === 0) {
+            melodify.toast("No hay contenido para exportar.");
+            return;
+        }
+
+        // 5. Llamamos a la función de descarga que ya tienes
+        melodify.request(
+            '/lyrics/update/', 
+            { 
+                song : '{{ song.pk }}', 
+                lyrics : srtResult 
+            }, (data)=>{
+            melodify.toast('{% fa5_icon "save" %}&nbsp;Guardado.')
+            // downloadFile(srtResult, "subtitulos_editados_2025.srt");
+            }
+        );
     },
 };    
 

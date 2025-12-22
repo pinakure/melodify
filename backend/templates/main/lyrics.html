@@ -2,32 +2,102 @@
 {% load static %}
 {% load fontawesome_5 %}
 {% include "main/widget-back.html" %}
+{% csrf_token %}
 <style>
     #subtitleEditor {
-        height: 400px; /* Altura fija para que el scrollIntoView funcione */
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        padding: 10px;
-        background: #f9f9f9;
+        height: 150px; /* Altura fija para que el scrollIntoView funcione */
+        overflow-y: hidden;
+        padding: 0;
+        width: 100%;
+        background: var(--bg-sidebar);
+        border-radius: 7px;
     }
 
     .timeline-segment:hover {
         background: #357ABD !important; /* Oscurecer al pasar el mouse */
         z-index: 10;
     }
+    .timeline-segment {
+        /* ... estilos previos ... */
+        border-left: 4px solid rgba(255,255,255,0.3); /* Guía visual izquierda */
+        border-right: 4px solid rgba(255,255,255,0.3); /* Guía visual derecha */
+    }
+
+    /* Interact.js añade clases automáticamente al redimensionar */
+    .interact-resizegrip {
+        cursor: ew-resize;
+    }
+    .text-field {
+        background-color: var(--bg-main);
+        border-radius:32px;
+        border: none;
+        text-align: center;
+        vertical-align: middle;
+        height: 64px;
+        min-height: 64px;
+        max-height: 64px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 100%;
+        font-family: 'lunchtype-medium';
+        font-size: 24px;
+        color: var(--accent-color);
+    }
+    #songTrackContainer {
+        position: relative;
+        width: 100%;
+        overflow-x: auto; 
+        background: var(--bg-player-title);
+        color: var(--accent-color); 
+        height: 128px; 
+        border-radius: 7px;
+    }
+    
+    #songPosition,
+    #songShape {
+        position: absolute;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        display: inline-block;
+    }
+    #songShape {
+        
+    }
+    #songPositionWrapper {
+        position: relative;
+        height: 100%;
+        pointer-events: none;
+    }
+    #songPosition {
+        width: 0%;
+        border-right-color:  var(--link-color);
+        border-right-width:  1px;
+        border-right-style:  solid;
+        pointer-events: none;
+    }
+    #timelineContainer {
+        width: 100%; 
+        overflow-x: auto; 
+        background: var(--bg-sidebar-hover); 
+        height: 60px; 
+        position: relative; 
+        margin-bottom: 20px; 
+        border-radius: 7px;
+    }
 </style>
+
 {%include 'main/widget-title.html' with caption="Editor de Lyrics" %}
 <input type="file" id="srtFileInput" accept=".srt">
 <div id="subtitleEditor" style="margin-top: 20px;"></div>
 <!-- Contenedor principal de la línea de tiempo -->
-<div id="timelineContainer" style="width: 100%; overflow-x: auto; background: #333; height: 120px; position: relative; margin-bottom: 20px; border-radius: 8px;">
+<div id="timelineContainer">
     <div id="timelineTrack" style="position: relative; height: 100%; min-width: 100%;">
         <!-- Los bloques de subtítulos se insertarán aquí -->
     </div>
 </div>
-<button id="downloadBtn" style="display:none; margin-top: 20px;">Guardar y Descargar .SRT</button>
+<button id="downloadBtn" class="input secondary" style="margin-top: 20px; color:var(--accent-color)">{% fa5_icon "download" color="var(--accent-color)" %}&nbsp;Descargar</button>
 
-<script src="{% static 'js/srt_editor.js' %}"></script>
 
 
 <script>
@@ -42,20 +112,5 @@
         };
         reader.readAsText(file);
     });
-
-    // Función para reconstruir el SRT y descargarlo
-    document.getElementById('downloadBtn').addEventListener('click', function() {
-        const blocks = document.querySelectorAll('.subtitle-block');
-        let srtResult = '';
-
-        blocks.forEach((block, index) => {
-            const id = index + 1;
-            const time = block.querySelector('.time-input').value;
-            const text = block.querySelector('.text-input').value;
-
-            srtResult += `${id}\n${time}\n${text}\n\n`;
-        });
-
-        downloadFile(srtResult, "subtitulos_editados.srt");
-    });
+    document.getElementById('downloadBtn').addEventListener('click', melodify.saveSrt);
 </script>
