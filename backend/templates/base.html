@@ -3,18 +3,7 @@
 <!DOCTYPE html>
 <html lang="es">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <link rel="stylesheet" href="/static/css/fonts.css">
-        <style id="scheme">{% include 'schemes/default.css' %}</style>
-        <link rel="stylesheet" href="/static/css/base.css">
-        <link rel="stylesheet" href="/static/css/sidebar.css">
-        <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-        <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-        <link rel="stylesheet" href="/static/css/player-styles.css">
-        <link rel="stylesheet" href="/static/css/song-list.css">
-        <!-- Esta linea de estilos debe ser la última para que los estilos responsivos tengan efecto  -->
-        <link rel="stylesheet" href="/static/css/vertical.css">
+        {% include "headers.html" %}
         <title>Melodify {% block title %}{% endblock %}</title>
         {% fontawesome_5_static %}        
         {% block header %}{% endblock %}
@@ -35,7 +24,10 @@
                 <div id="menu"></div>
                 <div id="curtain" onclick="melodify.node('menu').style.display = 'none';melodify.node('curtain').style.display = 'none';">
                 </div>
-
+                <a id="logo-link" onclick="melodify.navigate('lyrics')">
+                TEST
+                </a>
+                
                 <a id="logo-link" onclick="melodify.navigate('home')">
                     <div id="melodify-logo">
                         <div class="benzene">⌬</div>

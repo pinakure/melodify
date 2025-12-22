@@ -225,6 +225,12 @@ class SettingsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
+    
+class LyricsView(TemplateView):
+    template_name = 'main/lyrics.html'  
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        return context
 
 class UserView(ListView):
     model = Song
