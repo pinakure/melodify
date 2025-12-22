@@ -166,11 +166,12 @@ function processSRT(data) {
             }
     });
     
-
-    timelineTrack.innerHTML += `
-    <div id="songPositionWrapper">
-        <div id="songPosition"></div>
-    </div>`;
+    var pos_wrapper = document.createElement('div');
+    pos_wrapper.id = 'songPositionWrapper';
+    var pos = document.createElement('div');
+    pos.id = 'songPosition';
+    pos_wrapper.appendChild(pos);
+    timelineTrack.appendChild(pos_wrapper);
     var time = melodify.player.howl ? melodify.player.howl.duration() : maxEndTime;
     timelineTrack.style.width = `${time * PIXELS_PER_SECOND}px`;
     // timelineTrack.style.width = `${(maxEndTime + 10) * PIXELS_PER_SECOND}px`;
@@ -202,6 +203,7 @@ function scrollToEditor(index) {
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     target.querySelector('textarea').focus();
 }
+
 function downloadFile(content, fileName) {
     const blob = new Blob([content], { type: 'text/srt' });
     const url = window.URL.createObjectURL(blob);
