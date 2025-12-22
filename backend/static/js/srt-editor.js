@@ -84,17 +84,20 @@ function updateInputsFromTimeline(target, index) {
         timeInput.value = `${secondsToSrtTime(newStartSecs)} --> ${secondsToSrtTime(newEndSecs)}`;
     }
 }
-
-function processSRT(data) {
+var blocks;
+function loadSRT(data) {
     melodify.node('srtFileInput').style.display = 'none';
     melodify.lyrics_editor = true;
+    blocks = data.replace(/\r\n/g, '\n').split('\n\n');
+    processSRT();
+}
+
+function processSRT() {
     const timelineTrack = document.getElementById('timelineTrack');
     const editorContainer = document.getElementById('subtitleEditor');
-    
     timelineTrack.innerHTML = `<div id="songShape"></div>`;
     editorContainer.innerHTML = ''; 
     
-    const blocks = data.replace(/\r\n/g, '\n').split('\n\n');
     let maxEndTime = 0;
 
     blocks.forEach((block, index) => {
