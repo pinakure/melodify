@@ -3,7 +3,31 @@
 <!DOCTYPE html>
 <html lang="es">
     <head>
-        {% include "headers.html" %}
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible"      content="IE=Edge">
+        <meta http-equiv="content-language"     content="en">
+        <meta name="viewport"                   content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+        <meta name="msapplication-TileColor"    content="#ffffff">
+        <meta name="msapplication-TileImage"    content="{% static 'images/favicon.png' %}">
+        <meta name="theme-color"                content="#ffffff">
+
+        <style id="scheme">{% include 'schemes/default.css' %}</style>
+        <link rel="icon" 				href="{% static 'images/favicon.png'            %}" type="image/png">
+        <link rel="icon"                href="{% static 'images/favicon.png-192x192'    %}" type="image/png" sizes="192x192">
+        <link rel="icon"                href="{% static 'images/favicon.png-32x32'      %}" type="image/png" sizes="32x32"  >
+        <link rel="icon"                href="{% static 'images/favicon.png-96x96'      %}" type="image/png" sizes="96x96"  >
+        <link rel="icon"                href="{% static 'images/favicon.png-16x16'      %}" type="image/png" sizes="16x16"  >
+
+        <link rel="shortcut icon" 		href="{% static 'images/favicon.ico'            %}" type="image/x-icon">
+        <link rel="apple-touch-icon" 	href="{% static 'images/favicon.png'            %}">
+        <link rel="stylesheet" 			href="{% static 'css/fonts.css'                 %}">
+        <link rel="stylesheet" 			href="{% static 'css/base.css'                  %}">
+        <link rel="stylesheet" 			href="{% static 'css/sidebar.css'               %}">
+        <link rel="stylesheet" 			href="{% static 'css/player-styles.css'         %}">
+        <link rel="stylesheet" 			href="{% static 'css/song-list.css'             %}">
+        <!-- Esta linea de estilos debe ser la última (CSS) para que los estilos responsivos tengan efecto  -->
+        <link rel="stylesheet" 			href="{% static 'css/vertical.css'              %}">
+        <script src="{% static 'js/srt-editor.js' %}">
         <title>Melodify {% block title %}{% endblock %}</title>
         {% fontawesome_5_static %}        
         {% block header %}{% endblock %}
@@ -24,9 +48,9 @@
                 <div id="menu"></div>
                 <div id="curtain" onclick="melodify.node('menu').style.display = 'none';melodify.node('curtain').style.display = 'none';">
                 </div>
-                <a id="logo-link" onclick="melodify.navigate('lyrics')">
-                TEST
-                </a>
+                <button class="input" onclick="melodify.navigate('lyrics')">
+                    TEST
+                </button>
                 
                 <a id="logo-link" onclick="melodify.navigate('home')">
                     <div id="melodify-logo">
