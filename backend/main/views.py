@@ -226,8 +226,10 @@ class SettingsView(TemplateView):
         context = get_context(super().get_context_data(**kwargs))
         return context
     
-class LyricsView(TemplateView):
+class LyricsView(DetailView):
+    model = Song
     template_name = 'main/lyrics.html'  
+    context_object_name = 'song' 
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
@@ -330,7 +332,6 @@ class SongDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
-        obj = self.object
         return context
     
 @csrf_exempt

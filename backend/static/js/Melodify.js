@@ -93,10 +93,16 @@ MelodifyPlayer.prototype = {
             onplay: function() {
                 // Display the duration.
                 duration.innerHTML = self.formatTime(Math.round(melodify.player.howl.duration()));
-
+                
                 // Start updating the progress of the track.
                 requestAnimationFrame(self.step.bind(self));
-
+                
+                // Sync lyrics bar size with song duration
+                node = melodify.node('timelineTrack');
+                if(node) {
+                    node.style.width = `${melodify.player.howl.duration() * PIXELS_PER_SECOND}px`;
+                    melodify.node('songPositionWrapper').style.width = node.style.width;
+                }
                 // Start the wave animation if we have already loaded
                 // wave.container.style.display = 'block';
                 bar.style.display = 'none';

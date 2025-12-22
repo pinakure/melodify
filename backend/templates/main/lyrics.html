@@ -2,6 +2,17 @@
 {% load static %}
 {% load fontawesome_5 %}
 {% include "main/widget-back.html" %}
+
+{% if song.picture %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.picture %}
+{% elif song.album.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.album.picture %}
+{% elif song.artist.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.artist.picture.url %}
+{% else %}
+
+{% endif %}
+
 {% csrf_token %}
 <style>
     #subtitleEditor {
@@ -88,6 +99,11 @@
 </style>
 
 {%include 'main/widget-title.html' with caption="Editor de Lyrics" %}
+{% if not song %}
+    {% include "main/widget-title.html" with caption="No hay pista cargada" subcaption="Nada en la lista" %}
+{% else %}
+    {% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+{% endif %}
 <input type="file" id="srtFileInput" accept=".srt">
 <div id="subtitleEditor" style="margin-top: 20px;"></div>
 <!-- Contenedor principal de la línea de tiempo -->
@@ -101,6 +117,9 @@
 
 
 <script>
+    const SONG_LYRICS = `{{ song.lyrics }}`;
+    processSRT(SONG_LYRICS);
+
     document.getElementById('srtFileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;

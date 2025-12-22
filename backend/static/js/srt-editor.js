@@ -98,72 +98,72 @@ function processSRT(data) {
     let maxEndTime = 0;
 
     blocks.forEach((block, index) => {
-        const lines = block.split('\n');
-        if (lines.length >= 3) {
-            const times = lines[1].split(' --> ');
-            const start = timeToSeconds(times[0]);
-            const end = timeToSeconds(times[1]);
-            const duration = end - start;
-            const text = lines.slice(2).join(' ');
+            const lines = block.split('\n');
+            if (lines.length >= 3) {
+                const times = lines[1].split(' --&gt; ');
+                const start = timeToSeconds(times[0]);
+                const end = timeToSeconds(times[1]);
+                const duration = end - start;
+                const text = lines.slice(2).join(' ');
 
-            if (end > maxEndTime) maxEndTime = end;
+                if (end > maxEndTime) maxEndTime = end;
 
-            // --- 1. Crear bloque visual ---
-            const visualBlock = document.createElement('div');
-            visualBlock.className = 'timeline-segment';
-            visualBlock.id = `segment-${index}`;
-            // Guardar metadatos para el arrastre
-            visualBlock.setAttribute('data-original-start', start);
-            visualBlock.setAttribute('data-duration', duration);
-            visualBlock.setAttribute('data-x', 0); // Offset inicial del drag
-            // Dentro de processSRT, al crear el visualBlock:
-            visualBlock.style.cssText = `
-                position: absolute; 
-                left: ${start * PIXELS_PER_SECOND}px;
-                width: ${duration * PIXELS_PER_SECOND}px; 
-                height: 60px;
-                top: 0px;
-                background: var(--section-color);
-                color: white;
-                cursor: grab; /* Indica que se puede mover */
-                border: 1px solid #2c3e50;
-                padding: 5px;
-                border-radius: 4px;
-                font-size: 11px;
-                overflow: hidden;
-                touch-action: none; 
-                box-sizing: border-box; /* Importante para cálculos de ancho exactos */
-            `;
-            visualBlock.innerText = text;
-            visualBlock.onclick = () => scrollToEditor(index);
-            timelineTrack.appendChild(visualBlock);
+                // --- 1. Crear bloque visual ---
+                const visualBlock = document.createElement('div');
+                visualBlock.className = 'timeline-segment';
+                visualBlock.id = `segment-${index}`;
+                // Guardar metadatos para el arrastre
+                visualBlock.setAttribute('data-original-start', start);
+                visualBlock.setAttribute('data-duration', duration);
+                visualBlock.setAttribute('data-x', 0); // Offset inicial del drag
+                // Dentro de processSRT, al crear el visualBlock:
+                visualBlock.style.cssText = `
+                    position: absolute; 
+                    left: ${start * PIXELS_PER_SECOND}px;
+                    width: ${duration * PIXELS_PER_SECOND}px; 
+                    height: 60px;
+                    top: 0px;
+                    background: var(--section-color);
+                    color: white;
+                    cursor: grab; /* Indica que se puede mover */
+                    border: 1px solid #2c3e50;
+                    padding: 5px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    overflow: hidden;
+                    touch-action: none; 
+                    box-sizing: border-box; /* Importante para cálculos de ancho exactos */
+                `;
+                visualBlock.innerText = text;
+                visualBlock.onclick = () => scrollToEditor(index);
+                timelineTrack.appendChild(visualBlock);
 
-            // --- 2. Crear bloque de edición ---
-            const editDiv = document.createElement('div');
-            editDiv.id = `edit-block-${index}`;
-            editDiv.className = 'edit-item';
-            editDiv.style.padding = '10px';
-            
-            // Usamos un template string con el evento oninput
-            editDiv.innerHTML = `
-                <div style="font-weight: bold; color: var(--tile-info-text);">#${index + 1}</div>
-                <input type="text" class="time-field" value="${lines[1]}" style="width: 280px; margin-bottom: 5px;">
-                <textarea class="text-field" style="width: 100%; height: 40px; display: block;">${text}</textarea>
-            `;
+                // --- 2. Crear bloque de edición ---
+                const editDiv = document.createElement('div');
+                editDiv.id = `edit-block-${index}`;
+                editDiv.className = 'edit-item';
+                editDiv.style.padding = '10px';
+                
+                // Usamos un template string con el evento oninput
+                editDiv.innerHTML = `
+                    <div style="font-weight: bold; color: var(--tile-info-text);">#${index + 1}</div>
+                    <input type="text" class="time-field" value="${lines[1]}" style="width: 280px; margin-bottom: 5px;">
+                    <textarea class="text-field" style="width: 100%; height: 40px; display: block;">${text}</textarea>
+                `;
 
-            // EVENTO EN TIEMPO REAL: Actualizar bloque visual al escribir
-            const textarea = editDiv.querySelector('.text-field');
-            textarea.addEventListener('input', (e) => {
-                visualBlock.innerText = e.target.value;
-            });
+                // EVENTO EN TIEMPO REAL: Actualizar bloque visual al escribir
+                const textarea = editDiv.querySelector('.text-field');
+                textarea.addEventListener('input', (e) => {
+                    visualBlock.innerText = e.target.value;
+                });
 
-            // OPCIONAL: Resaltar bloque azul cuando el textarea recibe foco
-            textarea.addEventListener('focus', () => {
-                highlightTimelineBlock(index);
-            });
+                // OPCIONAL: Resaltar bloque azul cuando el textarea recibe foco
+                textarea.addEventListener('focus', () => {
+                    highlightTimelineBlock(index);
+                });
 
-            editorContainer.appendChild(editDiv);
-        }
+                editorContainer.appendChild(editDiv);
+            }
     });
     
 
@@ -171,7 +171,8 @@ function processSRT(data) {
     <div id="songPositionWrapper">
         <div id="songPosition"></div>
     </div>`;
-    timelineTrack.style.width = `${(melodify.player.howl.duration() ?? maxEndTime) * PIXELS_PER_SECOND}px`;
+    var time = melodify.player.howl ? melodify.player.howl.duration() : maxEndTime;
+    timelineTrack.style.width = `${time * PIXELS_PER_SECOND}px`;
     // timelineTrack.style.width = `${(maxEndTime + 10) * PIXELS_PER_SECOND}px`;
     melodify.node('songPositionWrapper').style.width = timelineTrack.style.width;
     initDraggableAndResizable();
