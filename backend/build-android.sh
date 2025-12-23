@@ -7,6 +7,15 @@ pip install buildozer
 buildozer distclean
 pip install cython
 sudo apt install openjdk-21-jdk openjdk-21-jre 
+sudo apt install cmake
+sudo apt install pkg-config
+sudo apt install automake
+sudo apt install autoconf
+sudo apt install libtool
+sudo apt install libffi-dev
+sudo apt install libssl-dev
+sudo apt install python3-dev
+sudo apt install libldtl-dev
 pip install setuptools
 pip install python-for-android
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/pyjnius-sdl2/armeabi-v7a__ndk_target_21/pyjnius/jnius/jnius_utils.pxi
