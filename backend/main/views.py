@@ -429,8 +429,8 @@ def save_lyrics_ajax(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
 def play_ajax(request, pk):
-    if isinstance(request.user , AnonymousUser):
-        return JsonResponse({ 'status' : 'login'})
+    # if isinstance(request.user , AnonymousUser):
+    #     return JsonResponse({ 'status' : 'login'})
     if request.method == 'GET':
         try:
             # Leer los datos JSON del cuerpo de la petición
