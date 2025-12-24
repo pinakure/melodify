@@ -1,11 +1,9 @@
 #!/bin/bash
-#buildozer appclean
 rm -rf bin
 source ../venv/bin/activate
+source ./install.sh
 git stash
 git pull
-sudo apt install nginx openjdk-17-jdk openjdk-17-jre cmake pkg-config automake autoconf libtool libffi-dev libssl-dev python3-dev libltdl-dev libsqlite3-dev
-pip install "cython<3.0.0" python-for-android django kivy kivymd asgiref sqlparse Pillow mutagen requests django-fontawesome_5 setuptools gunicorn buildozer
 rm -rf ./buildozer
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/pyjnius-sdl2/armeabi-v7a__ndk_target_21/pyjnius/jnius/jnius_utils.pxi
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/pyjnius-sdl2/arm64-v8a__ndk_target_21/pyjnius/jnius/jnius_utils.pxi
