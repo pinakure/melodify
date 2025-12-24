@@ -185,7 +185,7 @@ MelodifyPlayer.prototype = {
 			var div = document.createElement('div');
 			div.className = 'list-song';
 			div.innerHTML = `<li onclick="melodify.navigate('${ song.url_detalle }')" class="sidebar-entry ${melodify.player.index == melodify.player.playlist.indexOf(song) ?'active':''}">
-                                <div class="sidebar-entry-picture" style="background-image:url('${ song.url_picture!='' && song.url_picture!=null  ? song.url_picture : '/static/images/song.png' }')"></div>
+                                <div class="sidebar-entry-picture" style="background-image:url('${ song.url_picture!='' && song.url_picture!=null && song.url_picture!='None' ? song.url_picture : '/static/images/song.png' }')"></div>
                                 <div class="sidebar-entry-content">
                                     <p class="sidebar-entry-primary">${ index } - ${ song.song_name }</p>
                                     <p class="sidebar-entry-secondary">${ song.artist_name }</p>

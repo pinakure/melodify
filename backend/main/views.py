@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.db.models import Q
+from django.http import HttpResponse
 import sys
 import subprocess
 from io import StringIO
@@ -420,6 +421,31 @@ def save_lyrics_ajax(request):
             song.lyrics = lyrics
             song.save()            
             return JsonResponse({'status': 'success', 'message': 'Letras actualizadas.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+def play_ajax(request, pk):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    if request.method == 'GET':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            song = pk
+            
+            if not song:
+                return JsonResponse({'status': 'error', 'message': 'Missing Song'}, status=400)
+
+            # get song binary data from file 
+            song = Song.objects.filter(id=pk).get()
+            with open(song.filename, 'rb') as file:
+                data = file.read()
+            response = HttpResponse(data, content_type='application/octet-stream')
+            # response['Content-Disposition'] = 'attachment; filename="archivo.bin"'
+            return response
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
         except Exception as e:

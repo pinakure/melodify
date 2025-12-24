@@ -27,7 +27,7 @@
             data-artistname = "{{ song.artist.name }}" 
             data-lyrics     = "{{ song.lyrics }}" 
             data-songname   = "{{ song.title }}" 
-            data-src        = "/static/{{ song.filename }}" 
+            data-src        = "/play/{{ song.pk }}/song.mp3" 
             data-picture    = "{{ song.picture }}" 
             data-id         = "{{ song.pk }}"
             {% if not forloop.last %}
@@ -66,7 +66,7 @@
                     data-artistname = "{{ song.artist.name }}" 
                     data-lyrics     = "{{ song.lyrics }}" 
                     data-songname   = "{{ song.title }}" 
-                    data-src        = "/static/{{ song.filename }}" 
+                    data-src        = "/play/{{ song.pk }}/song.mp3" 
                     data-picture    = "{{ song.picture }}" 
                     data-id         = "{{ song.pk }}"
                     title           = "Agregar a la cola" 
