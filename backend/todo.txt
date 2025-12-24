@@ -11,9 +11,6 @@ Script
 Fronted Duties
 ~~~~~~~~~~~~~~~~~
 · Remember player volume
-. Lyric editor - New block    
-. Lyric editor - Split block  
-. Lyric editor - Delete block 
 
 ~~~~~~~~~~~~~~~~~
 Data Models

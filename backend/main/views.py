@@ -1,24 +1,20 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Case, When, Count, Value, F, Subquery, Min, Max
-from django.http import JsonResponse
+from django.db.models import Case, When, Count, Value, Min
+from main.management.commands.scan  import Command as Scan
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
+from django.core.management import execute_from_command_line
 from django.shortcuts import redirect
 from django.db.models import Q
-from django.http import HttpResponse
-import sys
-import subprocess
-from io import StringIO
-from django.core.management import execute_from_command_line
-import os
+from django.http import JsonResponse, HttpResponse
 from django.conf import settings            
-from main.management.commands.scan  import Command as Scan
-
+from .models import *
+import subprocess
 import json
-from .models import Album, Song, Artist, Genre, Playlist, Tag
+import os
 
 scanner = Scan()
 
