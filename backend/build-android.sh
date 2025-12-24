@@ -13,3 +13,5 @@ git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/bui
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/kivy/arm64-v8a__ndk_target_21/kivy/kivy/weakproxy.pyx
 python -m buildozer android debug
 source ./debug-apk.sh
+sudo cp config/etc/nginx/sites-available/melodify /etc/nginx/sites-available/melodify 
+sudo cp config/etc/systemd/system/gunicorn.service /etc/systemd/system/gunicorn.service 
