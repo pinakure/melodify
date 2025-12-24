@@ -399,8 +399,16 @@ Melodify.prototype = {
             // Cuando el usuario pulsa "Atrás", volvemos a empujar el estado actual
             window.history.pushState(null, null, window.location.href);
             console.log("Navegación atrás bloqueada");
-            // Aquí puedes mostrar un mensaje o realizar una acción
-            melodify.state.history.pop(); melodify.navigate(melodify.state.history.pop())
+            if(melodify.state.history.length > 1){
+                here = melodify.state.history.pop();
+                url = melodify.state.history.pop();
+                if(url && url !== null && url != null) {
+                    // melodify.toast(`Navigating to ${url}`);
+                    melodify.navigate(url, [], false);
+                    melodify.state.history.push(url)
+                }
+            }
+            return false;
         };
         resize();
     },
