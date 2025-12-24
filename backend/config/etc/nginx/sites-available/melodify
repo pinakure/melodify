@@ -3,8 +3,13 @@ server {
     server_name melodify.com;
 
     # Archivos estáticos (muy importante en producción)
-    location /static/ {
+    location /old-static/ {
         root /static/melodify/;
+    }
+    location /static/ {
+        alias /static/melodify/;
+        expires 30d;
+        add_header Cache-Control "public";
     }
     # Pasar todo lo demás a Gunicorn
     location / {

@@ -94,6 +94,7 @@ def get_sanitized_year(year : str):
 def get_hash(path : str):
     """Devuelve un hash de 128 caracteres ASCII (SHA-512 en hex) para un fichero MP3."""
     sha = hashlib.sha512()
+    print(path)
     with open(path, "rb") as f:
         # Leer en bloques para archivos grandes
         for chunk in iter(lambda: f.read(8192), b""):
@@ -533,7 +534,7 @@ class Command(BaseCommand):
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
                     path = os.path.join(root, f)
-                    hash = get_hash(path.capitalize())
+                    hash = get_hash(path)
                     # check whether or not the song object exists
                     id = os.path.join(root, f).capitalize()
                     song = self.get_song(id)
@@ -554,9 +555,11 @@ class Command(BaseCommand):
         BASEPARTS = BASEPATH.split(':')
         DRIVE = ''
         PATH  = ''
-        if len(BASEPARTS)==1:
-            # Single location ( / , /home/user/music , D: , D , D:\ ....)
+        if isinstance(BASEPARTS, str):
             PATH = BASEPARTS
+        elif len(BASEPARTS)==1:
+            # Single location ( / , /home/user/music , D: , D , D:\ ....)
+            PATH = BASEPARTS[0]
         else:
             # Drive and (optional) Path
             [DRIVE, PATH] = BASEPARTS
@@ -564,7 +567,7 @@ class Command(BaseCommand):
             PATH = PATH.rstrip(os.path.sep)
         if PATH == '': 
             PATH = os.path.sep
-
+        print(PATH)
         PATH_PIECES = PATH.split(os.path.sep)
         PATH = ''
         for p in PATH_PIECES:
