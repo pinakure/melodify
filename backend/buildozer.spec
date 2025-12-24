@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,lst,html,js,css
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/*,images/*.png,config/*.lst,static/css/*.css,static/js/*.js,static/images/*.png,templates/main/*.html,templates/registration/*.html,templates/*.html,backend/*.py,main/*.py,main/management/*.py,main/management/commands/*.py,main/templatetags/*.py,db.sqlite3,manage.py
+source.include_patterns = assets/*,images/*.png,config/*.lst,config/*.cfg,static/css/*.css,static/js/*.js,static/images/*.png,templates/main/*.html,templates/registration/*.html,templates/*.html,backend/*.py,main/*.py,main/management/*.py,main/management/commands/*.py,main/templatetags/*.py,db.sqlite3,manage.py
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
