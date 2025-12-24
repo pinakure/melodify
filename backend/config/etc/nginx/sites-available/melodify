@@ -16,6 +16,10 @@ server {
         # Elimina cualquier otra línea de "proxy_set_header Host" que hayas puesto antes
     }
 
+    location /media/ {
+        alias /src/melodify/media/; # Debe coincidir con MEDIA_ROOT
+    }
+    
     listen 443 ssl;
     ssl_certificate /etc/letsencrypt/live/m4gtracker.com.82.223.13.41.nip.io/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/m4gtracker.com.82.223.13.41.nip.io/privkey.pem;
