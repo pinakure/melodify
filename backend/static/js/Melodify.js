@@ -115,7 +115,7 @@ MelodifyPlayer.prototype = {
                 loading.style.display = 'none';
             },
             onloaderror: function(id, error) {
-                melodify.toast.log(`Error loading audio: ${error}`, 5, true);
+                melodify.toast(`Error loading audio: ${error}`, 5, true);
                 console.error(`Error loading audio: ${error}`);
                 bar.style.display = 'none';
                 loading.style.display = 'none';
