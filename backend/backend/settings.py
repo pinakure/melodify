@@ -20,6 +20,7 @@ ALLOWED_HOSTS = [
     '192.168.1.178',
     'localhost',
     'melodify.com',
+    'melodify.com.82.223.13.41.nip.io',
 ]
 
 
