@@ -394,6 +394,14 @@ Melodify.prototype = {
         if(this.state.playlist.length>1){
             this.player.play(this.state.playlist[this.player.index]);
         }
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            // Cuando el usuario pulsa "Atrás", volvemos a empujar el estado actual
+            window.history.pushState(null, null, window.location.href);
+            console.log("Navegación atrás bloqueada");
+            // Aquí puedes mostrar un mensaje o realizar una acción
+            melodify.state.history.pop(); melodify.navigate(melodify.state.history.pop())
+        };
         resize();
     },
     node : function(id){
