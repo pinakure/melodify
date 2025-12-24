@@ -15,4 +15,19 @@ server {
 
         # Elimina cualquier otra línea de "proxy_set_header Host" que hayas puesto antes
     }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/m4gtracker.com.82.223.13.41.nip.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/m4gtracker.com.82.223.13.41.nip.io/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+server {
+    if ($host = melodify.com.82.223.13.41.nip.io){
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name melodify.com melodify.com.82.223.13.41.nip.io;
+    return 404;
 }
