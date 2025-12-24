@@ -256,7 +256,8 @@ MelodifyPlayer.prototype = {
 		// Determine our current seek position.
 		var seek = this.howl.seek() || 0;
 		timer.innerHTML = self.formatTime(Math.round(seek));
-        var pc = (((seek / this.howl.duration()) * 100) || 0) + '%';
+        var percent = (((seek / this.howl.duration()) * 100) || 0);
+        var pc = `${percent}%`;
 		progress.style.width = pc;
         
         // If the howl is still playing, continue stepping.
@@ -269,7 +270,19 @@ MelodifyPlayer.prototype = {
                 if(!song_position) melodify.lyrics_editor = false;
                 else {
                     song_position.style.width = pc;
-                    // melodify.node('timelineContainer').scrollTo({ left: pc, behavior:'smooth'}); 
+                    wrapper = melodify.node('timelineContainer');
+                    wrapper.scrollTo({ left: (wrapper.scrollWidth - wrapper.clientWidth) * (percent/100), behavior:'smooth'}); 
+                    index = 0;
+                    for (const [i, block] of editor.blocks.entries()) {
+                        if (seek >= block.start && seek < block.end) {
+                            editor.highlightTimelineBlock(index);
+                            // auto-select node 
+                            if( editor.auto_select) 
+                                editor.scrollToEditor(index);
+                            break;
+                        }
+                        index++;
+                    }
                 }
             } else if(melodify.player.lyrics){
                 
@@ -812,7 +825,7 @@ Melodify.prototype = {
             // 3. Solo agregamos el bloque si tiene contenido para evitar bloques vacíos
             if (start && end && text) {
                 // El formato SRT requiere: ID, Tiempo, Texto y una línea en blanco
-                srtResult += `${id}\n${editor.timeToSeconds(start)} --> ${editor.timeToSeconds(end)}\n${text}\n\n`;
+                srtResult += `${id}\n${start} --> ${end}\n${text}\n\n`;
             }
         });
 
@@ -824,12 +837,12 @@ Melodify.prototype = {
 
         // 5. Llamamos a la función de descarga que ya tienes
         melodify.request(
-            '/lyrics/update/', 
+            '/lyrics/save/', 
             { 
-                song : '{{ song.pk }}', 
-                lyrics : srtResult 
+                song    : melodify.player.playlist[ melodify.player.index ].id, 
+                lyrics  : srtResult 
             }, (data)=>{
-            melodify.toast('{% fa5_icon "save" %}&nbsp;Guardado.')
+            melodify.toast('<i class="fas fa-save"></i>&nbsp;Guardado.')
             // editor.downloadFile(srtResult, "subtitulos_editados_2025.srt");
             }
         );

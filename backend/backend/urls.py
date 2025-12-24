@@ -30,6 +30,7 @@ urlpatterns = [
     path('playlist/<int:pk>/'   , PlaylistDetailView.as_view()  , name='playlist-detail'),
     path('search/'              , views.search_ajax             , name='search'),
     path('lyrics/<int:pk>/'     , LyricsView.as_view()          , name='lyrics'),
+    path('lyrics/save/'         , views.save_lyrics_ajax        , name='save-lyrics'),
     path('tags/'                , TagListView.as_view()         , name='tag-list'),
     path('settings/'            , SettingsView.as_view()        , name='settings'),
     path('scheme/<str:scheme>/' , views.scheme_view_ajax        , name='scheme'),

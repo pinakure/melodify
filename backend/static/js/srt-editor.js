@@ -82,7 +82,7 @@ SrtEditor.prototype = {
                 touch-action: none; 
                 box-sizing: border-box; /* Importante para cálculos de ancho exactos */
             `;
-            visualBlock.innerText = text;
+            visualBlock.innerHTML = text;
             visualBlock.onclick = () => editor.scrollToEditor(index);
             self.timelineTrack.appendChild(visualBlock);
 
@@ -210,6 +210,10 @@ SrtEditor.prototype = {
     },
     // Resalta el bloque azul en la línea de tiempo
     highlightTimelineBlock: function(index) {
+        if( this.active_block == index ) {
+            return;
+        }
+        this.active_block = index;
         document.querySelectorAll('.timeline-segment').forEach(el => {
             el.style.background = 'var(--section-color)';
             el.style.color = 'var(--text-color)';
@@ -221,7 +225,7 @@ SrtEditor.prototype = {
         activeBlock.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
         
         // Hacer scroll en la línea de tiempo si el bloque está fuera de vista
-        activeBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        // activeBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     },
     scrollToEditor: function(index) {
         const target = document.getElementById(`edit-block-${index}`);

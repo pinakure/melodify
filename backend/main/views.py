@@ -401,6 +401,32 @@ def create_playlist_ajax(request):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
+def save_lyrics_ajax(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data = json.loads(request.body)
+            song = data.get('song', '').strip()
+            lyrics = data.get('lyrics', '').strip()
+            
+            if not song:
+                return JsonResponse({'status': 'error', 'message': 'Missing Song'}, status=400)
+            if not lyrics:
+                return JsonResponse({'status': 'error', 'message': 'Missing Lyrics'}, status=400)
+
+            song = Song.objects.filter(id=song).get()
+            song.lyrics = lyrics
+            song.save()            
+            return JsonResponse({'status': 'success', 'message': 'Letras actualizadas.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
 def steal_get(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
