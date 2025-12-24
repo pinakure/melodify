@@ -498,12 +498,15 @@ def steal_search(request):
             args = [ 'python', os.path.join('scripts', 'steal.py'), url, '--search_only']
             try:
                 print(f"STEAL :: args = {args}")
-                songs = subprocess.run(
+                result = subprocess.run(
                     args,
                     capture_output=True, 
                     text=True
-                ).stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
-                print(f"STEAL :: songs = {songs}")
+                )
+                songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
+                print(f"STEAL :: songs = '{songs}'")
+                print(f"STEAL :: stdout = '{result.stdout}'")
+                print(f"STEAL :: stderr = '{result.stderr}'")
                 return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})
             except Exception as e:
                 print(str(e))
