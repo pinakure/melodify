@@ -1,11 +1,8 @@
 server {
     listen 80;
-    server_name melodify.com;
+    server_name melodify.com melodify.com.82.223.13.41.nip.io;
 
     # Archivos estáticos (muy importante en producción)
-    location /old-static/ {
-        root /static/melodify/;
-    }
     location /static/ {
         alias /static/melodify/;
         expires 30d;
@@ -14,7 +11,7 @@ server {
     # Pasar todo lo demás a Gunicorn
     location / {
         include proxy_params;
-        proxy_pass http://unix:/run/gunicorn.sock;
+        proxy_pass http://unix:/src/melodify/melodify.sock;
 
         # Elimina cualquier otra línea de "proxy_set_header Host" que hayas puesto antes
     }

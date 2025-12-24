@@ -11,7 +11,7 @@ Environment="PATH=/src/melodify/venv/bin"
 ExecStart=/src/melodify/venv/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
-    --bind unix:/run/gunicorn.sock \
+    --bind unix:/src/melodify/melodify.sock \
     backend.wsgi:application
 
 [Install]
