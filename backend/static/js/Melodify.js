@@ -100,7 +100,7 @@ MelodifyPlayer.prototype = {
                 // Sync lyrics bar size with song duration
                 node = melodify.node('timelineTrack');
                 if(node) {
-                    node.style.width = `${melodify.player33e.howl.duration() * PIXELS_PER_SECOND}px`;
+                    node.style.width = `${melodify.player.howl.duration() * PIXELS_PER_SECOND}px`;
                     melodify.node('songPositionWrapper').style.width = node.style.width;
                 }
                 // Start the wave animation if we have already loaded

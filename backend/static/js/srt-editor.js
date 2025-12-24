@@ -100,7 +100,8 @@ SrtEditor.prototype = {
                         <input readonly="readonly"  type="text" class="start-field" value="${self.secondsToSrtTime(start)}" style="pointer-events: none; width: 280px; margin-bottom: 5px;"/>
                         <div> --&gt; </div>
                         <input readonly="readonly" type="text" class="end-field" value="${self.secondsToSrtTime(end)}" style="pointer-events: none; width: 280px; margin-bottom: 5px;"/>
-                        <button class="input secondary" onclick="editor.deleteBlock(${index});"><i class="fas fa-trash"></i></button>
+                        <button class="input secondary" title="Eliminar" onclick="editor.deleteBlock(${index});"><i class="fas fa-trash"></i></button>
+                        <button class="input secondary" title="Dividir" onclick="editor.splitBlock(${index});"><i class="fas fa-cut"></i></button>
                     </div>
                 <textarea class="text-field" style="width: 100%; height: 40px; display: block;">${text}</textarea>
             `;
