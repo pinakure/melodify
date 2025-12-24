@@ -21,4 +21,9 @@ sudo chmod -R 755 /static
 sudo mkdir -p /static/melodify
 sudo chown -R $USER:www-data /static
 sudo chmod -R 755 /static
+sudo mkdir -p ./media/artists
+sudo mkdir -p ./media/albums
+sudo mkdir -p ./media/songs
+sudo chown -R $USER:www-data ./media
+sudo chmod -R 755 ./media
 python3 manage.py collectstatic --noinput
