@@ -536,7 +536,7 @@ class Command(BaseCommand):
                     path = os.path.join(root, f)
                     hash = get_hash(path)
                     # check whether or not the song object exists
-                    id = os.path.join(root, f).capitalize()
+                    id = os.path.join(root, f)
                     song = self.get_song(id)
                     if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
                         continue
