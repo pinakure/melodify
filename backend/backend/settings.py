@@ -129,3 +129,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SPOTIFY_CLIENT_ID  = 'dc75272b15354119b9df60392848cc6a'
+SPOTIFY_CLIENT_SECRET = '76d4dfef594f4625bd68b8068a574289' 

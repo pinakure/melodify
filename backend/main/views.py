@@ -449,6 +449,7 @@ def play_ajax(request, pk):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
+
 def steal_get(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
@@ -461,12 +462,16 @@ def steal_get(request):
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
             args = [ 'python', os.path.join('scripts', 'steal.py'), url]
+            print(f"STEAL :: args = {args}")
             result = subprocess.run(
                 args,
                 capture_output=True, 
                 text=True
             )
-            songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
+            songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
+            print(f"STEAL :: stderr = {result.stderr}")
+            print(f"STEAL :: result = {result.stdout}")
+            print(f"STEAL :: songs = {songs}")
             return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : json.loads(songs)})
 
         except json.JSONDecodeError:
@@ -492,12 +497,13 @@ def steal_search(request):
             os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
             args = [ 'python', os.path.join('scripts', 'steal.py'), url, '--search_only']
             try:
-                result = subprocess.run(
+                print(f"STEAL :: args = {args}")
+                songs = subprocess.run(
                     args,
                     capture_output=True, 
                     text=True
-                )
-                songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
+                ).stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
+                print(f"STEAL :: songs = {songs}")
                 return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})
             except Exception as e:
                 print(str(e))
@@ -514,6 +520,8 @@ def steal_search(request):
 def scan_artist(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
+    with open('./config/library-root.cfg', 'r') as f:
+        LIBRARY_ROOT = f.read()
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición
@@ -522,7 +530,7 @@ def scan_artist(request):
             
             if not artist:
                 return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
-            songs = scanner.scan(os.path.join(settings.LIBRARY_ROOT, artist[0].upper(), artist), False)
+            songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist), False)
             return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
 
         except json.JSONDecodeError:

@@ -1,10 +1,31 @@
+import os
+import django
+import sys
+from pathlib import Path
+
+# 1. Add your backend directory to the sys.path so Python can find 'backend.settings'
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
+
+# 2. Set the environment variable for your Django settings
+# Replace 'backend.settings' with the actual path to your settings.py (e.g., 'melodify.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+
+# 3. Setup Django
+django.setup()
+
+# Now you can safely import settings and spotDL
+from django.conf import settings
 from spotdl import Spotdl
 import shutil
-import os 
-import sys
+
+def debug(text):
+    return
+    print(text)
 
 def clean(songname):
     songname = songname.replace('?', '')
+    songname = songname.replace('"', '')
     songname = songname.replace(':', '')
     songname = songname.replace('*', '')
     songname = songname.replace('/', '-')
@@ -13,10 +34,15 @@ def clean(songname):
 
 help            = "Steal"
 initialized     = False
+client_id       = settings.SPOTIFY_CLIENT_ID
+client_secret   = settings.SPOTIFY_CLIENT_SECRET
 spotdl          =  Spotdl(
-    client_id="dc75272b15354119b9df60392848cc6a", 
-    client_secret="76d4dfef594f4625bd68b8068a574289", 
-    no_cache=True
+    client_id = client_id, 
+    client_secret = client_secret, 
+    no_cache=True,
+    # downloader_settings={
+    #     'output' : "out.mp3"
+    # }
 )
 
 def searchSong(url):
@@ -32,14 +58,18 @@ def searchSong(url):
     return payload
 
 def getSong(url):
+    debug(f"STEAL :: searching {url}...")
     song_objs = spotdl.search([url])
 
     with open('config/library-root.cfg', 'r') as f:
         LIBRARY_ROOT = f.read()
     payload = []
-
     for song in song_objs:
-        try:
+        debug(f"STEAL ::        title = {song.name}")
+        debug(f"STEAL ::        album = {song.album_name}")
+        debug(f"STEAL ::       artist = {', '.join(song.artists)}")
+        debug(f"STEAL :: download_url = {song.download_url}")
+        try:            
             artists  = ", ".join(song.artists)
             artist   = artists.split(',')[0]
             letter   = artist[0].upper()
@@ -50,6 +80,7 @@ def getSong(url):
             if os.path.exists(os.path.join(dstpath,  title)):
                 continue
             result   = spotdl.download_songs([song])[0]
+            debug(f"STEAL :: result = {result}")
             if result[1] is None:
                 continue
             filename = clean(result[1].name)
@@ -58,12 +89,13 @@ def getSong(url):
             except:
                 pass
             try:
+                debug(f"STEAL :: mv( filename = '{filename}', dest = '{dest}' )")
                 shutil.move(filename, dest)
                 payload.append(artist)
             except Exception as e:
-                print(str(e))
+                debug(str(e))
         except Exception as e:
-            print(f"Error downloading '{ song.name }' : {str(e)}")
+            debug(f"Error downloading '{ song.name }' : {str(e)}")
     return payload
 
 payload = ''
