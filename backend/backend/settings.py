@@ -111,14 +111,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-with open('config/library-root.cfg', 'r') as f:
-    library_root = f.read()
-LIBRARY_ROOT = os.path.join(library_root) # warning, this exposes your disk contents through /static/ URL
+SERVER = False
+if SERVER:
+    STATIC_ROOT = '/static/melodify'
 STATIC_FILES = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [ LIBRARY_ROOT, STATIC_FILES ]
+STATICFILES_DIRS = [ STATIC_FILES ]
 STATIC_URL = 'static/'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
