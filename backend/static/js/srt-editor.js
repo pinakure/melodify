@@ -252,6 +252,27 @@ SrtEditor.prototype = {
         };
         reader.readAsText(file);
     },
+    splitBlock: function(index){
+        var block = editor.blocks[index]; 
+        editor.blocks.splice( index, 1);
+        var blocks = [
+            {
+                start       : block.start,
+                end         : block.end - (block.duration/2),
+                duration    : block.duration/2,
+                text        : block.text.substring(0, block.text.length / 2)
+            },
+            {                
+                start       : block.start + (block.duration/2),
+                end         : block.end,
+                duration    : block.duration/2,
+                text        : block.text.substring(block.text.length / 2)
+            }
+        ];
+        editor.blocks.splice( index  , 0, blocks[0]);
+        editor.blocks.splice( index+1, 0, blocks[1]);
+        editor.processSRT();
+    },
     newBlock: function(e){
         // Calcular la posición X relativa al track
         const rect = this.getBoundingClientRect();
@@ -273,7 +294,6 @@ SrtEditor.prototype = {
             const end       = block.end;
 
             if( !found && ( new_block.end < start ) || ( new_block.start > end ) ){
-                //editor.blocks = [ editor.blocks.slice( 0, index), new_block , editor.blocks.slice(index) ];
                 editor.blocks.splice( index, 0,  new_block);
                 found=true;
             }
