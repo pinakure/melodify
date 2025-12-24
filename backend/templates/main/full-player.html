@@ -127,10 +127,10 @@
                 
             </div>
         </div>
+        <button class="input secondary" title="Editar letras sincronizadas" onclick="melodify.navigate('/lyrics/{{ song.pk }}/', [], true)">{% fa5_icon "edit" %}</button>  
         {% if song.lyrics %}
             <div id="debug" class="italic breathe"></div>
             <div id="lyrics" class="italic breathe" style="font-size: 24px; font-weight: 800;"></div>
-            <button class="input secondary" title="Editar letras sincronizadas" onclick="melodify.navigate('/lyrics/{{ song.pk }}/', [], true)">{% fa5_icon "edit" %}</button>  
         {% endif %}
     {% endif %}
 </div>

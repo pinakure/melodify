@@ -7,9 +7,9 @@ function SrtEditor( lyrics ){
     this.container          = melodify.node('subtitleEditor');
     this.timelineTrack      = melodify.node('timelineTrack');
     this.timelineTrack.addEventListener('dblclick'   , this.newBlock     );
-    melodify.node('srtFileInput'    ).addEventListener('change'     , melodify.getFile  );
+    melodify.node('srtFileInput'    ).addEventListener('change'     , this.getFile  );
     melodify.node('downloadBtn'     ).addEventListener('click'      , melodify.saveSrt  );
-    melodify.node('srtFileInput'    ).style.display = 'none';
+    if( lyrics.length > 0 ) melodify.node('srtFileInput'    ).style.display = 'none';
     this.processSRT();
     
     melodify.lyrics_editor  = this;
@@ -207,7 +207,6 @@ SrtEditor.prototype = {
         document.querySelector(`#edit-block-${index} .start-field`  ).value = `${editor.secondsToSrtTime(newStartSecs)}`;
         document.querySelector(`#edit-block-${index} .end-field`    ).value = `${editor.secondsToSrtTime(newEndSecs)}`;
     },
-    
     // Resalta el bloque azul en la línea de tiempo
     highlightTimelineBlock: function(index) {
         document.querySelectorAll('.timeline-segment').forEach(el => {
@@ -246,8 +245,9 @@ SrtEditor.prototype = {
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            const content = e.target.result;
-            editor.lyrics = content;
+            editor.blocks = editor.deserializeBlocks(e.target.result);
+            editor.processSRT();
+            melodify.node('srtFileInput').style.display = 'none';
         };
         reader.readAsText(file);
     },
