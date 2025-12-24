@@ -14,9 +14,9 @@ git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/bui
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/kivy/armeabi-v7a__ndk_target_21/kivy/kivy/weakproxy.pyx
 git checkout HEAD -- .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/kivy/arm64-v8a__ndk_target_21/kivy/kivy/weakproxy.pyx
 python -m buildozer android debug
-if [ -f "/bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" ]; then
-    echo "APK found: /bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk"
-    cp bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk /mnt/c/codigo/melodify/melodify.apk
+if [ -f "./bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" ]; then
+    echo "APK found: ./bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk"
+    cp ./bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk /mnt/c/codigo/melodify/melodify.apk
 else
-    echo "APK not found: /bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" >&2
+    echo "APK not found: ./bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" >&2
 fi
