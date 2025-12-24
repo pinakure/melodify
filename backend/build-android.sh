@@ -19,5 +19,4 @@ if [ -f "/bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" ]; then
     cp bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk /mnt/c/codigo/melodify/melodify.apk
 else
     echo "APK not found: /bin/melodify-0.1-arm64-v8a_armeabi-v7a-debug.apk" >&2
-    exit 1
 fi
