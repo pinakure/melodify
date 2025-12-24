@@ -3,12 +3,18 @@ Script
 ~~~~~~~~~~~~~~~~~
 · Generate and Display Discrepance List
 · Journalkeep scan status, ability restore scanning from last scanned item
+· Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
+
+
 
 ~~~~~~~~~~~~~~~~~
 Fronted Duties
 ~~~~~~~~~~~~~~~~~
+· Remember player volume
+. Lyric editor - New block    
+. Lyric editor - Split block  
+. Lyric editor - Delete block 
 
-·Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
 ~~~~~~~~~~~~~~~~~
 Data Models
 ~~~~~~~~~~~~~~~~~

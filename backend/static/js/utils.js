@@ -15,13 +15,13 @@ function truncate(artist, n){
 };
 
 function enable(node_id){
-    node = document.getElementById(`download-${node_id}`);
+    node = melodify.node(`download-${node_id}`);
     node.removeAttribute('readonly');
     node.removeAttribute('disabled');
 }
 
 function disable(node_id){
-    node = document.getElementById(`download-${node_id}`)
+    node = melodify.node(`download-${node_id}`)
     node.setAttribute('readonly', 'readonly');
     node.setAttribute('disabled', 'disabled');        
 }

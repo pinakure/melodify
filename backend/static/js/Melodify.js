@@ -100,7 +100,7 @@ MelodifyPlayer.prototype = {
                 // Sync lyrics bar size with song duration
                 node = melodify.node('timelineTrack');
                 if(node) {
-                    node.style.width = `${melodify.player.howl.duration() * PIXELS_PER_SECOND}px`;
+                    node.style.width = `${melodify.player33e.howl.duration() * PIXELS_PER_SECOND}px`;
                     melodify.node('songPositionWrapper').style.width = node.style.width;
                 }
                 // Start the wave animation if we have already loaded
@@ -278,10 +278,10 @@ MelodifyPlayer.prototype = {
                 var next  = melodify.player.lyrics[ melodify.player.lyrics_index+1 ]==undefined ? '' : melodify.player.lyrics[ melodify.player.lyrics_index+1 ];
                 var now   = parseInt(seek*1000);// parseInt(seek+0.5);
                 if( (now >= lyric.start) && (now <= lyric.end)){
-                    // document.getElementById('debug').innerHTML=`${now} - ${lyric.start} - ${lyric.end}`;
+                    // melodify.node('debug').innerHTML=`${now} - ${lyric.start} - ${lyric.end}`;
                     if( melodify.player.lyrics_last != lyric.start){
                         try {
-                                document.getElementById('lyrics').innerHTML = `
+                                melodify.node('lyrics').innerHTML = `
                                 <div class="lyric-wrapper" style="position: relative;height: 32px;">
                                     <p class="lyric">${ lyric.text }</p>
                                     <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }ms;">${ lyric.text }</p>
@@ -358,7 +358,7 @@ Melodify.prototype = {
         `;
         const toaster = this.node('toaster');
         toaster.insertAdjacentHTML('beforeend', toastHTML);
-        const currentToast = document.getElementById(`toast-${id}`);
+        const currentToast = melodify.node(`toast-${id}`);
         setTimeout(() => {
             if (currentToast) {
                 currentToast.classList.add('toast-fade');
@@ -439,7 +439,7 @@ Melodify.prototype = {
         }
         melodify.player.enqueue( song );
         if( nextSong != "" && (nextSong != melodify.first_song.id) ){
-            melodify.playSong( document.getElementById(`song-${ nextSong }`) , true );
+            melodify.playSong( melodify.node(`song-${ nextSong }`) , true );
         }
         if( !only_enqueue ) melodify.player.play(melodify.first_song);
     },
@@ -461,7 +461,7 @@ Melodify.prototype = {
         .then(response => response.text())
         .then(data => {
             /* Remove event listeners */
-            var search = document.getElementById('searchInput');
+            var search = melodify.node('searchInput');
             if(search){
                 search.removeEventListener('input', melodify.handlePlaylistFilter);
                 search.removeEventListener('input', melodify.handleAlbumFilter);
@@ -482,7 +482,7 @@ Melodify.prototype = {
             melodify.state.current_page = url;
             melodify.saveState();
             content.focus();
-            document.getElementById('curtain').click();
+            melodify.node('curtain').click();
         })
         .catch(error => {
             console.error('Navigate: Fetch error:', error);
@@ -528,16 +528,16 @@ Melodify.prototype = {
     },
     loadScheme : function(scheme){
         this.request(`/scheme/${ scheme }/`,{}, (data)=>{ 
-            document.getElementById('scheme').innerHTML = data.values;
+            melodify.node('scheme').innerHTML = data.values;
         }, true);
         this.state.settings.scheme = scheme;
     },
     /* Callback functions */
     filter: function(type) {
-        const input  = document.getElementById('search-Input');
+        const input  = melodify.node('search-Input');
         const filter = input.value.toLowerCase();
         const cards = document.querySelectorAll('.item');
-        const noMessage  = document.getElementById('no-message');
+        const noMessage  = melodify.node('no-message');
         
         let found = false;
 
@@ -556,7 +556,7 @@ Melodify.prototype = {
         }
     },
     search: function(value) {
-        const input  = document.getElementById('megasearch');
+        const input  = melodify.node('megasearch');
         const filter = input.value.toLowerCase();
         if(this.search_timeout) clearTimeout( this.search_timeout );
         this.search_timeout = setTimeout(()=>{
@@ -609,8 +609,8 @@ Melodify.prototype = {
         }   
     },
     showResults : function(data){
-        container = document.getElementById('results');
-        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : document.getElementById('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
+        container = melodify.node('results');
+        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : melodify.node('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
         container.innerHTML += "<ul>";
         for( d in data.songs ){
             song = data.songs[d];
@@ -619,16 +619,16 @@ Melodify.prototype = {
         container.innerHTML += "</ul>";
     },
     hidePlaylists : function(){ 
-        const div = document.getElementById('playlists-window');
+        const div = melodify.node('playlists-window');
         div.style.display = 'none';
     },
     showPlaylists : function( parent, song_id ){
-        const div = document.getElementById('playlists-window');
+        const div = melodify.node('playlists-window');
         div.style.display = 'inline-block';
-        document.getElementById('playlists-window').setAttribute('data-song', song_id);
+        melodify.node('playlists-window').setAttribute('data-song', song_id);
     },       
     addSongToPlaylist : function(playlist_id){
-        song_id = document.getElementById('playlists-window').getAttribute('data-song');
+        song_id = melodify.node('playlists-window').getAttribute('data-song');
         this.request('/playlists/populate/', { song : song_id, playlist : playlist_id }, ()=>{ 
             melodify.hidePlaylists();
         });
@@ -639,9 +639,9 @@ Melodify.prototype = {
         });
     },
     createPlaylist : function() {
-        const playlistNameInput = document.getElementById('new-list-name');
+        const playlistNameInput = melodify.node('new-list-name');
         const playlistName = playlistNameInput.value.trim();
-        const container = document.getElementById('tileContainer');
+        const container = melodify.node('tileContainer');
         if (!playlistName) {
             melodify.toast("Por favor, introduce un nombre para la lista.");
             return;
@@ -657,8 +657,8 @@ Melodify.prototype = {
     },
     bookmarkSong : function( song_id, enable ){
         this.request('/song/bookmark/', { song : song_id }, ()=>{ 
-            document.getElementById(  `bookmark-song-${ song_id }`).classList.toggle("hidden"),
-            document.getElementById(`unbookmark-song-${ song_id }`).classList.toggle("hidden")
+            melodify.node(  `bookmark-song-${ song_id }`).classList.toggle("hidden"),
+            melodify.node(`unbookmark-song-${ song_id }`).classList.toggle("hidden")
         });
     },
     handleScroll : function( callback ) {
@@ -683,15 +683,15 @@ Melodify.prototype = {
     },
     loadAlbums : function() {
         let albumCount = 0;
-        const loadingIndicator = document.getElementById('loading');
+        const loadingIndicator = melodify.node('loading');
         const scrollbox     = document.getElementsByClassName('main-content')[0];
 
         if (melodify.isLoading) return;
         melodify.isLoading = true;
         loadingIndicator.style.display = 'block';
 
-        var album_container = document.getElementById('tileContainer');
-        var album_count     = document.getElementById('album-count');
+        var album_container = melodify.node('tileContainer');
+        var album_count     = melodify.node('album-count');
         
         fetch(`/albums/?page=${melodify.next_page}${ melodify.search_term ? '&search=' : ''}${melodify.search_term}`, {
             headers: {
@@ -741,13 +741,13 @@ Melodify.prototype = {
     },
     loadPlaylists: function() {
         let playlistCount = 0;
-        const playlist_container = document.getElementById('tileContainer');
-        const countDisplay       = document.getElementById('playlist-count');
+        const playlist_container = melodify.node('tileContainer');
+        const countDisplay       = melodify.node('playlist-count');
         const scrollbox          = document.getElementsByClassName('main-content')[0];
 
         if (melodify.is_loading) return;
         melodify.is_loading = true;
-        const loadingIndicator  = document.getElementById('loading');
+        const loadingIndicator  = melodify.node('loading');
 
         loadingIndicator.style.display = 'block';
 
@@ -805,13 +805,14 @@ Melodify.prototype = {
             
             // 2. Obtenemos los valores de los inputs y textareas específicos
             // Usamos los nombres de clase que definimos en la creación dinámica
-            const time = block.querySelector('.time-field').value.trim();
-            const text = block.querySelector('.text-field').value.trim();
+            const start = block.querySelector('.start-field').value.trim();
+            const end   = block.querySelector('.end-field').value.trim();
+            const text  = block.querySelector('.text-field').value.trim();
 
             // 3. Solo agregamos el bloque si tiene contenido para evitar bloques vacíos
-            if (time && text) {
+            if (start && end && text) {
                 // El formato SRT requiere: ID, Tiempo, Texto y una línea en blanco
-                srtResult += `${id}\n${time}\n${text}\n\n`;
+                srtResult += `${id}\n${editor.timeToSeconds(start)} --> ${editor.timeToSeconds(end)}\n${text}\n\n`;
             }
         });
 
@@ -829,7 +830,7 @@ Melodify.prototype = {
                 lyrics : srtResult 
             }, (data)=>{
             melodify.toast('{% fa5_icon "save" %}&nbsp;Guardado.')
-            // downloadFile(srtResult, "subtitulos_editados_2025.srt");
+            // editor.downloadFile(srtResult, "subtitulos_editados_2025.srt");
             }
         );
     },
@@ -840,19 +841,19 @@ melodify.initialize();
 /* album list stuff */
 
 function toggleNewListForm() {
-    const form = document.getElementById('new-list');
+    const form = melodify.node('new-list');
     // Muestra u oculta el formulario
     if (form.style.display === 'none' || form.style.display === '') {
         form.style.display = 'flex'; // o 'block', dependiendo de tus estilos 'new-list'
-        document.getElementById('new-list-name').focus();
+        melodify.node('new-list-name').focus();
     } else {
         form.style.display = 'none';
-        document.getElementById('new-list-name').value = ''; // Limpia el input al ocultar
+        melodify.node('new-list-name').value = ''; // Limpia el input al ocultar
     }
 }
 function triggerSearch( handler, callback ) {
-    const searchInput   = document.getElementById('searchInput'); 
-    const container     = document.getElementById('tileContainer');
+    const searchInput   = melodify.node('searchInput'); 
+    const container     = melodify.node('tileContainer');
     const scrollbox     = document.getElementsByClassName('main-content')[0];
 
     const newSearchTerm = searchInput.value.toLowerCase().trim();

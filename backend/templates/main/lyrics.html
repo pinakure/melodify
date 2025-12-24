@@ -116,39 +116,4 @@
 
 
 
-<script>
-    const SONG_LYRICS = `{{ song.lyrics }}`;
-    loadSRT(SONG_LYRICS);
-
-    document.getElementById('srtFileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const content = e.target.result;
-            loadSRT(content);
-        };
-        reader.readAsText(file);
-    });
-    document.getElementById('downloadBtn').addEventListener('click', melodify.saveSrt);
-    document.getElementById('timelineTrack').addEventListener('dblclick', function(e) {
-        // Calcular la posición X relativa al track
-        const rect = this.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        
-        // Convertir píxeles a segundos
-        const startTime = x / PIXELS_PER_SECOND;
-        const endTime = startTime + 2; // Duración por defecto de 2 segundos
-
-        // Crear el nuevo bloque de datos
-        const newBlock = `${startTime.toFixed(3)} --> ${endTime.toFixed(3)}\nNuevo Subtítulo`;
-        
-        // Aquí puedes llamar a una función que inserte este bloque en tu array de datos
-        
-
-        // y refresque la interfaz, o añadirlo directamente al DOM.
-        melodify.toast("Nuevo bloque añadido", 2000);
-        // Nota: Deberás re-ejecutar processSRT o tener una función 'addSingleBlock'
-    });
-</script>
+<script> editor = new SrtEditor(`{{ song.lyrics }}`); </script>

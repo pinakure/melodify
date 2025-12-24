@@ -5,7 +5,7 @@
     <div id="duration">0:00</div>
 </div>
 <a  id="track" 
-    onclick="var song_id = document.getElementById('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);" 
+    onclick="var song_id = melodify.node('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);" 
     data-song-id="">
 </a>
 
