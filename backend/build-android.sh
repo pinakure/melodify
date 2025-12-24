@@ -3,7 +3,7 @@
 source ../venv/bin/activate
 git stash
 git pull
-sudo apt install openjdk-17-jdk openjdk-17-jre cmake pkg-config automake autoconf libtool libffi-dev libssl-dev python3-dev libltdl-dev libsqlite3-dev
+sudo apt install nginx openjdk-17-jdk openjdk-17-jre cmake pkg-config automake autoconf libtool libffi-dev libssl-dev python3-dev libltdl-dev libsqlite3-dev
 pip install "cython<3.0.0"
 pip install buildozer
 buildozer distclean

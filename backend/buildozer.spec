@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,hostpython3,python-for-android,django,kivy,kivymd,asgiref,sqlparse,Pillow,mutagen,requests,django-fontawesome_5,setuptools
+requirements = python3,hostpython3,python-for-android,django,kivy,kivymd,asgiref,sqlparse,Pillow,mutagen,requests,django-fontawesome_5,setuptools,gunicorn
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
