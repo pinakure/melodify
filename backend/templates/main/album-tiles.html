@@ -43,7 +43,7 @@
 <script>
     const scrollbox = document.getElementsByClassName('main-content')[0];
     melodify.next_page = 1;
-    melodify.loadAlbums();
+    // melodify.loadAlbums();
 
     // Carga inicial y listeners
 
@@ -56,5 +56,7 @@
     });
 
     triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums); 
+    melodify.toast('ALBUMS :: inicializado');
+    console.log("BEACON");
     
 </script>

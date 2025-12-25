@@ -715,8 +715,8 @@ Melodify.prototype = {
         const loadingIndicator = melodify.node('loading');
         const scrollbox     = document.getElementsByClassName('main-content')[0];
 
-        if (melodify.isLoading) return;
-        melodify.isLoading = true;
+        if (melodify.is_loading) return;
+        melodify.is_loading = true;
         loadingIndicator.style.display = 'block';
 
         var album_container = melodify.node('tileContainer');
@@ -758,13 +758,13 @@ Melodify.prototype = {
             } else {
                 scrollbox.removeEventListener('scroll', melodify.handleAlbumScroll);
             }            
-            melodify.isLoading = false;
+            melodify.is_loading = false;
 
             loadingIndicator.style.display = 'none';
         })
         .catch(error => {
             console.error('Error fetching albums:', error);
-            melodify.isLoading = false;
+            melodify.is_lfoading = false;
             loadingIndicator.style.display = 'none';
         });
     },
