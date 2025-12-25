@@ -6,9 +6,11 @@ from main.management.commands.scan  import Command as Scan
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import execute_from_command_line
 from django.shortcuts import redirect
 from django.db.models import Q
+from django.contrib.auth import authenticate, login
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings            
 from .models import *
@@ -598,3 +600,14 @@ def populate_playlist_ajax(request):
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+def login_ajax(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

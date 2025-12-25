@@ -538,10 +538,13 @@ Melodify.prototype = {
         )
         .then(response => response.json())
         .then(data => {
+            console.log("BEACON");
             if (data.status === 'success') {
                 done_callback(data);
             } else if (data.status === 'login') {
-                window.location = `/accounts/login/?next=${window.location}`;
+                // window.location = `/accounts/login/?next=${window.location}`;
+                // melodify.navigate(`/accounts/login/?next=${window.location}`);
+                melodify.node('login-window').style.display="inline-block";
             } else {
                 melodify.toast('Error: ' + data.message, 5, true);
             }

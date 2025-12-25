@@ -38,6 +38,7 @@ urlpatterns = [
     path('song/<int:pk>/'           , SongDetailView.as_view()      , name='song-detail'),
     path('song/bookmark/'           , views.bookmark_song           , name='bookmark-song'),
     path('scan/artist/'             , views.scan_artist             , name='scan-artist'),
+    path('login-ajax/'              , views. login_ajax             , name='login_ajax'),
     path('play/<int:pk>/song.mp3'   , views.play_ajax               , name='play'),
     path('user/<int:pk>/'           , UserView.as_view()            , name='user'),
 ]

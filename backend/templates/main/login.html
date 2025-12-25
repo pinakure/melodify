@@ -1,0 +1,41 @@
+{% load fontawesome_5 %}
+<!-- Estructura del Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" style="padding: 8px;">
+    {% include 'main/widget-title.html' with caption="Iniciar Sesión" %}
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="loginForm" >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div id="error-message" class="alert alert-danger d-none"></div>
+          <div>{% fa5_icon "user" %}&nbsp;<input type="text" name="username" placeholder="Usuario" class="form-control mb-2"></div>
+          <div>{% fa5_icon "key"  %}&nbsp;<input type="password" name="password" placeholder="Contraseña" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="input btn confirm" style="">{% fa5_icon "check" %}&nbsp;Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    document.getElementById('loginForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        const response = await fetch("{% url 'login_ajax' %}", {
+            method: 'POST',
+            body: formData,
+            headers: { "X-CSRFToken": formData.get('csrfmiddlewaretoken') }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.reload(); // Recarga para mostrar al usuario logueado
+        } else {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerText = "Usuario o contraseña incorrectos";
+            errorDiv.classList.remove('d-none');
+        }
+    };
+</script>
