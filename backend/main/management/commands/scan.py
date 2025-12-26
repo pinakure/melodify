@@ -14,7 +14,10 @@ from pathlib import Path
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
-
+def saferead(filename, read_mode='r'):
+    with open(filename, read_mode) as f:
+        return f.read()
+    
 # ============
 # CONFIG
 # ============
@@ -29,9 +32,8 @@ def load_array(file):
     
     payload = []
     
-    with open(file, "r") as file:
-        payload = file.read().split('\n')
-        return payload
+    payload = saferead(file)
+    return payload.split('\n')
 
 def load_dict(file):
     if os.path.splitext(os.path.basename(__file__))[0] == 'main':
@@ -41,8 +43,7 @@ def load_dict(file):
         
     payload = {}
     
-    with open(file, "r") as file:
-        elements = file.read().split('\n')
+    elements = saferead(file).split('\n')
     for element in elements:
         if len(element)==0:continue
         items = element.split('=')
@@ -515,8 +516,7 @@ class Command(BaseCommand):
     def getLyrics(self, path):
         lyric_file = path.rstrip('mp3')+'srt'
         if os.path.exists(lyric_file):
-            with open(lyric_file, 'r') as f:
-                return f.read()
+            return saferead(lyric_file)
         return ''
 
     def scan(self, folder, force=False):

@@ -17,6 +17,7 @@ from .models import *
 import subprocess
 import json
 import os
+from .utils import *
 
 scanner = Scan()
 
@@ -351,8 +352,7 @@ class UserView(DetailView):
 @csrf_exempt
 def scheme_view_ajax(request, scheme):
     scheme = scheme.strip('.')
-    with open(f'templates/schemes/{ scheme }.css', 'r') as f:
-        values = f.read()
+    values = saferead(f'templates/schemes/{ scheme }.css')
     return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
     
 @csrf_exempt
@@ -454,8 +454,7 @@ def play_ajax(request, pk):
 
             # get song binary data from file 
             song = Song.objects.filter(id=pk).get()
-            with open(song.filename, 'rb') as file:
-                data = file.read()
+            data = saferead(song.filename, 'rb')
             response = HttpResponse(data, content_type='application/octet-stream')
             # response['Content-Disposition'] = 'attachment; filename="archivo.bin"'
             return response
@@ -539,8 +538,7 @@ def steal_search(request):
 def scan_artist(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
-    with open('./config/library-root.cfg', 'r') as f:
-        LIBRARY_ROOT = f.read()
+    LIBRARY_ROOT = saferead('./config/library-root.cfg')
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición

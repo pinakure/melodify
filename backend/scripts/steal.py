@@ -61,8 +61,7 @@ def getSong(url):
     debug(f"STEAL :: searching {url}...")
     song_objs = spotdl.search([url])
 
-    with open('config/library-root.cfg', 'r') as f:
-        LIBRARY_ROOT = f.read()
+    LIBRARY_ROOT = saferead('config/library-root.cfg')
     payload = []
     for song in song_objs:
         debug(f"STEAL ::        title = {song.name}")
