@@ -190,10 +190,10 @@ class FavoritesView(ListView):
     model = Playlist
     template_name = 'main/favorites.html'  
     context_object_name = 'songs'
-    queryset = Song.objects.filter(bookmarked=True)
-
+    queryset = None
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['songs'] = context['favorites']
         return context
 
 class PlayerView(TemplateView):
