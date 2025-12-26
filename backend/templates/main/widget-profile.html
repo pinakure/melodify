@@ -1,0 +1,17 @@
+<!-- main/widget-profile.html  -->
+{% if user.is_authenticated %}
+{% load fontawesome_5 %}
+<button 
+type    = "button" 
+id      = "button-profile" 
+class   = "input accent"  
+title   = "{{ user.username }}" 
+onclick = "melodify.navigate('/user/{{ user.pk }}');"
+style   = "float:right; margin-top: 0px; margin-right: 0px;"
+>
+<strong style="font-size: 24px; line-height: 24px;">
+{{ user.username.0.upper}}
+</strong>
+<!-- {% fa5_icon 'user' %} -->
+</button>
+{% endif %}

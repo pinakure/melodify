@@ -60,8 +60,11 @@
                         <div class="benzene">⌬</div>
                     </div>
                 </div>
-                {% include "main/widget-megasearch.html" %}                    
-                {% include "main/widget-settings.html" %}
+                {% include "main/widget-megasearch.html" %}
+                <div id="header-buttons">
+                    {% include "main/widget-settings.html" %}
+                    {% include "main/widget-profile.html" %}
+                </div>                 
                 {% block back %}{% endblock %}
             </header>
             <!-- Contenedor del Panel Doble -->

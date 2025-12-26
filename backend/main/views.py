@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import execute_from_command_line
 from django.shortcuts import redirect
 from django.db.models import Q
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings            
 from .models import *
@@ -332,6 +332,18 @@ class SongDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs))
         return context
+      
+class UserView(DetailView):
+    model = get_user_model()
+    template_name = 'main/user.html'
+    context_object_name = 'user' 
+    
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs))
+        context['playlists' ] = Playlist.objects.filter(usuario__id=self.request.user.id)
+        context['authed'    ] = True if self.request.user.is_authenticated else False
+
+        return context
     
 @csrf_exempt
 def scheme_view_ajax(request, scheme):
@@ -450,7 +462,6 @@ def play_ajax(request, pk):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
-
 
 def steal_get(request):
     if isinstance(request.user , AnonymousUser):
@@ -610,4 +621,10 @@ def login_ajax(request):
             return JsonResponse({'success': True})
         else:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def logout_ajax(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'success': True})
     return JsonResponse({'error': 'Método no permitido'}, status=405)

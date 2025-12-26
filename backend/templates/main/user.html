@@ -1,0 +1,50 @@
+<!-- main/user.html -->
+{% load static %}
+{% load utils %}
+{% load fontawesome_5 %}
+
+{% include "main/widget-title.html" with caption=user.username.capitalize %}
+{% include "main/widget-back.html" %}
+
+
+
+
+<div class="user-detail-container" >    
+    <p class="labels"><strong>Nombre de usuario: </strong>{{ user.username }}</p>
+</div>
+<br/>
+{% if authed %}
+    <form id="logout-form">
+        {% csrf_token %}
+        <button 
+        type    = "submit" 
+        id      = "button-logout" 
+        class   = "input secondary"  
+        title   = "Cerrar sesión" 
+        >
+            {% fa5_icon 'arrow-left' %}&nbsp;Cerrar sesión
+        </button>
+    </form>
+    {% for playlist in playlists %}
+    · {{ playlist.title }}
+    {% endfor %}
+    <script>
+        document.getElementById('logout-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const response = await fetch("{% url 'logout_ajax' %}", {
+                method: 'POST',
+                body: formData,
+                headers: { "X-CSRFToken": formData.get('csrfmiddlewaretoken') }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                window.location.reload(); // Recarga para mostrar al usuario logueado
+            } else {
+                melodify.toast("Error logging out", 5, true);
+            }
+        };
+    </script>
+{% endif %}

@@ -17,6 +17,26 @@ html {
     -webkit-tap-highlight-color: transparent;
     list-style: none;
 }
+#navbar-links a,
+.fas{
+    transition: color 200ms ease-in, font-size 200ms ease-in !important;
+}
+#megasearch  { margin-right: 8px; width: 213px; transition: width 100ms ease-in-out !important;}
+
+@keyframes glow {
+    0% {
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 1px var(--accent-color) inset;
+    }
+    50% {
+        filter: brightness(1.5);
+        box-shadow: 0px 0px 8px var(--bg-content-blend) inset;
+    }
+    100% {
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 1px var(--accent-color) inset;
+    }
+}
 
 /* Customize Scrollbars */
 ::-webkit-scrollbar {
@@ -296,7 +316,19 @@ input {
 }
 button.input{
     background-color: var(--bg-sidebar-selection);
-    color: var(--secondary-color)
+    color: var(--secondary-color);
+    min-width: 40px;
+    min-height: 40px;
+}
+#header-buttons {
+    max-height: var(--nav-height);
+    min-width: 100px;
+    overflow: hidden;
+    display: inline-block;
+}
+i.fas, i.fa {
+    min-width: 16px;
+    min-height: 16px;
 }
 
 button.input:hover {
@@ -325,10 +357,12 @@ button.input:active {
     color: var(--tile-placeholder);
 }
 .mega-search {
-    left: auto;
-    right: 0px;
-    top: 4px;
-    position: absolute;
+    position: relative; 
+    margin-top: 6px;
+    margin-right: 8px;
+    margin-left: auto;
+    margin-bottom: 6px;
+    /* position: absolute; */
     background-color: var(--bg-sidebar);
 }
 
@@ -612,4 +646,12 @@ button:hover {
     width   : calc(100% - 32px);
     margin-left: auto;
     margin-right: auto;
+}
+
+#button-profile {
+    animation: glow 2s infinite ease-in-out;
+    background: linear-gradient(45deg, #f00, #f000), 
+    linear-gradient(135deg, #0f0, #f000), 
+    linear-gradient(225deg, #00f, #f000), 
+    linear-gradient(315deg, #ff0, #f000);
 }

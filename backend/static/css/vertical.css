@@ -133,4 +133,18 @@
     /* Hide logo with home link and show linkless logo */
     #logo-link { display: none !important;}
     #logo-no-link { display: inline-block !important;}
+    #megasearch {
+        width: calc(100% - 118px );
+    }
+}
+
+@media (max-width: 1200px) {
+  #navbar-links a {
+    font-size: 0; /* Hace el texto invisible */
+    /* transition: none; */
+  }
+  
+  #navbar-links a .fas {
+    font-size: 24px !important; /* Mantiene el tamaño del icono */
+  }
 }
