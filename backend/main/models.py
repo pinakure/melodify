@@ -75,7 +75,6 @@ class Song(models.Model):
 
     times_played = models.PositiveIntegerField(default=0)
     times_skipped= models.PositiveIntegerField(default=0)
-    bookmarked   = models.BooleanField(default=False)
 
     album        = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True, blank=True)
     codename     = models.CharField(max_length=200, blank=True)
