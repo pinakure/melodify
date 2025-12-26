@@ -121,3 +121,14 @@ class Playlist(models.Model):
     def __str__(self):
         return self.title
 
+
+# ============
+#   BOOKMARKS
+# ============
+class Bookmark(models.Model):
+    song    = models.ForeignKey(Song, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{ self.usuario.username } {self.song.title}'
+

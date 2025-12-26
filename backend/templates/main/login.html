@@ -3,7 +3,7 @@
 <!-- Estructura del Modal -->
 
 <div class="modal fade" id="loginModal" tabindex="-1" style="padding: 8px;">
-    {% include 'main/widget-title.html' with caption="Iniciar Sesión" %}
+    {% include 'main/widget-title.html' with caption="<div class='benzene'>⌬ Identificación</div>" %}
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="loginForm" >
@@ -14,7 +14,7 @@
                     <div>{% fa5_icon "key"  %}&nbsp;<input type="password" name="password" placeholder="Contraseña" class="form-control"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="input btn confirm">Acceder&nbsp;{% fa5_icon "arrow-right" %}</button>
+                    <button type="submit" class="input btn accent">Acceder&nbsp;{% fa5_icon "arrow-right" %}</button>
                     <br/>
                     <button type="button" style="position: absolute; right: 28px;background-image: url('{% static 'images/nostr.png' %}')" title="Acceder con Nostr" class="input btn secondary">{% fa5_icon "lock" color="#fff3" %}</button>
                 </div>

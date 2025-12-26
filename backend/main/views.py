@@ -20,7 +20,7 @@ import os
 
 scanner = Scan()
 
-def get_context( context ):
+def get_context( context , user):
     # Enter global severside data here
     context['playlists'] = Playlist.objects.all()
     sidebar = [
@@ -41,7 +41,21 @@ def get_context( context ):
             'use_index' : False,
         })
     context['sidebar'] = sidebar
+    context['playlists'] = get_playlists(user)
+    context['favorites'] = get_favorites(user)
     return context
+    
+def get_favorites(user):
+    if user.is_authenticated:
+        return Song.objects.filter(bookmark__usuario=user).distinct().annotate(fav=Value(True)) 
+    else:  
+        return []
+
+def get_playlists(user):
+    if user.is_authenticated:
+        return Playlist.objects.filter(usuario=user)
+    else:  
+        return []
 
 class AlbumTileView(ListView):
     model = Album
@@ -50,7 +64,7 @@ class AlbumTileView(ListView):
     paginate_by = 32  
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
     def get_queryset(self):
@@ -93,6 +107,7 @@ class AlbumTileView(ListView):
                 })
             return JsonResponse({'albums': data, 'total_count': queryset.count()})
         return super().get(request, *args, **kwargs)
+from django.db.models import Exists, OuterRef
 
 class AlbumDetailView(DetailView):
     model = Album
@@ -100,9 +115,9 @@ class AlbumDetailView(DetailView):
     context_object_name = 'album'
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         album = self.object
-        context['songs'] = Song.objects.filter(album=album).order_by('track_number')
+        context['songs'] = Song.objects.filter(album=album).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk))).order_by('track_number')
         return context
 
 class ArtistListView(ListView):
@@ -113,7 +128,7 @@ class ArtistListView(ListView):
     # queryset = Artist.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         context['albums_list'] = Album.objects.all().order_by('-release')
         return context
     
@@ -123,9 +138,9 @@ class ArtistDetailView(DetailView):
     context_object_name = 'artist' 
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         artist = self.object
-        context['songs'] = Song.objects.filter(artist=artist)
+        context['songs'] = Song.objects.filter(artist=artist).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk)))
         context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
         return context
     
@@ -136,7 +151,7 @@ class GenreListView(ListView):
     queryset = Genre.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
 class GenreDetailView(DetailView):
@@ -146,8 +161,8 @@ class GenreDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         genre = self.object
-        context = get_context(super().get_context_data(**kwargs))
-        context['songs'] = Song.objects.filter(genre=genre).order_by('track_number')
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['songs'] = Song.objects.filter(genre=genre).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk))).order_by('track_number')
         context['albums_list'] = Album.objects.filter(genres__pk=genre.id).all().order_by('-release')
         return context
 
@@ -158,7 +173,7 @@ class TagListView(ListView):
     queryset = Tag.objects.order_by('name') 
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
     
 class StealView(ListView):
@@ -168,7 +183,7 @@ class StealView(ListView):
     queryset = Song.objects.order_by('title') 
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
     
 class FavoritesView(ListView):
@@ -178,51 +193,41 @@ class FavoritesView(ListView):
     queryset = Song.objects.filter(bookmarked=True)
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
 class PlayerView(TemplateView):
     template_name = 'main/full-player.html'  
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         song_id = self.request.GET.get('song')
         print("SONG ID-------------------------------")
         print(song_id)
         if song_id is None:
             return context
-        song    = Song.objects.filter(id=song_id).get()
+        song    = Song.objects.filter(id=song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk))).get()
         context['song']     = song
         context['artist']   = song.artist
         return context
 
-class LandingView(ListView):
-    model = Playlist
-    template_name = 'main/landing.html'  
-    context_object_name = 'playlists'         
-    queryset = Playlist.objects.all()
-
+class LandingView(TemplateView):
+    template_name = 'main/landing.html' 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
-        context['favorites'] = Song.objects.filter(bookmarked=True)
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
-class HomeView(ListView):
-    model = Song
+class HomeView(TemplateView):
     template_name = 'main/home.html'  
-    context_object_name = 'songs'         
-    queryset = Song.objects.order_by('?')[:25]
-
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
-        context['favorites'] = Song.objects.filter(bookmarked=True)
-        context['playlists'] = Playlist.objects.all()
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['songs'] = Song.objects.order_by('?').annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk)))[:25]
         return context
 
 class SettingsView(TemplateView):
     template_name = 'main/settings.html'  
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
     
 class LyricsView(DetailView):
@@ -230,7 +235,7 @@ class LyricsView(DetailView):
     template_name = 'main/lyrics.html'  
     context_object_name = 'song' 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
 class UserView(ListView):
@@ -240,9 +245,7 @@ class UserView(ListView):
     queryset = Song.objects.order_by('?')[:25]
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
-        context['favorites'] = Song.objects.filter(bookmarked=True)
-        context['playlists'] = Playlist.objects.all()
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
 class TagDetailView(DetailView):
@@ -251,24 +254,21 @@ class TagDetailView(DetailView):
     context_object_name = 'tag' 
     
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         tag = self.object
-        context['songs'] = Song.objects.filter(tags__pk=tag.id).order_by('track_number')
-        #context['albums_list'] = Album.objects.filter(genres__pk=tag.id).all().order_by('-release')
+        context['songs'] = Song.objects.filter(tags__pk=tag.id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk))).order_by('track_number')
         return context
 
-class PlaylistListView(ListView):
-    model = Playlist
+class PlaylistListView(TemplateView):
     template_name = 'main/playlist-tiles.html'  
-    context_object_name = 'playlists'         
     paginate_by = 32  
 
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
-    def get_queryset(self):
-        queryset = Playlist.objects.order_by('title') 
+    def get_queryset(self, user_id):
+        queryset = Playlist.objects.filter(usuario__id=user_id).order_by('title') 
     
         # Obtenemos el término de búsqueda de los parámetros GET (para peticiones AJAX y normales)
         search_query = self.request.GET.get('search', None)
@@ -286,8 +286,9 @@ class PlaylistListView(ListView):
     def get(self, request, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # Petición AJAX: devolvemos JSON
-            page = request.GET.get('page', 1)
-            queryset = self.get_queryset() # Usamos el queryset ya filtrado por `get_queryset`
+            page    = request.GET.get('page', 1)
+            user_id = request.GET.get('user_id', 0)
+            queryset = self.get_queryset(user_id) # Usamos el queryset ya filtrado por `get_queryset`
             paginator = Paginator(queryset, self.paginate_by)
             
             try:
@@ -309,6 +310,8 @@ class PlaylistListView(ListView):
                 })
             return JsonResponse({'playlists': data, 'total_count': queryset.count()})
         return super().get(request, *args, **kwargs)
+        return JsonResponse({'playlists': [], 'total_count': 0})
+
 
 class PlaylistDetailView(DetailView):
     model = Playlist
@@ -316,9 +319,9 @@ class PlaylistDetailView(DetailView):
     context_object_name = 'playlist' 
     
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         playlist = self.object
-        context['songs'] = playlist.songs.all()
+        context['songs'] = playlist.songs.all().annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk)))
         context['back'] = self.request.GET.get('back', '')
         # context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
         
@@ -330,7 +333,7 @@ class SongDetailView(DetailView):
     context_object_name = 'song' 
     
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
       
 class UserView(DetailView):
@@ -339,7 +342,7 @@ class UserView(DetailView):
     context_object_name = 'user' 
     
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs))
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
         context['playlists' ] = Playlist.objects.filter(usuario__id=self.request.user.id)
         context['authed'    ] = True if self.request.user.is_authenticated else False
 
@@ -557,7 +560,7 @@ def scan_artist(request):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
-def bookmark_song(request):
+def old_bookmark_song(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
     
@@ -585,6 +588,39 @@ def bookmark_song(request):
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+def bookmark_song(request):
+    if isinstance(request.user , AnonymousUser):
+        return JsonResponse({ 'status' : 'login'})
+    
+    if request.method == 'POST':
+        try:
+            # Leer los datos JSON del cuerpo de la petición
+            data    = json.loads(request.body)
+            song_id = data.get('song', '').strip()
+            
+            if not song_id:
+                return JsonResponse({'status': 'error', 'message': 'Debe especificarse un ID.'}, status=400)
+
+            try:
+                bookmark = Bookmark.objects.filter(usuario=request.user, song__id=song_id).get()
+                if bookmark: 
+                    bookmark.delete()
+                    return JsonResponse({'status': 'success', 'message': 'Eliminada de Favoritos', 'id': song_id})
+            except:
+                bookmark = Bookmark()
+                bookmark.usuario  = request.user
+                bookmark.song_id = song_id
+                bookmark.save()
+                return JsonResponse({'status': 'success', 'message': 'Agregada a Favoritos', 'id': song_id})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
 
 def populate_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):

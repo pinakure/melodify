@@ -99,8 +99,10 @@
                 </main>
             </div>
             <!-- Barra Inferior -->
-            <div id="login-window">
-                {% include 'main/login.html' %}
+            <div id="login-window-wrapper">
+                <div id="login-window">
+                    {% include 'main/login.html' %}
+                </div>
             </div>
             <div class="playbar">
                 {% include 'main/bottom-player.html' %}
@@ -109,7 +111,12 @@
         <div id="toaster"></div>
         <script src="/static/js/howler.min.js"></script>
         <script src="/static/js/siriwave.js"></script>
-        <script src="/static/js/utils.js" defer></script>
-        <script src="/static/js/Melodify.js" defer></script>
+        <script src="/static/js/utils.js" ></script>
+        <script src="/static/js/Melodify.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', ()=>{
+                melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';
+            });
+        </script>
     </body>
 </html>
