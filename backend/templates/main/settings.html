@@ -40,7 +40,10 @@
     <option value="winamp">Winamp</option>
 </select>
 <div id="swatches"></div>
-
+<div class="breathe" onclick="melodify.toggleAnalyzer()">
+    <label for='use-renderer' >Analizador de Espectro</label>
+    <input id="use-renderer" style="border-radius: 100%; width: 12px; height: 12px;" type="checkbox" checked="">
+</div>
 <script>
     let elements = [
         'bg-main',
@@ -78,6 +81,6 @@
     }
     for( i in elements){
         colors[ elements[i] ] = getComputedStyle(document.getElementById(elements[i])).getPropertyValue(`--${ elements[i] }` ).trim();
-    } 
-    console.table(colors);
+    }
+    melodify.node('use-renderer').checked = melodify.state.enable_analyzer; 
 </script>

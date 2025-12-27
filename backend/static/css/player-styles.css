@@ -380,7 +380,7 @@ a#track:hover {
   
 }
 .analyzer-bar {
-  width: calc( 100% / 64 );
+  width: calc( 100% / 32 );
   margin-right: 2px;
   bottom: 0px;
   box-sizing: border-box;

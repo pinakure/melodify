@@ -6,7 +6,7 @@ elms.forEach(function(elm) {
 	window[elm] = document.getElementById(elm);
 });
 var analyzer_bars = [];
-for(var i=0, index=0; i<1024; i+=16, index++){
+for(var i=0, index=0; i<1024; i+=32, index++){
     analyzer_bars[ index ] = document.getElementById(`analyzer-bar-${index}`);
 }
 
@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     volume          : 1.0,
     playlist        : [],
     playlist_index  : 0,
+    enable_analyzer : true,
     repeat_mode     : 1,
     shuffle         : false,
     history         : [],
@@ -275,7 +276,7 @@ MelodifyPlayer.prototype = {
                     index = this.index+1;
                     if( melodify.state.repeat_mode == 1){
                         index %= melodify.player.playlist.length;
-                    } else if( index == melodify.player.playlist.length - 1 ){
+                    } else if( index == melodify.player.playlist.length ){
                         this.pause();
                         return;
                     }
@@ -329,6 +330,7 @@ MelodifyPlayer.prototype = {
 	},
     
     updateAnalyzer : function(){  
+        if(!melodify.state.enable_analyzer) return;
         melodify.player.analyzer.getByteFrequencyData( melodify.player.buffer );
         analyzer_bars.forEach((bar, i) => {
             const value = melodify.player.buffer[i];
@@ -456,6 +458,12 @@ Melodify.prototype = {
                 currentToast.remove();
             }
         }, timeout*1000);
+    },
+
+    toggleAnalyzer(){
+        melodify.state.enable_analyzer=melodify.node('use-renderer').checked;
+        melodify.node('analyzer').style.display = melodify.state.enable_analyzer ? 'flex' : 'none';
+        melodify.saveState(); 
     },
 
     loadState : function(){
