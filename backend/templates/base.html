@@ -99,12 +99,24 @@
                 </main>
             </div>
             <!-- Barra Inferior -->
+            <div id="loading-wrapper">
+                <div id="loading-content">
+                    <!-- {% fa5_icon 'compact-disc' color='#000' class="spin" %}  -->
+                    <!-- {% fa5_icon 'music' color='#000' class="spin" %} -->
+                    <!-- {% fa5_icon 'users' color='#000' class="spin" %} -->
+                    {% fa5_icon 'user' color='#000' class="spin" %}
+                    <!-- {% fa5_icon 'tags' color='#000' class="spin" %} -->
+                    <!-- {% fa5_icon 'list' color='#000' class="spin" %} -->
+                    <!-- {% fa5_icon 'spinner' color='#000' class="spin" %} -->
+                </div>
+            </div>
+
             <div id="login-window-wrapper">
                 <div id="login-window">
                     {% include 'main/login.html' %}
                 </div>
             </div>
-            <div class="playbar">
+            <div class="playbar" style="position: relative;">
                 {% include 'main/bottom-player.html' %}
             </div>
         </div>
@@ -117,7 +129,6 @@
             document.addEventListener('DOMContentLoaded', ()=>{
                 melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';
                 melodify.initialize();
-                console.log(`melodify.user_id = ${melodify.user_id}`);
             });
         </script>
     </body>

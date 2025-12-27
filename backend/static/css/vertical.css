@@ -38,21 +38,21 @@
         width: 100%;
         background-color: var(--bg-player-title);
     }
-
-    /* Raise central buttons a little */
-    #playBtn, #pauseBtn {
-        top: 14px;
-    }
     /* bring next and prev buttons together  */
-    #nextBtn {
-        left: calc( 50% + 64px);
-        right: auto;
+    
+    #shufBtn { left : calc( calc(50% - 16px) - 180px ); }
+    #prevBtn { left : calc( calc(50% - 16px) -  80px ); }
+    #nextBtn { right: calc( calc(50% - 16px) -  80px ); }
+    #repBtn  { right: calc( calc(50% - 16px) - 180px ); }
+    #loading-audio,
+    #shufBtn,
+    #repBtn,
+    #prevBtn,
+    #nextBtn,
+    #playBtn,
+    #pauseBtn {
+        top: 8px;
     }
-    #prevBtn {
-        right: calc( 50% + 64px);
-        left: auto;
-    }
-
     /* small bottom player progress bar */
     @if(var(--small-bar)){
         #progress,

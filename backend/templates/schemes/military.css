@@ -21,4 +21,7 @@
     --gradient-end          : #2d3023;
     --nav-height            : 60px;
     --sidebar-width         : 432px;
+    --default-font          : 'lunchtype-regular';
+    --player-font           : 'lunchtype-regular';
+    --player-font-size      : 24px;
 }

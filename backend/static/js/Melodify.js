@@ -1,7 +1,7 @@
 // static/js/Melodify.js
 
 // Cache references to DOM elements.
-var elms = ['track', 'timer', 'duration', 'playBtn', 'pauseBtn', 'prevBtn', 'nextBtn', 'playlistBtn', 'volumeBtn', 'progress', 'bar', 'wave', 'loading', 'playlist', 'list', 'volume', 'barEmpty', 'barFull', 'sliderBtn'];
+var elms = ['track', 'timer', 'duration', 'repBtn', 'shufBtn', 'playBtn', 'pauseBtn', 'prevBtn', 'nextBtn', 'playlistBtn', 'volumeBtn', 'progress', 'bar', 'wave', 'loading', 'playlist', 'list', 'volume', 'barEmpty', 'barFull', 'sliderBtn'];
 elms.forEach(function(elm) {
 	window[elm] = document.getElementById(elm);
 });
@@ -17,6 +17,11 @@ elms.forEach(function(elm) {
 //   frequency: 2
 // });
 // wave.start();
+const REPEAT_MODES = {
+    0 : 'NO-REPEAT',
+    1 : 'REPEAT',
+    2 : 'REPEAT-ONE',
+};
 
 function MelodifyPlayer() {
     this.playlist       = [];
@@ -25,26 +30,41 @@ function MelodifyPlayer() {
     this.lyrics         = null;
     this.lyrics_index   = 1;
     this.lyrics_last    = 0;
-    playBtn.addEventListener    ('click'      , function()      { melodify.player.play();});
-    pauseBtn.addEventListener   ('click'      , function()      { melodify.player.pause();});
-    prevBtn.addEventListener    ('click'      , function()      { melodify.player.skip('prev');});
-    nextBtn.addEventListener    ('click'      , function()      { melodify.player.skip('next');});
-    waveform.addEventListener   ('click'      , function(event) { melodify.player.seek(event.clientX / window.innerWidth);});
-    volumeBtn.addEventListener  ('click'      , function()      { melodify.player.toggleVolume();});
-    volume.addEventListener     ('click'      , function()      { melodify.player.toggleVolume();});
-    barEmpty.addEventListener   ('click'      , function(event) { var per = event.layerX / parseFloat(barEmpty.scrollWidth); melodify.player.volume(per);});
-    sliderBtn.addEventListener  ('mousedown'  , function()      { window.sliderDown = true;});
-    sliderBtn.addEventListener  ('touchstart' , function()      { window.sliderDown = true; });
-    volume.addEventListener     ('mouseup'    , function()      { window.sliderDown = false; });
-    volume.addEventListener     ('touchend'   , function()      { window.sliderDown = false; });
-    volume.addEventListener     ('mousemove', move);
-    volume.addEventListener     ('touchmove', move);
-    window.addEventListener     ('resize', resize);
+    this.repeat_mode    = 1;
+    this.shuffle        = false;
+    repBtn      .addEventListener   ('click'      , function()      { melodify.player.cycleRepeatMode();});
+    shufBtn     .addEventListener   ('click'      , function()      { melodify.player.toggleShuffle();});
+    playBtn     .addEventListener   ('click'      , function()      { melodify.player.play();});
+    pauseBtn    .addEventListener   ('click'      , function()      { melodify.player.pause();});
+    prevBtn     .addEventListener   ('click'      , function()      { melodify.player.skip('prev');});
+    nextBtn     .addEventListener   ('click'      , function()      { melodify.player.skip('next');});
+    waveform    .addEventListener   ('click'      , function(event) { melodify.player.seek(event.clientX / window.innerWidth);});
+    volumeBtn   .addEventListener   ('click'      , function()      { melodify.player.toggleVolume();});
+    volume      .addEventListener   ('click'      , function()      { melodify.player.toggleVolume();});
+    barEmpty    .addEventListener   ('click'      , function(event) { var per = event.layerX / parseFloat(barEmpty.scrollWidth); melodify.player.volume(per);});
+    sliderBtn   .addEventListener   ('mousedown'  , function()      { window.sliderDown = true;});
+    sliderBtn   .addEventListener   ('touchstart' , function()      { window.sliderDown = true; });
+    volume      .addEventListener   ('mouseup'    , function()      { window.sliderDown = false; });
+    volume      .addEventListener   ('touchend'   , function()      { window.sliderDown = false; });
+    volume      .addEventListener   ('mousemove', move);
+    volume      .addEventListener   ('touchmove', move);
+    window      .addEventListener   ('resize', resize);
 }
 
 MelodifyPlayer.prototype = {
 
-    loadLyrics : function(lyrics){
+    cycleRepeatMode: function(){
+        this.repeat_mode++;
+        this.repeat_mode%=3;
+        repBtn.setAttribute('data-mode', REPEAT_MODES[this.repeat_mode]);
+    },
+
+    toggleShuffle: function(){
+        this.shuffle ^= 1;
+        shufBtn.setAttribute('data-mode', this.shuffle ? 'SHUFFLE' : 'NO-SHUFFLE');
+    },
+
+    loadLyrics: function(lyrics){
         this.lyrics = {};
         if(lyrics.length > 0){
             lyrics = lyrics.split('\n\n');
@@ -72,7 +92,6 @@ MelodifyPlayer.prototype = {
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
-        // console.table(this.playlist);
     },
     play: function(song) {
         if(song==undefined){
@@ -81,7 +100,6 @@ MelodifyPlayer.prototype = {
             return;
         }
         document.title = song.title;
-        // this.enqueue(song);
         melodify.player.pause();
 		var self = this;
         index = this.playlist.indexOf(song);
@@ -89,12 +107,10 @@ MelodifyPlayer.prototype = {
 		if(!data)return;
 		this.howl = new Howl({
             src: [ data.file ],
-            html5: false, // Force to HTML5 so that the audio can stream in (best for large files).
+            html5: false, 
             onplay: function() {
-                // Display the duration.
                 duration.innerHTML = self.formatTime(Math.round(melodify.player.howl.duration()));
                 
-                // Start updating the progress of the track.
                 requestAnimationFrame(self.step.bind(self));
                 
                 // Sync lyrics bar size with song duration
@@ -103,65 +119,44 @@ MelodifyPlayer.prototype = {
                     node.style.width = `${melodify.player.howl.duration() * PIXELS_PER_SECOND}px`;
                     melodify.node('songPositionWrapper').style.width = node.style.width;
                 }
-                // Start the wave animation if we have already loaded
-                // wave.container.style.display = 'block';
-                bar.style.display = 'none';
-                pauseBtn.style.display = 'block';
+                pauseBtn.style.display = 'flex';
             },
             onload: function() {
-                // Start the wave animation.
-                // wave.container.style.display = 'block';
-                bar.style.display = 'none';
-                loading.style.display = 'none';
+                melodify.node('loading-audio').style.display = 'none';
             },
             onloaderror: function(id, error) {
                 melodify.toast(`Error loading audio: ${error}`, 5, true);
                 console.error(`Error loading audio: ${error}`);
-                bar.style.display = 'none';
-                loading.style.display = 'none';
+                melodify.node('loading-audio').style.display = 'none';
             },
             onend: function() {
-                // Stop the wave animation.
-                // wave.container.style.display = 'none';
-                bar.style.display = 'block';
                 self.skip('next');
             },
             onpause: function() {
-                // Stop the wave animation.
-                // wave.container.style.display = 'none';
-                bar.style.display = 'block';
             },
             onstop: function() {
-                // Stop the wave animation.
-                // wave.container.style.display = 'none';
-                bar.style.display = 'block';
             },
             onseek: function() {
-                // Start updating the progress of the track.
                 requestAnimationFrame(self.step.bind(self));
             }
         });
     
-		// Begin playing the howl object.
 		this.howl.play();
 
-		// Update the track display.
 		track.innerHTML = data.title;
 		track.setAttribute('data-song-id', data.song_id);
 
-		// Show the pause button.
 		if (this.howl.state() === 'loaded') {
 			playBtn.style.display = 'none';
-			pauseBtn.style.display = 'block';
+			pauseBtn.style.display = 'flex';
 		} else {
-			loading.style.display = 'block';
+			melodify.node('loading-audio').style.display = 'flex';
 			playBtn.style.display = 'none';
 			pauseBtn.style.display = 'none';
 		}
     
         this.loadLyrics( song.lyrics );
 
-		// Keep track of the index we are currently playing.
 		self.index = index;
         melodify.player.updatePlaylist(this.playlist);
 	},
@@ -172,7 +167,7 @@ MelodifyPlayer.prototype = {
 		melodify.player.howl.pause();
 
 		// Show the play button.
-		playBtn.style.display = 'block';
+		playBtn.style.display = 'flex';
 		pauseBtn.style.display = 'none';
 	},
 
@@ -315,7 +310,6 @@ MelodifyPlayer.prototype = {
 		}
 	},
     toggleVolume: function() {
-		var self = this;
 		var display = (volume.style.display === 'block') ? 'none' : 'block';
 
 		setTimeout(function() {
@@ -392,19 +386,22 @@ Melodify.prototype = {
     },
 
     lock: function(){
-        this.loading = true;
+        melodify.is_loading = true;
+        const node = melodify.node('loading-wrapper');
+        node.style.display = 'flex';
     },
     
     unlock: function(){
-        this.loading = false;
+        const node = melodify.node('loading-wrapper');
+        node.style.display = 'none';
+        melodify.is_loading = false;
     },
 
-    loading : function(type='benzene'){
-        if( this.is_loading )return;
-        this.lock();
-        const node = melodify.node('loading');
-        node.style.display = 'block';
-
+    loading : function(type='spinner'){
+        if( melodify.is_loading )return;
+        melodify.lock();
+        const content = melodify.node('loading-content');
+        content.innerHTML = `<i class="fas fa-${type} spin" style="color:var(--accent-color);"></i>`;
     },
 
     initialize: function(){
@@ -742,7 +739,7 @@ Melodify.prototype = {
         const scrollbox     = document.getElementsByClassName('main-content')[0];
 
         if (melodify.is_loading) return;
-        melodify.loading('compact-disc')
+        melodify.loading();
         
         var album_container = melodify.node('tileContainer');
         var album_count     = melodify.node('album-count');
@@ -782,28 +779,23 @@ Melodify.prototype = {
                 }
             } else {
                 scrollbox.removeEventListener('scroll', melodify.handleAlbumScroll);
-            }            
-            melodify.is_loading = false;
-
-            loadingIndicator.style.display = 'none';
+            }           
+            melodify.unlock();
         })
         .catch(error => {
             console.error('Error fetching albums:', error);
-            melodify.is_lfoading = false;
-            loadingIndicator.style.display = 'none';
+            melodify.unlock();
         });
     },
     loadPlaylists: function() {
         let playlistCount = 0;
+        const scrollbox          = document.getElementsByClassName('main-content')[0];
+        
+        if (melodify.is_loading) return;
+        melodify.loading();
+        
         const playlist_container = melodify.node('tileContainer');
         const countDisplay       = melodify.node('playlist-count');
-        const scrollbox          = document.getElementsByClassName('main-content')[0];
-
-        if (melodify.is_loading) return;
-        melodify.is_loading = true;
-        const loadingIndicator  = melodify.node('loading');
-
-        loadingIndicator.style.display = 'block';
 
         fetch(`playlists/?page=${melodify.next_page}${ melodify.search_term ? '&search=' : ''}${melodify.search_term}&user_id=${melodify.user_id}` , {
             headers: {
@@ -852,14 +844,12 @@ Melodify.prototype = {
             } else {
                 scrollbox.removeEventListener('scroll', melodify.handlePlaylistScroll);
             }
-            melodify.is_loading = false;
-            loadingIndicator.style.display = 'none';
+            melodify.unlock();
 
         })
         .catch(error => {
             melodify.toast(`Error fetching playlists: ${error}`, 5, true);
-            melodify.is_loading = false;
-            loadingIndicator.style.display = 'none';
+            melodify.unlock();
         });
     },
     saveSrt: function() {
@@ -911,7 +901,7 @@ function toggleNewListForm() {
     const form = melodify.node('new-list');
     // Muestra u oculta el formulario
     if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'flex'; // o 'block', dependiendo de tus estilos 'new-list'
+        form.style.display = 'flex'; 
         melodify.node('new-list-name').focus();
     } else {
         form.style.display = 'none';

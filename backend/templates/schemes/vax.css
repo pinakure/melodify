@@ -21,4 +21,7 @@
     --gradient-end          : #050505;
     --nav-height            : 60px;
     --sidebar-width         : 432px;
+    --default-font          : 'digital';
+    --player-font           : 'digital';
+    --player-font-size      : 24px;
 }
