@@ -18,6 +18,7 @@
   position    : absolute;
   font-family : var(--player-font);
   font-size   : var(--player-font-size);
+  text-shadow : 2px 2px 1px #0008;
   left        : 8px;
   bottom      : 4px;
 }
@@ -364,4 +365,63 @@ a#track {
 
 a#track:hover {
   color: var(--link-color) !important;
+}
+
+#analyzer {
+  position        : absolute;
+  display         : flex;
+  justify-content : center;
+  align-items     : self-end;
+  width           : 100%;
+  top             : 3px;
+  left            : 0px;
+  height          : calc(100% - 7px);
+  pointer-events  : none;
+  
+}
+.analyzer-bar {
+  width: calc( 100% / 64 );
+  margin-right: 2px;
+  bottom: 0px;
+  box-sizing: border-box;
+}
+
+.playbar[renderer="fire"],
+.playbar[renderer="themed"],
+.playbar[renderer="themed-reverse"],
+.playbar[renderer="scanlines"] {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--bg-content-blend) 0px,
+    var(--bg-content-blend) 1px,   /* Color 1 for 1px */
+    #000 1px,   /* Color 2 starts immediately */
+    #000 2px    /* Color 2 ends at 2px, then repeats */
+  );
+}
+.playbar[renderer="scanlines"] #analyzer {
+  mix-blend-mode  : soft-light;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--accent-color) 0px,
+    var(--accent-color) 1px,   /* Color 1 for 1px */
+    #000 1px,   /* Color 2 starts immediately */
+    #000 2px    /* Color 2 ends at 2px, then repeats */
+  );
+}
+.playbar[renderer="scanlines"] #analyzer .analyzer-bar {
+  background: var(--link-color);
+  mix-blend-mode  : screen;
+}
+.playbar[renderer="fire"] #analyzer .analyzer-bar {
+  background      : linear-gradient(180deg, #00f, #f00, #800, #f80, #ff0, #fff);
+  mix-blend-mode  : multiply;
+  margin-right    : 0px;
+}
+.playbar[renderer="themed"] #analyzer .analyzer-bar {
+  background      : linear-gradient(180deg, var(--link-color), var(--accent-color, var(--text-color), var(--bg-sidebar)));
+  mix-blend-mode  : multiply;
+}
+.playbar[renderer="themed-reverse"] #analyzer .analyzer-bar {
+  background      : linear-gradient(0deg, var(--link-color), var(--accent-color, var(--text-color), var(--bg-sidebar)));
+  mix-blend-mode  : multiply;
 }
