@@ -123,7 +123,7 @@ MelodifyPlayer.prototype = {
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
-        // melodify.player.saveState();
+        // melodify.saveState();
     },
 
     play: function(song) {
@@ -157,7 +157,7 @@ MelodifyPlayer.prototype = {
             onload: function() {
                 melodify.node('loading-audio').style.display = 'none';
                 melodify.player.updateButtons();
-                melodify.player.saveState();
+                melodify.saveState();
             },
             onloaderror: function(id, error) {
                 melodify.toast(`Error loading audio: ${error}`, 5, true);
