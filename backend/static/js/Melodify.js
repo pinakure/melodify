@@ -6,17 +6,23 @@ elms.forEach(function(elm) {
 	window[elm] = document.getElementById(elm);
 });
 
-// var wave = new SiriWave({
-//   container: waveform,
-//   width: window.innerWidth,
-//   height: 12,
-//   cover: true,
-//   color: 'f80',
-//   speed: 0.03,
-//   amplitude: 0.7,
-//   frequency: 2
-// });
-// wave.start();
+const INITIAL_STATE = {
+    currentSongId   : null,
+    currentTime     : 0,
+    volume          : 1.0,
+    playlist        : [],
+    playlist_index  : 0,
+    repeat_mode     : 1,
+    shuffle         : false,
+    history         : [],
+    settings        : {
+        background_blend_style  : 'soft-light',
+        scheme                  : 'default',
+    },
+    current_page    : '',
+    first_song      : null,
+};
+
 const REPEAT_MODES = {
     0 : 'NO-REPEAT',
     1 : 'REPEAT',
@@ -30,8 +36,6 @@ function MelodifyPlayer() {
     this.lyrics         = null;
     this.lyrics_index   = 1;
     this.lyrics_last    = 0;
-    this.repeat_mode    = 1;
-    this.shuffle        = false;
     repBtn      .addEventListener   ('click'      , function()      { melodify.player.cycleRepeatMode();});
     shufBtn     .addEventListener   ('click'      , function()      { melodify.player.toggleShuffle();});
     playBtn     .addEventListener   ('click'      , function()      { melodify.player.play();});
@@ -53,15 +57,32 @@ function MelodifyPlayer() {
 
 MelodifyPlayer.prototype = {
 
-    cycleRepeatMode: function(){
-        this.repeat_mode++;
-        this.repeat_mode%=3;
-        repBtn.setAttribute('data-mode', REPEAT_MODES[this.repeat_mode]);
+    updateButtons: function(){
+        repBtn .setAttribute('data-mode', REPEAT_MODES[ melodify.state.repeat_mode ]);
+        shufBtn.setAttribute('data-mode', melodify.state.shuffle ? 'SHUFFLE' : 'NO-SHUFFLE');
+        playBtn.setAttribute('data-enabled', 'true');
+        if(( melodify.player.playlist.length > 0 && melodify.player.index > 0) || ( melodify.state.repeat_mode > 0 ) || melodify.state.shuffle ) {
+            prevBtn.setAttribute('data-enabled', 'true');
+        } else {
+            prevBtn.setAttribute('data-enabled', 'false');
+        }
+        if(( melodify.player.playlist.length > 0 && melodify.player.index < (melodify.player.playlist.length-1)) || ( melodify.state.repeat_mode > 0 ) || melodify.state.shuffle ) {
+            nextBtn.setAttribute('data-enabled', 'true');
+        } else {
+            nextBtn.setAttribute('data-enabled', 'false');
+        }
     },
 
+    cycleRepeatMode: function(){
+        melodify.state.repeat_mode++;
+        melodify.state.repeat_mode%=3;
+        melodify.player.updateButtons();
+    },
+    
     toggleShuffle: function(){
-        this.shuffle ^= 1;
-        shufBtn.setAttribute('data-mode', this.shuffle ? 'SHUFFLE' : 'NO-SHUFFLE');
+        melodify.state.shuffle ^= 1;
+        if(melodify.state.shuffle) melodify.state.repeat_mode = 1;
+        melodify.player.updateButtons();
     },
 
     loadLyrics: function(lyrics){
@@ -123,6 +144,7 @@ MelodifyPlayer.prototype = {
             },
             onload: function() {
                 melodify.node('loading-audio').style.display = 'none';
+                melodify.player.updateButtons();
             },
             onloaderror: function(id, error) {
                 melodify.toast(`Error loading audio: ${error}`, 5, true);
@@ -131,6 +153,12 @@ MelodifyPlayer.prototype = {
             },
             onend: function() {
                 self.skip('next');
+            },
+            onnext : function(){
+                alert('hello');
+            },
+            onprev : function(){
+                alert('hello');
             },
             onpause: function() {
             },
@@ -328,22 +356,8 @@ MelodifyPlayer.prototype = {
 function Melodify(user_id=0){
     console.log(`new Melodify(${user_id})`);
     /* Restore initial melodify state */
-    this.user_id = user_id;
-    const initial_state = {
-        currentSongId   : null,
-        currentTime     : 0,
-        volume          : 0.5,
-        playlist        : [],
-        playlist_index  : 0,
-        history         : [],
-        settings        : {
-            background_blend_style  : 'soft-light',
-            scheme                  : 'default',
-        },
-        current_page    : '',
-        first_song      : null,
-    };
-    this.state              = initial_state;
+    this.user_id            = user_id;    
+    this.state              = INITIAL_STATE;
     this.next_page          = 1;
     this.search_timeout     = null;
     this.is_loading         = false;
@@ -432,6 +446,7 @@ Melodify.prototype = {
             return false;
         };
         resize();
+        melodify.player.updateButtons();
     },
     node : function(id){
         return document.getElementById(id);
