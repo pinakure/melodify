@@ -236,7 +236,7 @@ MelodifyPlayer.prototype = {
 		var index = 0;
 		if (direction === 'prev') {
             if( melodify.state.shuffle ){
-
+                index = parseInt(Math.random() * melodify.player.playlist.length);
             } else {
                 if( melodify.state.repeat_mode == 2){
                     index = this.index;
@@ -254,7 +254,7 @@ MelodifyPlayer.prototype = {
             }
 		} else {
             if( melodify.state.shuffle ){
-                
+                index = parseInt(Math.random() * melodify.player.playlist.length);
             } else {
                 if( melodify.state.repeat_mode == 2){
                     index = this.index;
