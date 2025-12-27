@@ -39,11 +39,10 @@
         background-color: var(--bg-player-title);
     }
     /* bring next and prev buttons together  */
-    
-    #shufBtn { left : calc( calc(50% - 16px) - 180px ); }
+    #shufBtn { left : calc( calc(50% - 16px) - 140px ); }
     #prevBtn { left : calc( calc(50% - 16px) -  80px ); }
     #nextBtn { right: calc( calc(50% - 16px) -  80px ); }
-    #repBtn  { right: calc( calc(50% - 16px) - 180px ); }
+    #repBtn  { right: calc( calc(50% - 16px) - 140px ); }
     #loading-audio,
     #shufBtn,
     #repBtn,

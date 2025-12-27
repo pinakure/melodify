@@ -61,12 +61,18 @@ MelodifyPlayer.prototype = {
         repBtn .setAttribute('data-mode', REPEAT_MODES[ melodify.state.repeat_mode ]);
         shufBtn.setAttribute('data-mode', melodify.state.shuffle ? 'SHUFFLE' : 'NO-SHUFFLE');
         playBtn.setAttribute('data-enabled', 'true');
-        if(( melodify.player.playlist.length > 0 && melodify.player.index > 0) || ( melodify.state.repeat_mode > 0 ) || melodify.state.shuffle ) {
+        if(( melodify.player.playlist.length > 0 && melodify.player.index           > 0) 
+        || ( melodify.state.repeat_mode      > 0 && melodify.player.playlist.length > 1)
+        || ( melodify.state.shuffle              && melodify.player.playlist.length > 1)
+        ){
             prevBtn.setAttribute('data-enabled', 'true');
         } else {
             prevBtn.setAttribute('data-enabled', 'false');
         }
-        if(( melodify.player.playlist.length > 0 && melodify.player.index < (melodify.player.playlist.length-1)) || ( melodify.state.repeat_mode > 0 ) || melodify.state.shuffle ) {
+        if(( melodify.player.playlist.length > 0 && melodify.player.index           < (melodify.player.playlist.length-1)) 
+        || ( melodify.state.repeat_mode      > 0 && melodify.player.playlist.length > 1                                  ) 
+        || ( melodify.state.shuffle              && melodify.player.playlist.length > 1                                  )
+        ){
             nextBtn.setAttribute('data-enabled', 'true');
         } else {
             nextBtn.setAttribute('data-enabled', 'false');
@@ -77,12 +83,14 @@ MelodifyPlayer.prototype = {
         melodify.state.repeat_mode++;
         melodify.state.repeat_mode%=3;
         melodify.player.updateButtons();
+        melodify.saveState();
     },
     
     toggleShuffle: function(){
         melodify.state.shuffle ^= 1;
         if(melodify.state.shuffle) melodify.state.repeat_mode = 1;
         melodify.player.updateButtons();
+        melodify.saveState();
     },
 
     loadLyrics: function(lyrics){
@@ -110,10 +118,12 @@ MelodifyPlayer.prototype = {
         this.lyrics_index = 1;
         this.lyrics_last  = 0;
     },
+
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
     },
+
     play: function(song) {
         if(song==undefined){
             this.howl.play();
@@ -188,6 +198,7 @@ MelodifyPlayer.prototype = {
 		self.index = index;
         melodify.player.updatePlaylist(this.playlist);
 	},
+
     pause: function() {
 		// Get the Howl we want to manipulate.
 		if(!melodify.player.howl)return;
@@ -198,7 +209,6 @@ MelodifyPlayer.prototype = {
 		playBtn.style.display = 'flex';
 		pauseBtn.style.display = 'none';
 	},
-
 
     /* updates entries drawn at si ar playlist */
     updatePlaylist : function(){
@@ -225,11 +235,41 @@ MelodifyPlayer.prototype = {
 		// Get the next track based on the direction of the track.
 		var index = 0;
 		if (direction === 'prev') {
-			index = this.index-1;
+            if( melodify.state.shuffle ){
+
+            } else {
+                if( melodify.state.repeat_mode == 2){
+                    index = this.index;
+                    this.index = -1;
+                } else {
+
+                    index = this.index-1;
+                    if( melodify.state.repeat_mode == 1){
+                        if(index < 0) index = melodify.player.playlist.length-1;
+                    } else {
+                        index = this.index;
+                        this.index = -1;
+                    }
+                }
+            }
 		} else {
-            index = this.index+1;
+            if( melodify.state.shuffle ){
+                
+            } else {
+                if( melodify.state.repeat_mode == 2){
+                    index = this.index;
+                    this.index = -1;
+                } else {
+                    index = this.index+1;
+                    if( melodify.state.repeat_mode == 1){
+                        index %= melodify.player.playlist.length;
+                    } else if( index == melodify.player.playlist.length - 1 ){
+                        this.pause();
+                        return;
+                    }
+                }
+            }
 		}
-        index %= this.playlist.length;
 		this.skipTo(index);
         if(melodify.state.current_page.split('/')[1] == 'player'){
             melodify.navigate(`/player/?song=${ melodify.player.playlist[index].id }&`);
@@ -426,7 +466,7 @@ Melodify.prototype = {
         /* Restore playlist playback index */
         this.player.index = this.state.playlist_index;
         /* Begin playback */
-        if(this.state.playlist.length>1){
+        if(this.state.playlist.length){
             this.player.play(this.state.playlist[this.player.index]);
         }
         window.history.pushState(null, null, window.location.href);
@@ -488,7 +528,7 @@ Melodify.prototype = {
             next        : nextSong,
         };
     },
-    playSong : function(buttonElement, only_enqueue=false) {
+    playSong: function(buttonElement, only_enqueue=false) {
         const nextSong   = buttonElement.getAttribute('data-next-id');
         var song = this.getSongDetails( buttonElement );
         

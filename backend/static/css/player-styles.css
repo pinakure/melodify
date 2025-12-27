@@ -151,7 +151,7 @@
   margin: 0px !important;
   /* margin: -15% auto; */
   /* display: none; */
-  cursor: ew-resize;
+  cursor: col-resize;
   opacity: 0.8;
   -webkit-user-select: none;
   user-select: none;
