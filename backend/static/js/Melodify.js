@@ -9,6 +9,7 @@ elms.forEach(function(elm) {
 const INITIAL_STATE = {
     currentSongId   : null,
     currentTime     : 0,
+    current_section : 0,
     volume          : 1.0,
     playlist        : [],
     playlist_index  : 0,
@@ -122,6 +123,7 @@ MelodifyPlayer.prototype = {
     enqueue : function(song){
         this.playlist.push(song);
         this.index = this.playlist.length-1;
+        // melodify.player.saveState();
     },
 
     play: function(song) {
@@ -155,6 +157,7 @@ MelodifyPlayer.prototype = {
             onload: function() {
                 melodify.node('loading-audio').style.display = 'none';
                 melodify.player.updateButtons();
+                melodify.player.saveState();
             },
             onloaderror: function(id, error) {
                 melodify.toast(`Error loading audio: ${error}`, 5, true);
@@ -298,7 +301,8 @@ MelodifyPlayer.prototype = {
 
 		// Update the global volume (affecting all Howls).
 		Howler.volume(val);
-
+        melodify.state.volume = val;
+        melodify.saveState();
 		// Update the display on the slider.
 		var barWidth = (val * 90) / 100;
 		barFull.style.width = (barWidth * 100) + '%';
@@ -487,6 +491,11 @@ Melodify.prototype = {
         };
         resize();
         melodify.player.updateButtons();
+        Howler.volume(melodify.state.volume);
+        var barWidth = (melodify.state.volume * 90) / 100;
+		barFull.style.width = (barWidth * 100) + '%';
+		sliderBtn.style.left = (window.innerWidth * barWidth + window.innerWidth * 0.05 - 25) + 'px';
+        melodify.node(`section-${ melodify.state.current_section }`).click();
     },
     node : function(id){
         return document.getElementById(id);
@@ -547,7 +556,10 @@ Melodify.prototype = {
         if( nextSong != "" && (nextSong != melodify.first_song.id) ){
             melodify.playSong( melodify.node(`song-${ nextSong }`) , true );
         }
-        if( !only_enqueue ) melodify.player.play(melodify.first_song);
+        if( !only_enqueue ) {
+            melodify.player.play(melodify.first_song);
+            melodify.saveState();
+        }
     },
     enqueueSong: function( buttonElement ){
         var song = this.getSongDetails( buttonElement );  
@@ -556,6 +568,7 @@ Melodify.prototype = {
             melodify.player.playlist[ melodify.player.playlist.length-1 ].next = song.id; 
         melodify.player.playlist.push(song);
         melodify.player.updatePlaylist();
+        melodify.saveState();
     },
     navigate: function(url, params=[], register_history=true){
         if( register_history ) this.state.history.push(url);
