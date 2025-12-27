@@ -66,8 +66,8 @@
                 </a>
                 {%endif%}
                 <div style="display: flex; justify-content: space-around; margin-top: 8px;gap:4px;" >
-                    <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.bookmarked == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
-                    <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.bookmarked == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
+                    <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.fav == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
+                    <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.fav == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
                     <button 
                         type            = "button" 
                         class           = "input confirm" 

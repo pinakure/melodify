@@ -116,6 +116,8 @@
         <script>
             document.addEventListener('DOMContentLoaded', ()=>{
                 melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';
+                melodify.initialize();
+                console.log(`melodify.user_id = ${melodify.user_id}`);
             });
         </script>
     </body>

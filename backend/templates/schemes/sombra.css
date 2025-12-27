@@ -1,24 +1,37 @@
 :root {
-    --bg-main               : #d46a9b;
-    --bg-nav                : #c24d81;
-    --bg-sidebar            : #e287b2;
-    --bg-sidebar-selection  : #b03a70;
-    --bg-sidebar-hover      : #d979a7;
-    --bg-content-blend      : #da7cb0C0;
-    --bg-content            : #da7cb0;
+    /* Fondos principales: De rosa chicle a fucsia profundo */
+    --bg-main               : #ff4da6; /* Rosa vibrante */
+    --bg-nav                : #e60073; /* Fucsia oscuro */
+    --bg-sidebar            : #ff80bf; /* Rosa pastel saturado */
+    --bg-sidebar-selection  : #cc0066; /* Rosa fuerte para selección */
+    --bg-sidebar-hover      : #ff66b3; /* Brillo al pasar el ratón */
+    
+    /* Contenido con transparencia */
+    --bg-content-blend      : #ff3399E6; 
+    --bg-content            : #ff3399;
+    
+    /* Texto y detalles */
     --text-color            : #ffffff;
-    --secondary-color       : #fce4ec;
-    --link-color            : #fefefe;
-    --section-color         : #a63168;
-    --confirm-color         : #88d498;
-    --accent-color          : #ffd54f;
-    --bg-player-title       : #b03a70;
-    --shadow-color          : #8c3a60;
-    --tile-placeholder      : #c95c8e;
-    --tile-info             : #9a3d6a;
-    --tile-info-text        : #f8bbd0;
-    --gradient-begin        : #e91e63;
-    --gradient-end          : #f06292;
+    --secondary-color       : #ffe6f2; /* Blanco rosado */
+    --link-color            : #ffffff;
+    --section-color         : #b30059; /* El tono más oscuro para contraste */
+    
+    /* Estados y Acentos */
+    --confirm-color         : #00ffcc; /* Turquesa neón (contrasta perfecto con rosa) */
+    --accent-color          : #fff000; /* Amarillo eléctrico */
+    
+    /* Específicos */
+    --bg-player-title       : #cc0066;
+    --shadow-color          : #660033;
+    --tile-placeholder      : #ff99cc;
+    --tile-info             : #d6006d;
+    --tile-info-text        : #ffccf2;
+    
+    /* Degradado agresivo */
+    --gradient-begin        : #ff0080;
+    --gradient-end          : #ff66b3;
+    
+    /* Dimensiones (se mantienen) */
     --nav-height            : 60px;
     --sidebar-width         : 432px;
 }

@@ -57,6 +57,12 @@ def get_playlists(user):
         return Playlist.objects.filter(usuario=user)
     else:  
         return []
+    
+# returns song object with virtual 'fav' field embedded, tuned for given user_id
+def get_song(song_id, user_id):
+    return Song.objects.filter(id = song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=user_id))).get()
+        
+
 
 class AlbumTileView(ListView):
     model = Album
@@ -203,13 +209,11 @@ class PlayerView(TemplateView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
         song_id = self.request.GET.get('song')
-        print("SONG ID-------------------------------")
         print(song_id)
         if song_id is None:
-            return context
-        song    = Song.objects.filter(id=song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk))).get()
-        context['song']     = song
-        context['artist']   = song.artist
+            return context        
+        context['song']     = get_song( song_id, self.request.user.pk)
+        context['artist']   = context['song'].artist
         return context
 
 class LandingView(TemplateView):
@@ -335,6 +339,7 @@ class SongDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['song'] = get_song( context['song'].pk, self.request.user.pk)
         return context
       
 class UserView(DetailView):
@@ -352,7 +357,7 @@ class UserView(DetailView):
 @csrf_exempt
 def scheme_view_ajax(request, scheme):
     scheme = scheme.strip('.')
-    values = saferead(f'templates/schemes/{ scheme }.css')
+    values = saferead( os.path.join('..' , 'templates' , 'schemes' , f'{ scheme }.css'))
     return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
     
 @csrf_exempt

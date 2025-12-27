@@ -332,6 +332,7 @@ MelodifyPlayer.prototype = {
 };
 
 function Melodify(user_id=0){
+    console.log(`new Melodify(${user_id})`);
     /* Restore initial melodify state */
     this.user_id = user_id;
     const initial_state = {
@@ -348,16 +349,12 @@ function Melodify(user_id=0){
         current_page    : '',
         first_song      : null,
     };
-    state = localStorage.getItem(`melodify[${ this.user_id }]`);
-    if(!state) state = initial_state;
-    else state = JSON.parse(state);
-    this.state              = state;
+    this.state              = initial_state;
     this.next_page          = 1;
     this.search_timeout     = null;
     this.is_loading         = false;
     this.search_term        = '';
     this.player             = new MelodifyPlayer();
-    this.player.playlist    = this.state.playlist;
     this.lyrics_editor      = false;
 };
 Melodify.prototype = {
@@ -386,8 +383,32 @@ Melodify.prototype = {
             }
         }, timeout*1000);
     },
-    initialize: function(){
+
+    loadState : function(){
+        state = localStorage.getItem(`melodify[${ this.user_id }]`);
+        if(state) this.state = JSON.parse(state);
         this.loadScheme(this.state.settings.scheme);
+        this.player.playlist = this.state.playlist;
+    },
+
+    lock: function(){
+        this.loading = true;
+    },
+    
+    unlock: function(){
+        this.loading = false;
+    },
+
+    loading : function(type='benzene'){
+        if( this.is_loading )return;
+        this.lock();
+        const node = melodify.node('loading');
+        node.style.display = 'block';
+
+    },
+
+    initialize: function(){
+        this.loadState();
         this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
         /* Restore playlist */
         this.player.updatePlaylist(this.state.playlist);
@@ -419,6 +440,7 @@ Melodify.prototype = {
         return document.getElementById(id);
     },
     saveState: function() {
+        console.log(`melodify.saveState(${melodify.user_id})`);
         this.state.playlist = this.player.playlist;
         this.state.playlist_index = this.player.index;
         localStorage.setItem(`melodify[${melodify.user_id}]`, JSON.stringify(this.state));
@@ -717,13 +739,11 @@ Melodify.prototype = {
     },
     loadAlbums : function() {
         let albumCount = 0;
-        const loadingIndicator = melodify.node('loading');
         const scrollbox     = document.getElementsByClassName('main-content')[0];
 
         if (melodify.is_loading) return;
-        melodify.is_loading = true;
-        loadingIndicator.style.display = 'block';
-
+        melodify.loading('compact-disc')
+        
         var album_container = melodify.node('tileContainer');
         var album_count     = melodify.node('album-count');
         
@@ -884,7 +904,7 @@ Melodify.prototype = {
 };    
 
 const melodify = new Melodify();
-melodify.initialize();
+
 /* album list stuff */
 
 function toggleNewListForm() {
