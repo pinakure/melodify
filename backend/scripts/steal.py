@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import django
 import sys
@@ -20,16 +21,21 @@ from spotdl import Spotdl
 import shutil
 from main.management.commands.scan import saferead
 
-
-def saferead(filename, read_mode='r'):
-    with open(filename, read_mode) as f:
-        return f.read()
-    
 def debug(text):
     #return
-    with open('/var/log/melodify.log', 'a') as f:
+    with open(settings.LOG_FILE, 'a') as f:
         f.write(text+'\n')
-    
+
+import re
+
+def clean_path_name(name):
+    # 1. Eliminar caracteres prohibidos en Windows: \ / : * ? " < > |
+    name = re.sub(r'[\\/:*?"<>|]', '', name)
+    # 2. Eliminar espacios o puntos al final (causan WinError 123)
+    name = name.strip().rstrip('.')
+    # 3. Forzar UTF-8 para manejar la 'ñ' correctamente
+    return name.encode('utf-8', 'ignore').decode('utf-8')
+
 def clean(songname):
     songname = songname.replace('?', '')
     songname = songname.replace('"', '')
@@ -41,8 +47,8 @@ def clean(songname):
 
 help            = "Steal"
 initialized     = False
-client_id       = settings.SPOTIFY_CLIENT_ID
-client_secret   = settings.SPOTIFY_CLIENT_SECRET
+client_id       = settings.SPOTIFY_CLIENT_ID        # move this data to user 
+client_secret   = settings.SPOTIFY_CLIENT_SECRET    # move this data to user profile
 spotdl          =  Spotdl(
     client_id = client_id, 
     client_secret = client_secret, 
@@ -68,7 +74,53 @@ def getSong(url):
     debug("-"*80)
     debug(f"STEAL :: searching {url}...")
     song_objs = spotdl.search([url])
-    LIBRARY_ROOT = saferead('config/library-root.cfg')
+    LIBRARY_ROOT = saferead('config/library-root.cfg').strip('\n')
+    payload = []
+    for song in song_objs:
+        try:
+            # 1. Limpiar metadatos para la ruta de destino
+            artist_clean = clean_path_name(song.artists[0])
+            album_clean  = clean_path_name(song.album_name)
+            title_clean  = clean_path_name(song.name) + ".mp3"
+            letter       = artist_clean[0].upper() if artist_clean else "#"
+
+            # 2. Construir rutas seguras
+            base_dir = Path(LIBRARY_ROOT).resolve()
+            dst_dir  = base_dir / letter / artist_clean / album_clean
+            dest_file = dst_dir / title_clean
+
+            if dest_file.exists():
+                debug(f"Skipping: {title_clean} ya existe.")
+                continue
+
+            # 3. Descargar y obtener la ruta REAL del archivo temporal
+            # spotdl.download_songs devuelve una tupla (song, path_to_file)
+            download_results = spotdl.download_songs([song])
+            temp_path_str = download_results[0][1] # Esta es la ruta real en disco
+
+            if temp_path_str is None:
+                continue
+
+            temp_file = Path(temp_path_str)
+
+            # 4. Crear carpetas y mover
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            
+            debug(f"STEAL :: moviendo de {temp_file} a {dest_file}")
+            # Usamos str() para compatibilidad total con shutil en Windows
+            shutil.move(str(temp_file), str(dest_file))
+            
+            payload.append(artist_clean)
+
+        except Exception as e:
+            debug(f"Error con '{song.name}': {str(e)}")
+    return payload
+
+def oldGetSong(url):
+    debug("-"*80)
+    debug(f"STEAL :: searching {url}...")
+    song_objs = spotdl.search([url])
+    LIBRARY_ROOT = saferead('config/library-root.cfg').strip('\n')
     payload = []
     for song in song_objs:
         debug(f"STEAL ::        title = {song.name}")
