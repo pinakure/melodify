@@ -131,3 +131,35 @@ class Bookmark(models.Model):
     def __str__(self):
         return f'{ self.usuario.username } {self.song.title}'
 
+
+# ===========
+# SCHEMES 
+# ===========
+class Scheme(models.Model):
+    name                 = models.CharField(primary_key=True, max_length =    128, default = 'default'            )
+    bg_main              = models.CharField(max_length =    128, default = '#0A0A0A'          )
+    bg_nav               = models.CharField(max_length =    128, default = '#121212'          )
+    bg_sidebar           = models.CharField(max_length =    128, default = '#1A1A1A'          )
+    bg_sidebar_selection = models.CharField(max_length =    128, default = '#333333'          )
+    bg_sidebar_hover     = models.CharField(max_length =    128, default = '#222222'          )
+    bg_content_blend     = models.CharField(max_length =    128, default = '#0A0A0AC0'        )
+    bg_content           = models.CharField(max_length =    128, default = '#0f0f0f'          )
+    text_color           = models.CharField(max_length =    128, default = '#ffffff'          )
+    link_color           = models.CharField(max_length =    128, default = '#cccccc'          )
+    accent_color         = models.CharField(max_length =    128, default = '#ffa340'          )
+    secondary_color      = models.CharField(max_length =    128, default = '#888888'          )
+    section_color        = models.CharField(max_length =    128, default = '#eeeeee'          )
+    confirm_color        = models.CharField(max_length =    128, default = '#dddddd'          )
+    bg_player_title      = models.CharField(max_length =    128, default = '#2a2a2a'          )
+    shadow_color         = models.CharField(max_length =    128, default = '#000000'          )
+    tile_placeholder     = models.CharField(max_length =    128, default = '#333333'          )
+    tile_info            = models.CharField(max_length =    128, default = '#050505'          )
+    tile_info_text       = models.CharField(max_length =    128, default = '#666666'          )
+    gradient_begin       = models.CharField(max_length =    128, default = '#444444'          )
+    gradient_end         = models.CharField(max_length =    128, default = '#111111'          )
+    nav_height           = models.CharField(max_length =     32, default = '60px'               )
+    sidebar_width        = models.CharField(max_length =     32, default = '432px'              )
+    default_font         = models.CharField(max_length =     32, default = "'lunchtype-regular'")
+    player_font          = models.CharField(max_length =     32, default = "'lunchtype-regular'")
+    player_font_size     = models.CharField(max_length =     32, default = '24px'               )
+    renderer             = models.CharField(max_length =     32, default = 'themed'             )

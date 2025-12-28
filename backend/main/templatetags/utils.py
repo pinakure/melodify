@@ -14,3 +14,8 @@ def strftime(value, arg):
 def get_next_song_id(songs, position):
     return songs[position+1].id
 
+@register.filter(name="replace")
+def replace(value, arg):
+    """Uso: {{ texto|replace:"_, " }} reemplaza guiones por espacios"""
+    original, reemplazo = arg.split(',')
+    return str(value).replace(original, reemplazo)

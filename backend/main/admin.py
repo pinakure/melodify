@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Artist, Genre, Tag, Album, Song, Playlist
+from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme
 
+
+# ============
+#   SCHEMES
+# ============
+@admin.register(Scheme)
+class SchemeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
 
 # ============
 #   ARTIST

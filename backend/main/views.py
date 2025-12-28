@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import execute_from_command_line
+from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -234,6 +235,11 @@ class SettingsView(TemplateView):
     template_name = 'main/settings.html'  
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['schemes'               ] = Scheme.objects.all().order_by('name').values('name')
+        context['scheme_data'           ] = Scheme.objects.all().order_by('name').values()
+        context['library_root'          ] = saferead('./config/library-root.cfg').strip('\n')
+        context['spotify_client_id'     ] = settings.SPOTIFY_CLIENT_ID
+        context['spotify_client_secret' ] = settings.SPOTIFY_CLIENT_SECRET
         return context
     
 class LyricsView(DetailView):
@@ -354,12 +360,12 @@ class UserView(DetailView):
         context['authed'    ] = True if self.request.user.is_authenticated else False
 
         return context
-    
+
 @csrf_exempt
 def scheme_view_ajax(request, scheme):
-    scheme = scheme.strip('.')
-    values = saferead( os.path.join('templates' , 'schemes' , f'{ scheme }.css'))
-    return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
+    obj = model_to_dict(Scheme.objects.filter(name=scheme).get())
+    css_vars = {f"--{k.replace('_', '-')}": v.replace('"', '') for k, v in obj.items()}
+    return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : css_vars})
     
 @csrf_exempt
 def search_ajax(request):

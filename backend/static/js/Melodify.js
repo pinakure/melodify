@@ -258,7 +258,7 @@ Melodify.prototype = {
     },
     loadScheme : function(scheme){
         this.request(`/scheme/${ scheme }/`,{}, (data)=>{ 
-            melodify.node('scheme').innerHTML = data.values;
+            melodify.node('scheme').innerHTML = ':root '+JSON.stringify(data.values).replaceAll('"', '').replaceAll(',', ';');
             this.state.settings.scheme = scheme;
             const styles = getComputedStyle(document.documentElement);
             const renderer = styles.getPropertyValue('--renderer');
