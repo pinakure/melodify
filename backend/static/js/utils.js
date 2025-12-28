@@ -27,18 +27,6 @@ function disable(node_id){
 }
 
 var resize = function() {
-	var height = window.innerHeight * 0.3;
-	var width = window.innerWidth;
-	// wave.height = height;
-	// wave.height_2 = height / 2;
-	// wave.MAX = wave.height_2 - 4;
-	// wave.width = width;
-	// wave.width_2 = width / 2;
-	// wave.width_4 = width / 4;
-	// wave.canvas.height = height;
-	// wave.canvas.width = width;
-	// wave.container.style.margin = -(height / 2) + 'px auto';
-
 	// Update the position of the slider.
 	var sound = melodify.player.playlist.length > 0 ? melodify.player.playlist[melodify.player.index].howl : null;
 	if (sound) {

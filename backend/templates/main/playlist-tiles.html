@@ -101,7 +101,7 @@
     scrollbox.addEventListener('scroll', melodify.handlePlaylistScroll);
     searchInput.addEventListener('input', melodify.handlePlaylistFilter);
 
-    triggerSearch(melodify.handlePlaylistScroll, melodify.loadPlaylists); 
+    melodify.triggerSearch(melodify.handlePlaylistScroll, melodify.loadPlaylists); 
     melodify.loadPlaylists();
 </script>
 
