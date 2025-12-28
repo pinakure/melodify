@@ -358,7 +358,7 @@ class UserView(DetailView):
 @csrf_exempt
 def scheme_view_ajax(request, scheme):
     scheme = scheme.strip('.')
-    values = saferead( os.path.join('..' , 'templates' , 'schemes' , f'{ scheme }.css'))
+    values = saferead( os.path.join('templates' , 'schemes' , f'{ scheme }.css'))
     return JsonResponse({'status': 'success', 'scheme': scheme, 'values' : values})
     
 @csrf_exempt

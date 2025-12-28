@@ -10,9 +10,6 @@ Script
 ~~~~~~~~~~~~~~~~~
 Fronted Duties
 ~~~~~~~~~~~~~~~~~
-· Remember player volume
-. Update Lists window when a list is created
-* check album view, why 1 album only?
 · nostr auth
 · make sure scan script works
 
