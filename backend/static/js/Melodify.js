@@ -1,10 +1,5 @@
 // static/js/Melodify.js
-
-// Cache references to DOM elements.
-
-
 function Melodify(user_id=0){
-    console.log(`new Melodify(${user_id})`);
     /* Restore initial melodify state */
     this.user_id            = user_id;    
     this.state              = INITIAL_STATE;
@@ -14,6 +9,7 @@ function Melodify(user_id=0){
     this.search_term        = '';
     this.player             = new MelodifyPlayer();
     this.lyrics_editor      = false;
+    this.download_queue     = [];
 };
 Melodify.prototype = {
     toast: function(message, timeout=5, error=false, id=null){
@@ -41,44 +37,42 @@ Melodify.prototype = {
             }
         }, timeout*1000);
     },
-
+    error: function(error){
+        this.toast(`ERROR : ${error}`, 5, true, 'melodify-error');
+        console.error(error);
+    },
     toggleAnalyzer(){
         melodify.state.enable_analyzer=melodify.node('use-renderer').checked;
         melodify.node('analyzer').style.display = melodify.state.enable_analyzer ? 'flex' : 'none';
         melodify.saveState(); 
     },
-
     loadState : function(){
         state = localStorage.getItem(`melodify[${ this.user_id }]`);
         if(state) this.state = JSON.parse(state);
         this.loadScheme(this.state.settings.scheme);
         this.player.playlist = this.state.playlist;
     },
-
     lock: function(){
         melodify.is_loading = true;
         const node = melodify.node('loading-wrapper');
         node.style.display = 'flex';
-    },
-    
+    },    
     unlock: function(){
         const node = melodify.node('loading-wrapper');
         node.style.display = 'none';
         melodify.is_loading = false;
     },
-
     loading : function(type='spinner'){
         if( melodify.is_loading )return;
         melodify.lock();
         const content = melodify.node('loading-content');
         content.innerHTML = `<i class="fas fa-${type} spin" style="color:var(--accent-color);"></i>`;
     },
-
     initialize: function(){
         /*
             // Start fullscreen
             setTimeout(()=>document.documentElement.requestFullscreen().catch((err) => {
-                console.error(`Error enabling fullscreen: ${err.message}`);
+                melodify.error(`Cannot enable fullscreen: ${err.message}`);
             }), 3000);
         */
         this.loadState();
@@ -95,7 +89,6 @@ Melodify.prototype = {
         window.onpopstate = function() {
             // Cuando el usuario pulsa "Atrás", volvemos a empujar el estado actual
             window.history.pushState(null, null, window.location.href);
-            console.log("Navegación atrás bloqueada");
             if(melodify.state.history.length > 1){
                 here = melodify.state.history.pop();
                 url = melodify.state.history.pop();
@@ -119,7 +112,6 @@ Melodify.prototype = {
         return document.getElementById(id);
     },
     saveState: function() {
-        console.log(`melodify.saveState(${melodify.user_id})`);
         this.state.playlist = this.player.playlist;
         this.state.playlist_index = this.player.index;
         localStorage.setItem(`melodify[${melodify.user_id}]`, JSON.stringify(this.state));
@@ -222,8 +214,7 @@ Melodify.prototype = {
             melodify.node('curtain').click();
         })
         .catch(error => {
-            console.error('Navigate: Fetch error:', error);
-            melodify.toast(`Navigate: Network/Server Error ${error}`);
+            melodify.error(`Navigate: Network / Server error: ${error}`);
         });
     },
     getCookie: function(name) {
@@ -246,22 +237,23 @@ Melodify.prototype = {
         )
         .then(response => response.json())
         .then(data => {
-            console.log("BEACON");
             if (data.status === 'success') {
                 done_callback(data);
             } else if (data.status === 'login') {
                 melodify.node('login-window-wrapper').style.display="flex";
             } else {
-                melodify.toast('Error: ' + data.message, 5, true);
+                melodify.error(`Request Error: ${ data.message }`);
             }
         })
         .catch(error => {
             if( error == "TypeError: done_callback is not a function"){
-                melodify.toast("You forgot to write the done callback.", 5, true)
+                melodify.error("Request: missing success callback")
             } else {
-                console.error('Fetch error:', error);
-                melodify.toast('Ocurrió un error de red o del servidor.', 5, true);
+                melodify.error(`Request: Network / Server error: ${error}`);
             }
+        })
+        .finally(()=>{
+            melodify.unlock();
         });
     },
     loadScheme : function(scheme){
@@ -270,11 +262,9 @@ Melodify.prototype = {
             this.state.settings.scheme = scheme;
             const styles = getComputedStyle(document.documentElement);
             const renderer = styles.getPropertyValue('--renderer');
-            console.log(renderer);
             melodify.node('playbar').setAttribute('renderer', renderer);
         }, true);
     },
-    /* Callback functions */
     filter: function(type) {
         const input  = melodify.node('search-Input');
         const filter = input.value.toLowerCase();
@@ -344,21 +334,91 @@ Melodify.prototype = {
             }, true);
         }, 500);
     },
-    scanSongs : function(artist_list){
-        melodify.toast("Scanning songs");
+    downloadSong: function(index, song_url){
+        disable(index); 
+        node.innerHTML = '<i style="font-size: 17px" class="fas fa-spinner spin"></i>'
+        melodify.request(
+            '/stealget/', 
+            { url : `${ song.url }` }, 
+            (data)=>{ 
+                melodify.scanSongs(data.songs); 
+                melodify.node(`download-${index}`).innerHTML = '<i style="font-size: 17px" class="fas fa-check"></i>'
+            }
+        ); 
+    },
+    downloadQueue : function(){
+        if( melodify.download_queue.length ){
+            const song = melodify.download_queue.pop();
+            const node = melodify.node(`download-${ song.id.split('-')[1] }`);
+            node.innerHTML = '<i style="font-size: 17px" class="fas fa-spinner spin"></i>'
+            melodify.toast(`Descargando ${song.artist} - ${song.title}`);
+            melodify.request(
+                '/stealget/', 
+                { url : song.url }, 
+                (data)=>{ 
+                    node.innerHTML = '<i style="font-size: 17px" class="fas fa-check"></i>'
+                    melodify.scanSongs(data.songs);
+                    // melodify.node('song-${}') 
+                    return melodify.downloadQueue();
+                }
+            );                
+        } else {
+            melodify.unlock();
+            melodify.node('download-all').removeAttribute('disabled');
+        }
+    },
+    downloadList: function(){
+        melodify.node('download-all').setAttribute('disabled', 'disabled');
+        document.querySelectorAll('#results ul li').forEach((e)=>{
+            const id = e.getAttribute('id');
+            melodify.download_queue[ melodify.download_queue.length ] = {
+                id      : id,
+                title   : e.getAttribute('title'),
+                artist  : e.getAttribute('artist'),
+                url     : e.getAttribute('url'),
+            }
+            disable(id.split('-')[1]);
+            melodify.node(`download-${ id.split('-')[1] }`).innerHTML = '<i style="font-size: 17px" class="fas fa-clock"></i>'
+        });
+        melodify.downloadQueue();
+    },
+    scanSongs: function(artist_list){
         for(artist in artist_list){
-            this.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
+            // melodify.toast(`Scanning ${artist_list[artist]}songs`, 5, 0, "scan-songs");
+            melodify.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
         }   
     },
-    showResults : function(data){
+    showResults: function(data){
         container = melodify.node('results');
-        container.innerHTML = `<div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">Descargar Todo&nbsp;<button title="Descargar todo" class="input" onclick="melodify.request('/stealget/', { url : melodify.node('searchInput').value}, (data)=>{ melodify.scanSongs(data.songs); })"><i class="fas fa-download "></i></button></div>`;
+        container.innerHTML = '';
+        if( data.songs.length > 1){
+            container.innerHTML += `
+                <div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">
+                    <button 
+                        title="Descargar todo" 
+                        class="input" 
+                        id="download-all"
+                        onclick="melodify.downloadList()">
+                        <i class="fas fa-download "></i>&nbsp;Descargar Todo
+                    </button>
+                </div>`;
+        }
         container.innerHTML += "<ul>";
+        var id=0;
+        ul = document.createElement('ul');
         for( d in data.songs ){
             song = data.songs[d];
-            container.innerHTML += `<li><p>${ song.name }</p><p>${ song.artist }</p><button title="Descargar" id="download-${d}" class="input accent" onclick="disable(${d}); melodify.request('/stealget/', { url : '${ song.url }' }, (data)=>{ melodify.scanSongs(data.songs); enable(${d}); })"><i class="fas fa-download "></i></button></li>`;
+            ul.innerHTML += `
+                <li id="song-${id}" url="${song.url}" title="${song.name}" artist="${song.artist}">
+                    <p>${ song.name }</p>
+                    <p>${ song.artist }</p>
+                    <button title="Descargar" id="download-${d}" class="input accent" onclick="melodify.downloadSong(${d}, '${song.url}');">
+                        <i id="download-icon-${d}" class="fas fa-download "></i>
+                    </button>
+                </li>`;
+            id++;
         }
-        container.innerHTML += "</ul>";
+        container.appendChild(ul);
     },
     hidePlaylists : function(){ 
         const div = melodify.node('playlists-window');
@@ -501,7 +561,7 @@ Melodify.prototype = {
             melodify.unlock();
         })
         .catch(error => {
-            console.error('Error fetching albums:', error);
+            melodify.error(`Error fetching albums: ${error}`);
             melodify.unlock();
         });
     },
@@ -566,7 +626,7 @@ Melodify.prototype = {
 
         })
         .catch(error => {
-            melodify.toast(`Error fetching playlists: ${error}`, 5, true);
+            melodify.error(`Error fetching playlists: ${error}`);
             melodify.unlock();
         });
     },

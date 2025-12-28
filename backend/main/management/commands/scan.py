@@ -11,11 +11,16 @@ import os
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
+def debug(text):
+    #return
+    with open(settings.LOG_FILE, 'a') as f:
+        f.write(text+'\n')
+
 def saferead(filename, read_mode='r'):
     if settings.ANDROID:
         BASE_DIR = Path(__file__).resolve().parent
         filename = BASE_DIR / filename
-    print(("-"*80)+"\n" + f"SAFEREAD: Trying to open '{filename}'", end="\n")
+    debug(f"SAFEREAD :: Trying to open '{filename}'")
     with open(filename, read_mode) as f:
         return f.read()
     

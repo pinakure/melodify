@@ -544,7 +544,7 @@ def steal_search(request):
 def scan_artist(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
-    LIBRARY_ROOT = saferead('./config/library-root.cfg')
+    LIBRARY_ROOT = saferead('./config/library-root.cfg').strip('\n')
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición
@@ -555,35 +555,6 @@ def scan_artist(request):
                 return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
             songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist), False)
             return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
-
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-    
-    # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
-
-def old_bookmark_song(request):
-    if isinstance(request.user , AnonymousUser):
-        return JsonResponse({ 'status' : 'login'})
-    
-    if request.method == 'POST':
-        try:
-            # Leer los datos JSON del cuerpo de la petición
-            data    = json.loads(request.body)
-            song_id = data.get('song', '').strip()
-            
-            if not song_id:
-                return JsonResponse({'status': 'error', 'message': 'Debe especificarse un ID.'}, status=400)
-
-            song = Song.objects.filter(id=song_id).get()
-            song.bookmarked = song.bookmarked ^ 1
-            song.save()
-            if song.bookmarked: 
-                return JsonResponse({'status': 'success', 'message': 'Agregada a Favoritos', 'id': song_id})
-            else:
-                return JsonResponse({'status': 'success', 'message': 'Eliminada de Favoritos', 'id': song_id})
 
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)

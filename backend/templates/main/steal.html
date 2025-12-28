@@ -31,7 +31,19 @@
 
 {% block content %}
 {% csrf_token %}
-<input onkeydown="if (event.keyCode === 13) { document.getElementById('searchbutton').click(); return false; }" type="text" id="searchInput" class="input" placeholder="URL / KEYWORD">
-<button id="searchbutton" class="input" onclick="melodify.request('/stealsearch/', { url : document.getElementById('searchInput').value}, melodify.showResults)">{% fa5_icon "search" %}</button>
+<input 
+    onkeydown="if (event.keyCode === 13) { document.getElementById('searchbutton').click(); return false; }" 
+    type="text" 
+    id="searchInput" 
+    class="input" 
+    placeholder="URL / KEYWORD"
+>
+<button 
+    id="searchbutton" 
+    class="input" 
+    onclick="melodify.loading(); melodify.request('/stealsearch/', { url : melodify.node('searchInput').value}, melodify.showResults)"
+>
+    {% fa5_icon "search" %}
+</button>
 <div id="results"></div>
 {% endblock %}
