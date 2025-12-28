@@ -487,6 +487,7 @@ def steal_get(request):
             result = subprocess.run(
                 args,
                 capture_output=True, 
+                timeout=3600,
                 text=True
             )
             songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
@@ -494,7 +495,6 @@ def steal_get(request):
             print(f"STEAL :: result = {result.stdout}")
             print(f"STEAL :: songs = {songs}")
             return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : json.loads(songs)})
-
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
         except Exception as e:

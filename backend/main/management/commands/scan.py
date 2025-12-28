@@ -3,8 +3,6 @@ from django.core.files import File
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
 from datetime import datetime, timedelta
 from django.utils import timezone
-
-#!/usr/bin/env python3
 import os
 import time
 import json

@@ -27,3 +27,6 @@ sudo mkdir -p ./media/songs
 sudo chown -R $USER:www-data ./media
 sudo chmod -R 755 ./media
 python3 manage.py collectstatic --noinput
+sudo touch /var/log/melodify.log
+sudo chown -R melodify:www-data /var/log/melodify.log
+sudo chmod -R 755 /var/log/melodify.log

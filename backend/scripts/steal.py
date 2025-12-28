@@ -19,10 +19,16 @@ from django.conf import settings
 from spotdl import Spotdl
 import shutil
 
-def debug(text):
-    return
-    print(text)
 
+def saferead(filename, read_mode='r'):
+    with open(filename, read_mode) as f:
+        return f.read()
+    
+def debug(text):
+    #return
+    with open('/var/log/melodify.log', 'a') as f:
+        f.write(text+'\n')
+    
 def clean(songname):
     songname = songname.replace('?', '')
     songname = songname.replace('"', '')
@@ -58,9 +64,9 @@ def searchSong(url):
     return payload
 
 def getSong(url):
+    debug("-"*80)
     debug(f"STEAL :: searching {url}...")
     song_objs = spotdl.search([url])
-
     LIBRARY_ROOT = saferead('config/library-root.cfg')
     payload = []
     for song in song_objs:
@@ -68,7 +74,7 @@ def getSong(url):
         debug(f"STEAL ::        album = {song.album_name}")
         debug(f"STEAL ::       artist = {', '.join(song.artists)}")
         debug(f"STEAL :: download_url = {song.download_url}")
-        try:            
+        try:
             artists  = ", ".join(song.artists)
             artist   = artists.split(',')[0]
             letter   = artist[0].upper()
@@ -77,16 +83,19 @@ def getSong(url):
             dest     = os.path.join(LIBRARY_ROOT, letter, artist, album, title)
             dstpath  = os.path.join(LIBRARY_ROOT, letter, artist, album)
             if os.path.exists(os.path.join(dstpath,  title)):
+                debug(f"Skipping '{os.path.join(dstpath, title)}' : Already Exists")
                 continue
+            debug(f"STEAL :: Downloading song '{song}'...")
             result   = spotdl.download_songs([song])[0]
-            debug(f"STEAL :: result = {result}")
+            debug(f"STEAL :: result = '{result}'")
             if result[1] is None:
+                debug(f"STEAL :: Skipping '{os.path.join(dstpath, title)}' : result[1] = None'")
                 continue
             filename = clean(result[1].name)
             try:
                 os.makedirs(dstpath)
             except:
-                pass
+                debug(f"STEAL :: makedirs('dstpath') failed.'")
             try:
                 debug(f"STEAL :: mv( filename = '{filename}', dest = '{dest}' )")
                 shutil.move(filename, dest)
