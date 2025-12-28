@@ -65,7 +65,7 @@ class AlbumAdmin(admin.ModelAdmin):
 # ============
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ("title", "artist", "album", "genre", "comment", "year", "codename", "bpm", "all_tags", "favorite", "status")
+    list_display = ("title", "artist", "album", "genre", "comment", "year", "codename", "bpm", "all_tags", "status")
     search_fields = ("title", "codename", "album__name")
     #list_filter = ("genre", "artist", "album", "bookmarked", "tags")
     
@@ -79,10 +79,6 @@ class SongAdmin(admin.ModelAdmin):
     def status(self, obj):
         return not obj.error 
     
-    @admin.display(boolean=False, description='💛')
-    def favorite(self, obj):
-        return "🤍" if not obj.bookmarked else "💛" 
-
 
 # ============
 #   PLAYLIST
