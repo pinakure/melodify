@@ -78,6 +78,8 @@ DATABASES = {
     }
 }
 
+LOG_FILE = '\codigo\melodify\melodify.log'
+# LOG_FILE = '/var/log/melodify.log'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
