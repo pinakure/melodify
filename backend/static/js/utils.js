@@ -1,3 +1,5 @@
+// static/js/utils.js
+
 var move = function(event) {
 	if (window.sliderDown) {
 		var x = event.clientX || event.touches[0].clientX;

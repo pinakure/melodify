@@ -18,6 +18,7 @@ django.setup()
 from django.conf import settings
 from spotdl import Spotdl
 import shutil
+from main.management.commands.scan import saferead
 
 
 def saferead(filename, read_mode='r'):

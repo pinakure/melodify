@@ -3,16 +3,19 @@ from django.core.files import File
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
 from datetime import datetime, timedelta
 from django.utils import timezone
-import os
-import time
-import json
-import hashlib
+from django.conf import settings
 from pathlib import Path
+import hashlib
+import os
 
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
 def saferead(filename, read_mode='r'):
+    if settings.ANDROID:
+        BASE_DIR = Path(__file__).resolve().parent
+        filename = BASE_DIR / filename
+    print(("-"*80)+"\n" + f"SAFEREAD: Trying to open '{filename}'", end="\n")
     with open(filename, read_mode) as f:
         return f.read()
     

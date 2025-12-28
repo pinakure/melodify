@@ -17,7 +17,7 @@ from .models import *
 import subprocess
 import json
 import os
-from .utils import *
+from .management.commands.scan import saferead
 
 scanner = Scan()
 
