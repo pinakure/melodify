@@ -12,7 +12,6 @@ VERSION = '0.251229'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-x-xr0dk^wcis00z=aal_0@xx0z__+eviot4wt29-*%^uvp!i*8'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG   = True
 SECURE  = False
 ANDROID = False
 
@@ -22,6 +21,7 @@ ALLOWED_HOSTS = [
     '192.168.1.178',
     'localhost',
     'melodify.com',
+    'melodify.local',
     'melodify.com.82.223.13.41.nip.io',
 ]
 
