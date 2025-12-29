@@ -70,6 +70,11 @@ COMMANDS        = [
     f'{APP_CMD} collectstatic'      ,
 ]
 
+SERVICES = [
+    'nginx',
+    f'{ APP_NAME }',
+]
+
 LINK = {
     f'/etc/nginx/sites-available/{APP_NAME}' : f'/etc/nginx/sites-enabled/{APP_NAME}',
 }
@@ -101,114 +106,39 @@ class Command(BaseCommand):
         if platform.system() == 'Windows':
             print("This command is intended to run only on linux servers.")
             exit()
+        os.system('clear')
+        self.section('Install System Packages')
         os.system(f'sudo apt install {" ".join(APT_PACKAGES)}')
+        self.section('Install Python Packages')
         os.system(f'pip install {" ".join(PIP_PACKAGES)}')
-
-
-
-"""
-#!/bin/bash
-USER=$(whoami)
-PYTHON=/src/melodify/venv/bin/python3
-MELODIFY=$PYTHON manage.py
-echo "----------------------------------------------------------------------------------------"
-echo "Activating VirtualEnv..."
-echo "----------------------------------------------------------------------------------------"
-source ../venv/bin/activate
-echo "----------------------------------------------------------------------------------------"
-echo "Installing system dependencies..."
-echo "----------------------------------------------------------------------------------------"
-sudo apt install            \
-    ffmpeg                  \
-    nginx                   \
-    openjdk-17-jdk          \
-    openjdk-17-jre          \
-    cmake                   \
-    pkg-config              \
-    automake                \
-    autoconf                \
-    libtool                 \
-    libffi-dev              \
-    libssl-dev              \
-    python3-dev             \
-    libltdl-dev             \
-    libsqlite3-dev
-echo "----------------------------------------------------------------------------------------"
-echo "Installing python dependencies..."
-echo "----------------------------------------------------------------------------------------"
-pip install                 \
-    spotdl                  \
-    stable-ts               \
-    "cython<3.0.0"          \
-    python-for-android      \
-    django                  \
-    kivy                    \
-    kivymd                  \
-    asgiref                 \
-    sqlparse                \
-    Pillow                  \
-    mutagen                 \
-    requests                \
-    django-fontawesome_5    \
-    setuptools              \
-    gunicorn                \
-    buildozer               
-echo "----------------------------------------------------------------------------------------"
-echo "Installing Nginx & Gunicorn config files..."
-echo "----------------------------------------------------------------------------------------"
-sudo cp config/etc/nginx/sites-available/melodify /etc/nginx/sites-available/melodify 
-sudo ln -s /etc/nginx/sites-available/melodify /etc/nginx/sites-enabled/melodify 
-sudo cp config/etc/systemd/system/melodify.service /etc/systemd/system/melodify.service 
-echo "----------------------------------------------------------------------------------------"
-echo "Enabling / Starting Nginx service..."
-echo "----------------------------------------------------------------------------------------"
-sudo systemctl daemon-reload
-sudo systemctl enable nginx
-sudo systemctl stop nginx
-sudo systemctl start nginx
-sudo systemctl status nginx
-echo "----------------------------------------------------------------------------------------"
-echo "Enabling / Starting Gunicorn-Melodify service..."
-echo "----------------------------------------------------------------------------------------"
-sudo systemctl enable melodify
-sudo systemctl stop melodify
-sudo systemctl start melodify
-sudo systemctl status melodify
-echo "----------------------------------------------------------------------------------------"
-echo "Initializing django application database..."
-echo "----------------------------------------------------------------------------------------"
-$MELODIFY makemigrations 
-$MELODIFY makemigrations main
-$MELODIFY migrate
-$MELODIFY migrate main
-echo "----------------------------------------------------------------------------------------"
-echo "Creating required working directories..."
-echo "----------------------------------------------------------------------------------------"
-sudo mkdir -p /library/.artists
-sudo chown -R $USER:www-data /library
-sudo chmod -R 755 /static
-sudo mkdir -p /static/melodify
-sudo chown -R $USER:www-data /static
-sudo chmod -R 755 /static
-sudo mkdir -p ./media/artists
-sudo mkdir -p ./media/albums
-sudo mkdir -p ./media/songs
-sudo chown -R $USER:www-data ./media
-sudo chmod -R 755 ./media
-echo "----------------------------------------------------------------------------------------"
-echo "Initializing Log File..."
-echo "----------------------------------------------------------------------------------------"
-sudo touch /var/log/melodify.log
-sudo chown -R melodify:www-data /var/log/melodify.log
-sudo chmod -R 755 /var/log/melodify.log
-echo "----------------------------------------------------------------------------------------"
-echo "Collecting static files..."
-echo "----------------------------------------------------------------------------------------"
-$MELODIFY collectstatic --noinput
-echo "----------------------------------------------------------------------------------------"
-echo "Setting up library root (temporary fix)"
-echo "----------------------------------------------------------------------------------------"
-echo /library > /src/melodify/backend/config/library-root.cfg
-$MELODIFY 
-
-"""
+        self.section('Copy Required Files')
+        for source,dest in COPY.items():
+            os.system(f'sudo cp {source} {dest}')
+        self.section('Make Symbolic Links')
+        for source,dest in LINK.items():
+            os.system(f'sudo ln -s {source} {dest}')
+        self.section('Reload Service Files')
+        os.system('sudo systemctl daemon-reload')
+        for service in SERVICES:
+            self.section(f"Enable / Start Service {service}")
+            os.system(f'sudo systemctl enable {service}')
+            os.system(f'sudo systemctl stop {service}')
+            os.system(f'sudo systemctl start {service}')
+            os.system(f'sudo systemctl status {service}')
+        self.section('Create Required Directories')
+        for dir in DIRECTORIES:
+            os.system(f'sudo mkdir -p {dir}')
+            os.system(f'sudo chown -R {USER}:{GROUP} {dir}')
+            os.system(f'sudo chmod -R 775 {dir}')
+        self.section('Create Log File')
+        os.system(f'sudo touch {LOG_FILE}')
+        os.system(f'sudo chown -R {USER}:{GROUP} {LOG_FILE}')
+        os.system(f'sudo chmod -R 775 {LOG_FILE}')
+        self.section('Setup Library Root')
+        os.system(f'echo /library > {BASE_PATH}/config/library-root.cfg')
+        self.section('Initialize django application database')
+        os.system(f'{APP_CMD} makemigrations')
+        os.system(f'{APP_CMD} makemigrations main')
+        os.system(f'{APP_CMD} migrate')
+        os.system(f'{APP_CMD} migrate main')
+        os.system(f'{APP_CMD} collectstatic --noinput')
