@@ -81,7 +81,7 @@
 {% include "main/widget-title.html" with caption='Listas' counter_id='playlist-count' counter_value=playlists.count %}
 {% include "main/widget-search.html" with type='listas' %}
 
-<button type="button" onclick="toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>
+<button type="button" onclick="melodify.toggleNewListForm()" style="border-radius: 24px" class="input new-list-toggle confirm">{% fa5_icon 'plus' color="#000"%}</button>
 
 {% csrf_token %}
 <div id="loading" style="display: none;">Cargando playlists...</div>
@@ -89,7 +89,7 @@
 <div class="new-list" id="new-list">
     <input type="text" id="new-list-name" placeholder="Nombre de la lista" />
     <button type="button" id="new-list-send" class="input confirm" title="Añadir nueva lista" onclick="melodify.createPlaylist()">{% fa5_icon 'plus' color="#000"%}</button>
-    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="toggleNewListForm()">{% fa5_icon 'times' color="#000"%}</button>
+    <button type="button" id="new-list-cancel" class="input" title="Cancelar" onclick="melodify.toggleNewListForm()">{% fa5_icon 'times' color="#000"%}</button>
 </div>    
 
 <div class="tile-container" id="tileContainer"></div>
