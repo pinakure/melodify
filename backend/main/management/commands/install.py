@@ -154,4 +154,4 @@ class Command(BaseCommand):
         os.system(f'{APP_CMD} makemigrations main')
         os.system(f'{APP_CMD} migrate')
         os.system(f'{APP_CMD} migrate main')
-        os.system(f'{APP_CMD} collectstatic --noinput')
+        os.system(f'{APP_CMD} collectstatic --noinput --settings=backend.settings-server')
