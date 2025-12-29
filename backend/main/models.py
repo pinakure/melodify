@@ -163,3 +163,14 @@ class Scheme(models.Model):
     player_font          = models.CharField(max_length =     32, default = "'lunchtype-regular'")
     player_font_size     = models.CharField(max_length =     32, default = '24px'               )
     renderer             = models.CharField(max_length =     32, default = 'themed'             )
+
+
+# ===========
+# SCHEMES 
+# ===========
+class NostrProfile(models.Model):
+    user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='nostr_profile')
+    pubkey              = models.CharField(max_length=64, unique=True, help_text="Public key en formato hex")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.pubkey[:8]}"

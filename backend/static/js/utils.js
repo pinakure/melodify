@@ -37,3 +37,35 @@ var resize = function() {
 		sliderBtn.style.left = (window.innerWidth * barWidth + window.innerWidth * 0.05 - 25) + 'px';
 	}
 };
+
+async function loginWithNostr() {
+    if (!window.nostr) {
+        alert("Instala una extensión de Nostr (como Alby)");
+        return;
+    }
+
+    // 1. Crear el evento de autenticación (NIP-98)
+    const event = {
+        kind: 27235,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [
+            ["u", window.location.href], // URL actual
+            ["method", "POST"]
+        ],
+        content: "Autenticación para Melodify"
+    };
+
+    // 2. Pedir a la extensión que firme
+    const signedEvent = await window.nostr.signEvent(event);
+
+    // 3. Enviar a Django
+    const response = await fetch("/login-ajax/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: signedEvent })
+    });
+
+    if (response.ok) {
+        window.location.reload(); // Redirigir tras éxito
+    }
+}

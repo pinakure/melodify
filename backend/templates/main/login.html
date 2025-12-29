@@ -16,7 +16,15 @@
                 <div class="modal-footer">
                     <button type="submit" class="input btn accent">Acceder&nbsp;{% fa5_icon "arrow-right" %}</button>
                     <br/>
-                    <button type="button" style="position: absolute; right: 28px;background-image: url('{% static 'images/nostr.png' %}')" title="Acceder con Nostr" class="input btn secondary">{% fa5_icon "lock" color="#fff3" %}</button>
+                    <button 
+                        type="button" 
+                        style="position: absolute; right: 28px;background-image: url('{% static 'images/nostr.png' %}')" 
+                        title="Acceder con Nostr" 
+                        class="input btn secondary"
+                        onclick="loginWithNostr()"
+                    >
+                        {% fa5_icon "lock" color="#fff3" %}
+                    </button>
                 </div>
             </form>
             

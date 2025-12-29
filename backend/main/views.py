@@ -632,6 +632,14 @@ def populate_playlist_ajax(request):
 
 def login_ajax(request):
     if request.method == 'POST':
+        # Handle nostr authentication
+        signed_event = request.POST.get('nostr_event')
+        if signed_event:
+            user = authenticate(request, signed_event_json=signed_event)
+            if user:
+                login(request, user)
+                return JsonResponse({"status": "ok", "method": "nostr"})
+        # Handle traditional authentication    
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()

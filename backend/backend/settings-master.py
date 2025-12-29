@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-VERSION = '0.251229'
+VERSION = '0.25122921'
 SECRET_KEY = 'django-insecure-x-xr0dk^wcis00z=aal_0@xx0z__+eviot4wt29-*%^uvp!i*8'
 SECURE  = False
 ANDROID = False
@@ -65,6 +65,11 @@ DATABASES = {
 }
 
 LOG_FILE = '\codigo\melodify\melodify.log'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+    'tu_app.auth_backends.NostrAuthBackend',     
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {

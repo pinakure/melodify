@@ -4,7 +4,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-VERSION = '0.251229'
+VERSION = '0.25122921'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -84,6 +84,11 @@ LOG_FILE = '\codigo\melodify\melodify.log'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+    'tu_app.auth_backends.NostrAuthBackend',     
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
