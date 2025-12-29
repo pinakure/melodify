@@ -64,7 +64,7 @@ DATABASES = {
     }
 }
 
-LOG_FILE = '\codigo\melodify\melodify.log'
+LOG_FILE = '/var/log/melodify.log'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', 
