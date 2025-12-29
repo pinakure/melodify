@@ -61,19 +61,22 @@ async function loginWithNostr() {
 		console.log("Conectado con:", pubkey);
 		
 		// Si llegas aquí, el canal está abierto. Ahora firma:
+		console.log("Firmando:", event);
 		const signedEvent = await window.nostr.signEvent(event);
 		console.log("Firmado:", signedEvent);
+		
+		// 3. Enviar a Django
+		console.log("Iniciando Sesión");
+		const response = await fetch("/login-ajax/", {
+			method: "POST",
+			headers: { "Content-Type": "application/json", 'X-CSRFToken' : melodify.getCookie('csrftoken') },
+			body: JSON.stringify({ event: signedEvent })
+		});
+
+		if (response.ok) {
+			window.location.reload(); // Redirigir tras éxito
+		}
 	} catch (e) {
 		console.error("Error directo:", e);
 	}
-    // 3. Enviar a Django
-    const response = await fetch("/login-ajax/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: signedEvent })
-    });
-
-    if (response.ok) {
-        window.location.reload(); // Redirigir tras éxito
-    }
 }
