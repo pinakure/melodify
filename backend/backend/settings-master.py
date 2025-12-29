@@ -4,7 +4,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 VERSION = '0.25122923'
 SECRET_KEY = 'django-insecure-x-xr0dk^wcis00z=aal_0@xx0z__+eviot4wt29-*%^uvp!i*8'
-SECURE  = False
 ANDROID = False
 
 ALLOWED_HOSTS = [
