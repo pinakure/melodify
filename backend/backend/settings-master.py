@@ -100,12 +100,13 @@ if not DEBUG:
         SECURE_SSL_REDIRECT = True
         SESSION_COOKIE_SECURE = True
         CSRF_COOKIE_SECURE = True
+        SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
         USE_X_FORWARDED_HOST = True
         CSRF_TRUSTED_ORIGINS = ['https://melodify.com.82.223.13.41.nip.io']
 STATIC_FILES = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [ STATIC_FILES ]
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
