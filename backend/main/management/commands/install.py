@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--secure"  , '-s', default=[False]   ,nargs="*", type=bool)
-        parser.add_argument("--ai"      , '-n', default=[True]   ,nargs="*", type=bool)
+        parser.add_argument("--noai"    , '-n', default=[False]   ,nargs="*", type=bool)
 
     def section(self, text):
         print('-'*80)
@@ -110,8 +110,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         SERVER_SECURE = options['secure'][0]
-        ENABLE_AI     = options['ai'][0]
+        ENABLE_AI     = not options['noai'][0]
+        print(f"Server Secure = {SERVER_SECURE}")
+        print(f"    Enable AI = {ENABLE_AI}")
         if ENABLE_AI:
+            print("Enabling AI Routines")
             PIP_PACKAGES.append('stable-ts')
         if platform.system() == 'Windows':
             print("This command is intended to run only on linux servers.")
