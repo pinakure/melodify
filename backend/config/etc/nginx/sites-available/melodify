@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name melodify.com melodify.com.82.223.13.41.nip.io;
+    server_name melodify.com melodify.com.82.223.13.41.nip.io melodify.local;
 
     location /static/ {
         alias /static/melodify/;
