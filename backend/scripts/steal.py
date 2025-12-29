@@ -31,6 +31,7 @@ spotdl          =  Spotdl(
     client_secret = client_secret, 
     no_cache=True,
 )
+debug(f"STEAL :: Spot DL Initialized")
 
 def clean_path_name(name):
     # 1. Eliminar caracteres prohibidos en Windows: \ / : * ? " < > |
