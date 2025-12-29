@@ -6,11 +6,9 @@ Script
 · Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
 
 
-
 ~~~~~~~~~~~~~~~~~
 Fronted Duties
 ~~~~~~~~~~~~~~~~~
-· nostr auth
 · make sure scan script works
 
 ~~~~~~~~~~~~~~~~~

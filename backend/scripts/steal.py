@@ -109,7 +109,10 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 if len(sys.argv) >2:
     if sys.argv[2]=='--search_only':
+        debug(f"STEAL :: Searching '{URL}'")
         payload = searchSong(URL)
 else:
+    debug(f"STEAL :: Downloading '{URL}'")
     payload = getSong(URL)
+debug(f"STEAL :: Finished processing '{URL}'")
 print(payload)

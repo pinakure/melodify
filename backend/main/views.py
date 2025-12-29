@@ -18,7 +18,7 @@ from .models import *
 import subprocess
 import json
 import os
-from .management.commands.scan import saferead
+from .management.commands.scan import saferead, debug
 
 scanner = Scan()
 
@@ -212,7 +212,6 @@ class PlayerView(TemplateView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
         song_id = self.request.GET.get('song')
-        print(song_id)
         if song_id is None:
             return context        
         context['song']     = get_song( song_id, self.request.user.pk)
@@ -375,9 +374,6 @@ def search_ajax(request):
         topic = data.get('topic', '')
     else:
         topic = request.POST.get('topic', '')
-    print("*"*80)
-    print(f"  Searching term {topic} ")
-    print("*"*80)
     results = {
         'albums' : list(
             Album.objects.filter(name__icontains=topic)
@@ -490,7 +486,7 @@ def steal_get(request):
             if not url:
                 return JsonResponse({'status': 'error', 'message': 'url no puede estar vacío.'}, status=400)
             args = [ 'python', os.path.join('scripts', 'steal.py'), url]
-            print(f"STEAL :: args = {args}")
+            debug(f"STEAL :: args = {args}")
             result = subprocess.run(
                 args,
                 capture_output=True, 
@@ -498,9 +494,9 @@ def steal_get(request):
                 text=True
             )
             songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
-            print(f"STEAL :: stderr = {result.stderr}")
-            print(f"STEAL :: result = {result.stdout}")
-            print(f"STEAL :: songs = {songs}")
+            debug(f"STEAL :: stderr = {result.stderr}")
+            debug(f"STEAL :: result = {result.stdout}")
+            debug(f"STEAL :: songs = {songs}")
             return JsonResponse({'status': 'success', 'message': 'Steal OK', 'songs' : json.loads(songs)})
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'JSON inválido'}, status=400)
@@ -525,19 +521,19 @@ def steal_search(request):
             os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
             args = [ 'python', os.path.join('scripts', 'steal.py'), url, '--search_only']
             try:
-                print(f"STEAL :: args = {args}")
+                debug(f"STEAL :: args = {args}")
                 result = subprocess.run(
                     args,
                     capture_output=True, 
                     text=True
                 )
                 songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
-                print(f"STEAL :: songs = '{songs}'")
-                print(f"STEAL :: stdout = '{result.stdout}'")
-                print(f"STEAL :: stderr = '{result.stderr}'")
+                debug(f"STEAL :: songs = '{songs}'")
+                debug(f"STEAL :: stdout = '{result.stdout}'")
+                debug(f"STEAL :: stderr = '{result.stderr}'")
                 return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})
             except Exception as e:
-                print(str(e))
+                debug(f"STEAL :: Exception : {str(e)}")
                 return JsonResponse({'status': 'error', 'message': str(e)})
 
         except json.JSONDecodeError:
@@ -636,17 +632,17 @@ def login_ajax(request):
         try:
             data = json.loads(request.body)
             signed_event = data.get('event')
-            print(f"NOSTR :: signed_event = {signed_event is not None}")
+            debug(f"NOSTR :: signed_event = {signed_event is not None}")
             if signed_event:
-                print(f"NOSTR :: Authenticating user")
+                debug(f"NOSTR :: Authenticating user")
                 user = authenticate(request, signed_event_json=signed_event)
-                print(f"NOSTR :: user = '{user}'")
+                debug(f"NOSTR :: user = '{user}'")
                 if user:
-                    print(f"NOSTR :: Logging in {user}")
+                    debug(f"NOSTR :: Logging in {user}")
                     login(request, user)
                     return JsonResponse({"status": "ok", "method": "nostr"})
         except Exception as e:
-            print(str(e))
+            debug(f'NOST :: Exception : {str(e)}')
         
         # Handle traditional authentication    
         form = AuthenticationForm(request, data=request.POST)

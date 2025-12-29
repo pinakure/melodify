@@ -79,7 +79,7 @@ DATABASES = {
     }
 }
 
-LOG_FILE = '\codigo\melodify\melodify.log'
+LOG_FILE = '\\codigo\\melodify\\melodify.log'
 # LOG_FILE = '/var/log/melodify.log'
 
 # Password validation
