@@ -15,6 +15,7 @@ PYTHON          = f'{VENV}/bin/python'
 APP_CMD         = f'{PYTHON} manage.py'
 ROOT            = f'admin'
 ROOT_PASSWORD   = f'Melodify777!'
+SERVER_SECURE   = False
 
 APT_PACKAGES    = [
     'ffmpeg'                        ,
@@ -80,9 +81,14 @@ LINK = {
 }
 
 COPY = {
-    f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}'   : f'/etc/nginx/sites-available/{APP_NAME}',
     f'{BASE_PATH}/config/etc/systemd/system/{APP_NAME}.service'  : f'/etc/systemd/system/{APP_NAME}.service', 
 }
+
+if SERVER_SECURE:
+    COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}-secure'] = f'/etc/nginx/sites-available/{APP_NAME}'
+else:
+    COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}'] = f'/etc/nginx/sites-available/{APP_NAME}'
+    
 
 SERVICES = [
     f'nginx',
@@ -138,10 +144,10 @@ class Command(BaseCommand):
         os.system(f'echo /library > {BASE_PATH}/config/library-root.cfg')
         self.section('Prepare Settings')
         os.system(f'echo "DEBUG=True"               >  backend/settings.py')
-        os.system(f'echo "SERVER=False"             >> backend/settings.py')
+        os.system(f'echo "SECURE={SERVER_SECURE}"   >> backend/settings.py')
         os.system(f'cat backend.settings-master.py  >> backend/settings.py')
         os.system(f'echo "DEBUG=False"              >  backend/settings-server.py')
-        os.system(f'echo "SERVER=True"              >> backend/settings-server.py')
+        os.system(f'echo "SECURE={SERVER_SECURE}"   >> backend/settings-server.py')
         os.system(f'cat backend.settings-master.py  >> backend/settings-server.py')
         self.section('Initialize django application database')
         os.system(f'{APP_CMD} makemigrations')
