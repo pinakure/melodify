@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import sys
 import os
+import io
 import re
 
 # 1. Add your backend directory to the sys.path so Python can find 'backend.settings'
@@ -40,9 +41,9 @@ def clean_path_name(name):
     return name.encode('utf-8', 'ignore').decode('utf-8')
 
 def searchSong(url):
+    debug(f"STEAL :: searching {url}...")
     song_objs = spotdl.search([url])
     payload = []
-    debug(f"STEAL :: searching {url}...")
     for song in song_objs:
         payload.append({ 
             'name'   : song.name,
@@ -103,6 +104,9 @@ def getSong(url):
 
 payload = ''
 URL = sys.argv[1]
+debug(f"STEAL :: Processing '{URL}'")
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 if len(sys.argv) >2:
     if sys.argv[2]=='--search_only':
         payload = searchSong(URL)
