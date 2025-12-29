@@ -12,7 +12,6 @@ ExecStart=/src/melodify/venv/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
     --bind unix:/src/melodify/melodify.sock \
-    --settings=backend.settings-server \
     backend.wsgi:application
 
 [Install]
