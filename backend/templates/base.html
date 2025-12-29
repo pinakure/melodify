@@ -20,15 +20,15 @@
 
         <link rel="shortcut icon" 		href="{% static 'images/favicon.ico'            %}" type="image/x-icon">
         <link rel="apple-touch-icon" 	href="{% static 'images/favicon.png'            %}">
-        <link rel="stylesheet" 			href="{% static 'css/fonts.css'                 %}">
-        <link rel="stylesheet" 			href="{% static 'css/base.css'                  %}">
-        <link rel="stylesheet" 			href="{% static 'css/sidebar.css'               %}">
-        <link rel="stylesheet" 			href="{% static 'css/player-styles.css'         %}">
-        <link rel="stylesheet" 			href="{% static 'css/song-list.css'             %}">
+        <link rel="stylesheet" 			href="{% static 'css/fonts.css'                 %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/base.css'                  %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/sidebar.css'               %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/player-styles.css'         %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/song-list.css'             %}?version={{ version }}">
         <!-- Esta linea de estilos debe ser la última (CSS) para que los estilos responsivos tengan efecto  -->
         <link rel="stylesheet" 			href="{% static 'css/vertical.css'              %}">
         <script src="{% static 'js/interact.min.js' %}"></script>
-        <script src="{% static 'js/srt-editor.js' %}"></script>
+        <script src="{% static 'js/srt-editor.js'   %}?version={{ version }}"></script>
 
         <title>Melodify</title>
         {% fontawesome_5_static %}        
@@ -115,10 +115,10 @@
         </div>
         <div id="toaster"></div>
         <script src="/static/js/howler.min.js"></script>
-        <script src="/static/js/utils.js" ></script>
-        <script src="/static/js/constants.js" ></script>
-        <script src="/static/js/MelodifyPlayer.js"></script>
-        <script src="/static/js/Melodify.js"></script>
+        <script src="/static/js/utils.js?version={{ version }}" ></script>
+        <script src="/static/js/constants.js?version={{ version }}" ></script>
+        <script src="/static/js/MelodifyPlayer.js?version={{ version }}"></script>
+        <script src="/static/js/Melodify.js?version={{ version }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', ()=>{
                 melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';

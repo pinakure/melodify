@@ -46,6 +46,7 @@ def get_context( context , user):
     context['playlists'] = get_playlists(user)
     context['favorites'] = get_favorites(user)
     context['analyzer_range'] = range(32)
+    context['version'] = settings.VERSION
     return context
     
 def get_favorites(user):
