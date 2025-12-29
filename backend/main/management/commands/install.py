@@ -36,7 +36,6 @@ APT_PACKAGES    = [
 
 PIP_PACKAGES    = [
     'spotdl'                        ,
-    'stable-ts'                     ,
     '"cython<3.0.0"'                ,
     'python-for-android'            ,
     'django'                        ,
@@ -101,7 +100,8 @@ class Command(BaseCommand):
     help = "Install Required dependencies"
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument("--secure"  , '-s', default=[False]   ,nargs="*", type=bool)
+        parser.add_argument("--ai"      , '-n', default=[True]   ,nargs="*", type=bool)
 
     def section(self, text):
         print('-'*80)
@@ -109,6 +109,10 @@ class Command(BaseCommand):
         print('-'*80)
 
     def handle(self, *args, **options):
+        SERVER_SECURE = options['secure'][0]
+        ENABLE_AI     = options['ai'][0]
+        if ENABLE_AI:
+            PIP_PACKAGES.append('stable-ts')
         if platform.system() == 'Windows':
             print("This command is intended to run only on linux servers.")
             exit()
