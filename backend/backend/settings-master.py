@@ -8,13 +8,13 @@ SECURE  = False
 ANDROID = False
 
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    '192.168.1.151',
-    '192.168.1.178',
+    'melodify.com.82.223.13.41.nip.io',
+    '.82.223.13.41.nip.io',
+    '.nip.io',
     'localhost',
+    '127.0.0.1',
     'melodify.com',
     'melodify.local',
-    'melodify.com.82.223.13.41.nip.io',
 ]
 
 INSTALLED_APPS = [
