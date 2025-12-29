@@ -150,7 +150,7 @@ class Command(BaseCommand):
         self.section('Setup Library Root')
         os.system(f'echo /library > {BASE_PATH}/config/library-root.cfg')
         self.section('Prepare Settings')
-        os.system(f'echo "DEBUG=True"               >  backend/settings.py')
+        os.system(f'echo "DEBUG={not SERVER_SECURE}"               >  backend/settings.py')
         os.system(f'echo "SECURE={SERVER_SECURE}"   >> backend/settings.py')
         os.system(f'cat backend/settings-master.py  >> backend/settings.py')
         os.system(f'echo "DEBUG=False"              >  backend/settings-server.py')
