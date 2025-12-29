@@ -13,7 +13,7 @@ server {
     }
 
     location /media/ {
-        alias /src/melodify/media/;
+        alias /src/melodify/backend/media/;
     }
     
     listen 443 ssl;

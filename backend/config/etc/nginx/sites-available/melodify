@@ -7,13 +7,12 @@ server {
         expires 30d;
         add_header Cache-Control "public";
     }
-    # Pasar todo lo demás a Gunicorn
     location / {
         include proxy_params;
         proxy_pass http://unix:/src/melodify/melodify.sock;
     }
 
     location /media/ {
-        alias /src/melodify/media/; 
+        alias /src/melodify/backend/media/; 
     }
 }
