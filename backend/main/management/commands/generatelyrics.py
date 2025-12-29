@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Scheme
 from .scan import saferead
-import stable_whisper
 import os 
 
 class Command(BaseCommand):
@@ -13,6 +12,7 @@ class Command(BaseCommand):
         parser.add_argument("--model"   , '-m', default=['small'] ,nargs="*", type=str)
 
     def handle(self, *args, **options):
+        import stable_whisper
         filename = options['filename'][0]
         language = options['language'][0]
         __model  = options['model'][0]
