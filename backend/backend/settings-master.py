@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-VERSION = '0.25122922'
+VERSION = '0.25122923'
 SECRET_KEY = 'django-insecure-x-xr0dk^wcis00z=aal_0@xx0z__+eviot4wt29-*%^uvp!i*8'
 SECURE  = False
 ANDROID = False
@@ -101,6 +101,7 @@ if not DEBUG:
         SECURE_SSL_REDIRECT = True
         SESSION_COOKIE_SECURE = True
         CSRF_COOKIE_SEGURE = True
+        CSRF_TRUSTED_ORIGINS = ['https://melodify.com.82.223.13.41.nip.io']
 STATIC_FILES = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [ STATIC_FILES ]
 STATIC_URL = 'static/'
