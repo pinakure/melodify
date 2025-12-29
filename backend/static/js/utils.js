@@ -46,18 +46,26 @@ async function loginWithNostr() {
 
     // 1. Crear el evento de autenticación (NIP-98)
     const event = {
-        kind: 27235,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [
-            ["u", window.location.href], // URL actual
-            ["method", "POST"]
-        ],
-        content: "Autenticación para Melodify"
-    };
-
+		kind: 27235,
+		created_at: Math.floor(Date.now() / 1000),
+		content: "", // No lo borres
+		tags: [
+			["u", window.location.href],
+			["method", "POST"]
+		]
+	};
+	console.log(event);
     // 2. Pedir a la extensión que firme
-    const signedEvent = await window.nostr.signEvent(event);
-
+    try {
+		const pubkey = await window.nostr.getPublicKey(); 
+		console.log("Conectado con:", pubkey);
+		
+		// Si llegas aquí, el canal está abierto. Ahora firma:
+		const signedEvent = await window.nostr.signEvent(event);
+		console.log("Firmado:", signedEvent);
+	} catch (e) {
+		console.error("Error directo:", e);
+	}
     // 3. Enviar a Django
     const response = await fetch("/login-ajax/", {
         method: "POST",
