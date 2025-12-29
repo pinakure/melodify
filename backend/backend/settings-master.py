@@ -68,7 +68,7 @@ LOG_FILE = '\codigo\melodify\melodify.log'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', 
-    'tu_app.auth_backends.NostrAuthBackend',     
+    'main.auth_backends.NostrAuthBackend',     
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -100,7 +100,8 @@ if not DEBUG:
         SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
         SECURE_SSL_REDIRECT = True
         SESSION_COOKIE_SECURE = True
-        CSRF_COOKIE_SEGURE = True
+        CSRF_COOKIE_SECURE = True
+        USE_X_FORWARDED_HOST = True
         CSRF_TRUSTED_ORIGINS = ['https://melodify.com.82.223.13.41.nip.io']
 STATIC_FILES = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [ STATIC_FILES ]

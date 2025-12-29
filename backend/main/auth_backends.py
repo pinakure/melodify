@@ -3,7 +3,7 @@ import time
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from nostr_sdk import Event, PublicKey
-from .models import NostrProfile
+from main.models import NostrProfile
 
 """
 Metadatos de Nostr (NIP-01): 
