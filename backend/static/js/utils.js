@@ -43,29 +43,27 @@ async function loginWithNostr() {
         alert("Instala una extensión de Nostr (como Alby)");
         return;
     }
-
-    // 1. Crear el evento de autenticación (NIP-98)
-    const event = {
-		kind: 27235,
-		created_at: Math.floor(Date.now() / 1000),
-		content: "", // No lo borres
-		tags: [
-			["u", window.location.href],
-			["method", "POST"]
-		]
-	};
-	console.log(event);
-    // 2. Pedir a la extensión que firme
     try {
+		// Pedir a la extensión que firme
 		const pubkey = await window.nostr.getPublicKey(); 
 		console.log("Conectado con:", pubkey);
-		
 		// Si llegas aquí, el canal está abierto. Ahora firma:
+		// Crear el evento de autenticación (NIP-98)
+		const event = {
+			kind: 27235,
+			pubkey: pubkey, // OBLIGATORIO para muchas extensiones al serializar
+			created_at: Math.floor(Date.now() / 1000),
+			content: "",    // OBLIGATORIO: Debe ser string vacío, no null
+			tags: [
+				["u", window.location.href],
+				["method", "POST"]
+			]
+		};
 		console.log("Firmando:", event);
 		const signedEvent = await window.nostr.signEvent(event);
 		console.log("Firmado:", signedEvent);
 		
-		// 3. Enviar a Django
+		// Enviar a Django
 		console.log("Iniciando Sesión");
 		const response = await fetch("/login-ajax/", {
 			method: "POST",

@@ -87,7 +87,7 @@ LOG_FILE = '\codigo\melodify\melodify.log'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', 
-    'tu_app.auth_backends.NostrAuthBackend',     
+    'main.auth_backends.NostrAuthBackend',     
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
