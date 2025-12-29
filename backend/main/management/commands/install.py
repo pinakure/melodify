@@ -82,12 +82,7 @@ LINK = {
 COPY = {
     f'{BASE_PATH}/config/etc/systemd/system/{APP_NAME}.service'  : f'/etc/systemd/system/{APP_NAME}.service', 
 }
-
-if SERVER_SECURE:
-    COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}-secure'] = f'/etc/nginx/sites-available/{APP_NAME}'
-else:
-    COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}'] = f'/etc/nginx/sites-available/{APP_NAME}'
-    
+   
 
 SERVICES = [
     f'nginx',
@@ -116,6 +111,12 @@ class Command(BaseCommand):
         if ENABLE_AI:
             print("Enabling AI Routines")
             PIP_PACKAGES.append('stable-ts')
+        
+        if SERVER_SECURE:
+            COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}-secure'] = f'/etc/nginx/sites-available/{APP_NAME}'
+        else:
+            COPY[f'{BASE_PATH}/config/etc/nginx/sites-available/{APP_NAME}'] = f'/etc/nginx/sites-available/{APP_NAME}'
+        
         if platform.system() == 'Windows':
             print("This command is intended to run only on linux servers.")
             exit()
