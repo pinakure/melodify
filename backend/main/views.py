@@ -522,6 +522,11 @@ def steal_search(request):
             args = [ 'python', os.path.join('scripts', 'steal.py'), url, '--search_only']
             try:
                 debug(f"STEAL :: args = {args}")
+                env = os.environ.copy()
+                env["PYTHONIOENCODING"] = 'utf-8'
+                env["LANG"] = 'en_US.UTF-8'
+                os.environ["PATH"] += os.pathsep + "/usr/bin"
+                env["PATH"]+=os.pathsep + "/usr/bin"
                 result = subprocess.run(
                     args,
                     capture_output=True, 

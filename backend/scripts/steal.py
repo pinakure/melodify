@@ -10,6 +10,7 @@ import re
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 
+
 # 2. Set the environment variable for your Django settings
 # Replace 'backend.settings' with the actual path to your settings.py (e.g., 'melodify.settings')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -20,16 +21,19 @@ django.setup()
 
 from django.conf import settings
 from main.management.commands.scan import saferead, debug
+debug(f"STEAL :: Imported Django")
 from spotdl import Spotdl
+debug(f"STEAL :: Imported Spot DL")
 
 help            = "Steal"
 initialized     = False
 client_id       = settings.SPOTIFY_CLIENT_ID        # move this data to user 
 client_secret   = settings.SPOTIFY_CLIENT_SECRET    # move this data to user profile
+debug(f"STEAL :: Initializing Spot DL")
 spotdl          =  Spotdl(
-    client_id = client_id, 
-    client_secret = client_secret, 
-    no_cache=True,
+    client_id       = client_id, 
+    client_secret   = client_secret, 
+    no_cache        = True,
 )
 debug(f"STEAL :: Spot DL Initialized")
 

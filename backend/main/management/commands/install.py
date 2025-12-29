@@ -164,3 +164,4 @@ class Command(BaseCommand):
         os.system(f'{APP_CMD} migrate main')
         os.system(f'{APP_CMD} collectstatic --noinput --settings=backend.settings-server')
         os.system(f'{APP_CMD} import_schemes')
+        os.system('spotdl --download-ffmpeg')
