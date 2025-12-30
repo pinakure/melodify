@@ -50,3 +50,8 @@ def load_dict(file):
         value = items[1].split(',')
         payload[key] = [ x.strip() for x in value ]
     return payload
+
+def dump_picture(filename, data):
+    # Guarda los datos binarios de la imagen en un archivo
+    with open(filename, 'wb') as img_file:
+        img_file.write(data)

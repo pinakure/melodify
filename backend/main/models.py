@@ -66,7 +66,8 @@ class Song(models.Model):
     title        = models.CharField(max_length=200, default="Untitled")
     filename     = models.CharField(max_length=255, default="untitled.mp3")
     artist       = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
-    genre        = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
+    genre        = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True, related_name="genre")
+    genres       = models.ManyToManyField(Genre, blank=True, related_name="genres")
     comment      = models.TextField(blank=True)
     
     track_number = models.PositiveIntegerField(default=1, null=True, blank=True)

@@ -5,18 +5,17 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.conf import settings
 from pathlib import Path
-from .utils import debug, saferead, safewrite, load_array, load_dict
+from .utils import debug, saferead, safewrite, load_array, load_dict, dump_picture
+from .generatelyrics import Command as GenerateLyrics
+import platform
 import hashlib
 import os
-
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3
 
 # ============
 # CONFIG
 # ============
-INDENT_SIZE = 2
-PATH_SEP = '\\' #os.path.sep
+INDENT_SIZE         = 2
+PATH_SEP            = os.path.sep
 FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
 FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
 FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
@@ -55,7 +54,31 @@ def sanitize_filename(text):
 def sanitize_name(name):
     return name.strip().lower().title()
 
-def get_sanitized_year(year : str):
+def sanitize_tag(tag, song):
+    if is_forbidden_tag(tag):
+        return ""
+    if is_codename(tag):
+        song.codename = tag
+        return ""
+    if is_comment_tag(tag):
+        song.comment += tag
+        return ""
+
+    timestamp = is_timestamp(tag)
+    if len(timestamp) > 0:
+        song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
+        return ""
+    if is_number(tag):
+        return ""
+    tag = tag.replace(' - ', ', ')
+    for emoji,key in EMOJI_REPLACEMENT.items():
+        tag = tag.replace(key, emoji)
+
+    tag = tag.rstrip()
+    tag = tag.rstrip('.')
+    return tag
+
+def sanitize_year(year : str):
     year = year.split('-')[0]
     if int(year)<1000: return "1000"
     return year
@@ -161,105 +184,132 @@ def is_timestamp(tag):
         return ''
     return ''
 
-def sanitize_tag(tag, song):
-    if is_forbidden_tag(tag):
-        return ""
-    if is_codename(tag):
-        song.codename = tag
-        return ""
-    if is_comment_tag(tag):
-        song.comment += tag
-        return ""
 
-    timestamp = is_timestamp(tag)
-    if len(timestamp) > 0:
-        song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
-        return ""
-    if is_number(tag):
-        return ""
-    tag = tag.replace(' - ', ', ')
-    for emoji,key in EMOJI_REPLACEMENT.items():
-        tag = tag.replace(key, emoji)
 
-    tag = tag.rstrip()
-    tag = tag.rstrip('.')
-    return tag
 
-def extract_id3_tags(filepath):
-    """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
-    try:
-        audio = MP3(filepath)
-        tags = ID3(filepath)
-        def get_comments():
-            target_tags = [
-                'COMM::eng',
-                'COMM::esp',
-                'COMM::jap',
-                #'COMM:ID3v1 Comment:eng',
-            ]
-            comments = []
-            for t in target_tags:
-                for comment in get_all(t):
-                    comments.append(comment)
-            comments = ", ".join(comments)
-            return comments
-
-        def get(tag):
-            return tags[tag].text[0] if tag in tags else None
-
-        def get_picture():
-            return tags.get("APIC:").data if 'APIC:' in tags else None,
-
-        def get_all(tag):
-            return tags[tag].text if tag in tags else []
-
-        date = get("TDRC") or get("TYER")
-        try:
-            date = date.strftime('%Y-%m-%d %H:%M:%S')
-        except Exception as e:
-            date = str(date) if date else None
-                
-        return {
-            "file"          : filepath,
-            "title"         : get("TIT2"),
-            "artist"        : get("TPE1"),
-            "album"         : get("TALB"),
-            "track_number"  : get("TRCK"),
-            "picture"       : get_picture(),
-            "comments"      : get_comments(),
-            "genre"         : get("TCON"),
-            "rating"        : tags["POPM:Windows Media Player 9 Series"].rating if "POPM:Windows Media Player 9 Series" in tags else None,
-            "key"           : get("TKEY"),
-            "year"          : date,
-            "bpm"           : get("TBPM"),
-            "composer"      : get("TCOM"),
-            "disc_number"   : get("TPOS"),
-            "length_seconds": int(audio.info.length) if audio.info else None,
-            "bitrate"       : audio.info.bitrate if audio.info else None,
-            "duration"      : timedelta(seconds=audio.info.length),
-        }
-    except Exception as e:
-        print("SCAN :: ID3 Exception : "+str(e))
-        return {
-            "file": filepath,
-            "error": str(e)
-        }
-
-def dump_picture(filename, data):
-    # Guarda los datos binarios de la imagen en un archivo
-    with open(filename, 'wb') as img_file:
-        img_file.write(data)
 
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
+    
+    def echo(self, text):
+        self.stdout.write(self.tabs+text)
     
     def add_arguments(self, parser):
         parser.add_argument("scan_path"                                 , nargs="+" , type=str  )
         parser.add_argument("--force"           , '-f', default=False   , nargs="*" , type=bool )
         parser.add_argument("--generatelyrics"  , '-g', default=False   , nargs="*" , type=bool )
+        parser.add_argument("--verbose"         , '-V', default=False   , nargs="*" , type=bool )
 
-    def echo(self, text, indent=0):
-        self.stdout.write(" "*(indent*INDENT_SIZE)+text)
+    def resolveBasePath(self, BASEPATH):
+        if platform.system() == 'Windows':
+            os.system('cls')
+        else:
+            os.system('clear')
+        BASEPARTS = BASEPATH.split(':')
+        DRIVE = ''
+        PATH  = ''
+        if isinstance(BASEPARTS, str):
+            PATH = BASEPARTS
+        elif len(BASEPARTS)==1:
+            # Single location ( / , /home/user/music , D: , D , D:\ ....)
+            PATH = BASEPARTS[0]
+        else:
+            # Drive and (optional) Path
+            [DRIVE, PATH] = BASEPARTS
+            PATH = PATH.lstrip(os.path.sep)
+            PATH = PATH.rstrip(os.path.sep)
+        if PATH == '': 
+            PATH = os.path.sep
+        # Remove duplicated os.path.sep in the path
+        PATH_PIECES = PATH.split(os.path.sep)
+        PATH = ''
+        for p in PATH_PIECES:
+            if not len(p): continue 
+            PATH += p
+            PATH += os.path.sep
+        MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, PATH )
+        print(f'SCAN :: self.path = "{PATH}"')
+        print(f'SCAN :: self.music_folder = "{MUSIC_FOLDER}"')
+        self.music_folder   = MUSIC_FOLDER
+        self.path           = PATH
+
+    def handle(self, *args, **options):
+        self.force          = options['force'] or False
+        self.lyrics         = options['generatelyrics'] or False
+        self.verbose        = options['verbose'] or False
+        self.generator      = GenerateLyrics() if self.lyrics else None
+        self.path           = ''
+        self.music_folder   = ''
+        self.language       = 'en'
+        self.resolveBasePath(options["scan_path"][0])
+        if self.force   : print("SCAN :: Enable Forced Analysis")
+        if self.verbose : print("SCAN :: Enable High Verbosity")
+        if self.lyrics  : 
+            print("SCAN :: Enable Generate Lyrics using AI")
+            self.generator.initialize('small')
+        self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder ))} songs.")
+    
+    def get_id3tags(self, filepath):
+        """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
+        from mutagen.mp3 import MP3
+        from mutagen.id3 import ID3    
+        try:
+            audio = MP3(filepath)
+            tags =  ID3(filepath)
+            def get_comments():
+                target_tags = [
+                    'COMM::eng',
+                    'COMM::esp',
+                    'COMM::jap',
+                    #'COMM:ID3v1 Comment:eng',
+                ]
+                comments = []
+                for t in target_tags:
+                    for comment in get_all(t):
+                        comments.append(comment)
+                comments = ", ".join(comments)
+                return comments
+
+            def get(tag):
+                return tags[tag].text[0] if tag in tags else None
+
+            def get_picture():
+                return tags.get("APIC:").data if 'APIC:' in tags else None,
+
+            def get_all(tag):
+                return tags[tag].text if tag in tags else []
+
+            date = get("TDRC") or get("TYER")
+            try:
+                date = date.strftime('%Y-%m-%d %H:%M:%S')
+            except Exception as e:
+                date = str(date) if date else None
+                    
+            return {
+                "file"          : filepath,
+                "title"         : get("TIT2"),
+                "artist"        : get("TPE1"),
+                "album"         : get("TALB"),
+                "track_number"  : get("TRCK"),
+                "picture"       : get_picture(),
+                "comments"      : get_comments(),
+                "genre"         : get("TCON"),
+                "rating"        : tags["POPM:Windows Media Player 9 Series"].rating if "POPM:Windows Media Player 9 Series" in tags else None,
+                "key"           : get("TKEY"),
+                "year"          : date,
+                "bpm"           : get("TBPM"),
+                "composer"      : get("TCOM"),
+                "disc_number"   : get("TPOS"),
+                "length_seconds": int(audio.info.length) if audio.info else None,
+                "bitrate"       : audio.info.bitrate if audio.info else None,
+                "duration"      : timedelta(seconds=audio.info.length),
+            }
+        except Exception as e:
+            print("SCAN :: ID3 Exception : "+str(e))
+            return {
+                "file": filepath,
+                "error": str(e)
+            }
 
     def get_song(self, path : str):
         try:
@@ -301,23 +351,29 @@ class Command(BaseCommand):
                             with open(image_file, 'rb') as f:
                                 artist.picture.save(os.path.basename(image_file), File(f), save=True)
                                 artist.save()
-                self.echo(f'Created artist "{ artist_name }"')
+                self.echo(f'+ Created artist "{ artist_name }"')
                 return artist
 
     def get_or_create_genre(self, genre_name, info):
-        if genre_name is None: return None
-        genre_name=sanitize_name(genre_name)
-        if len(genre_name)==0: return None
-        try:
-            genre = Genre.objects.filter( name__iexact=genre_name ).get()
-            return genre
-        except Exception as e:
-            genre = Genre()
-            genre.name = genre_name
-            genre.save()
-            self.echo(f'Created genre "{ genre_name }"')
-            return genre
-
+        if genre_name is None or len(genre_name.strip())==0: 
+            return []
+        genre_name.replace(" n ", '&')
+        genre_name.replace("'n'", '&')
+        genre_name.replace('and', '&')
+        genre_name.replace(','  , '/')
+        genres = genre_name.split('/')
+        for genre_name in genres:
+            genre_name = sanitize_name(genre_name)
+            try:
+                genre = Genre.objects.filter( name__iexact=genre_name ).get()
+                return [genre]
+            except Exception as e:
+                genre = Genre()
+                genre.name = genre_name
+                genre.save()
+                self.echo(f'+ Created genre "{ genre_name }"')
+                return [genre]
+                
     def get_or_create_tags(self, tags_text, song=None):
         if tags_text is None: return []
         tags_text=sanitize_name(tags_text)
@@ -336,7 +392,7 @@ class Command(BaseCommand):
                 tag = Tag()
                 tag.name = tag_token
                 tag.save()
-                self.echo(f"Created tag {tag_token}", indent=1)
+                self.echo(f'+ Created tag "{tag_token}"')
             tags.append(tag)
         return tags
 
@@ -356,203 +412,212 @@ class Command(BaseCommand):
             album.limited = False
             album.edition = 'Vanila'
             album.save()
-            self.echo(f'Created album "{album_name}"')
+            self.echo(f'+ Created album "{album_name}"')
             return album
 
     def add_song_error(self, song, exception, error=True):
-        song.errors = song.errors + str(exception) + '\n'
+        song.errors = song.errors + str(exception) + ';\n'
         if error:
             song.error = error
 
-    def setup_song(self, song, info : dict, hash : str, lyrics : str):
-        song.hash    = hash
-        song.errors  = ''
-        song.error   = False
-        song.lyrics  = lyrics.replace('"', "'")
-        song.comment = ''
+    def setup_title(self):
         try:
-            song.title = info.get('title')
-            if song.title is None:
-                song.error = True
-                song.errors = song.errors + "Title not found. Using filename as fallback.\\n"
-                song.title = str(song.filename).split(PATH_SEP)[-1]
-                # self.echo(song.title)
-                # quit()
+            self.song.title = self.info.get('title')
+            if self.song.title is None:
+                self.add_song_error(self.song, "Title not found. Using filename as fallback.")
+                self.song.title = str(self.song.filename).split(PATH_SEP)[-1]
         except Exception as e:
-            self.echo(str(e))
-            self.add_song_error(song, f"TITLE:{str(e)}")
+            self.song.title = "Desconocido"
+            self.add_song_error( self.song, f"TITLE:{str(e)}" )
 
+    def setup_duration(self):
         try:
-            song.duration = info.get('duration')
+            self.song.duration = self.info.get('duration')
         except Exception as e:
-            song.duration = 1
-            self.add_song_error(song, f"DURATION:{str(e)}", error=False)
+            self.song.duration = 1
+            self.add_song_error( self.song, f"DURATION:{str(e)}")
+    
+    def setup_trackno(self):
+        value = self.info.get('track_number') or 0
+        try:
+            self.song.track_number = int(value.split('/')[0])
+        except:            
+            try:
+                self.song.track_number = int(value)
+            except Exception as e:            
+                self.song.track_number = None
+                self.add_song_error(self.song, f"TRACK:{str(e)}")
 
+    def setup_timestamp(self):
+        self.song.timestamp = None
         try:
-            song.track_number   = int(info.get('track_number'))
+            YEAR        = self.info.get('year') or "1000" # We use 1000 as 'special' value for discarding malformed timestamps
+            TIMESTAMP   = datetime( int( sanitize_year( YEAR ) ), 1, 1)
+            self.song.timestamp = timezone.make_aware( TIMESTAMP ) 
+            if self.song.timestamp.year == 1000: 
+                # Invalid Year, no audio from year 1000 could be recorded!
+                self.song.timestamp = None
         except Exception as e:
-            self.add_song_error(song, f"TRACK:{str(e)}", error=False)
+            self.add_song_error(self.song, f"TIMESTAMP:{str(e)}")
 
+    def setup_album(self):
+        self.song.album = None
         try:
-            song.timestamp = timezone.make_aware(datetime(int(get_sanitized_year(info.get('year') or "1000")), 1, 1))
-            if song.timestamp.year == 1000: song.timestamp = None
+            self.song.album = self.get_or_create_album(self.info.get('album'), self.info)
         except Exception as e:
-            self.add_song_error(song, f"TRACK:{str(e)}")
-        try:
-            song.album = self.get_or_create_album(info.get('album'), info)
-        except Exception as e:
-            self.add_song_error(song, f"ALBUM:{str(e)}")
+            self.add_song_error(self.song, f"ALBUM:{str(e)}")
 
+    def setup_artist(self):
+        self.song.artist = None
         try:
-            song.artist = self.get_or_create_artist( info.get('artist'), info)
-            if song.album:
-                song.album.artists.add(song.artist)
-                song.album.save()
+            self.song.artist = self.get_or_create_artist( self.info.get('artist'), self.info)
         except Exception as e:
-            self.add_song_error(song, f"ARTIST:{str(e)}")
-
+            self.add_song_error(self.song, f"ARTIST:{str(e)}")
         try:
-            song.genre = self.get_or_create_genre( info.get('genre'), info)
-            if song.album:
-                song.album.genres.add(song.genre)
-                song.album.save()
+            if self.song.album:
+                self.song.album.artists.add(self.song.artist)
+                self.song.album.save()
         except Exception as e:
-            self.add_song_error(song, f"GENRE:{str(e)}")
-
+            self.add_song_error(self.song, f"ARTIST:{str(e)}")
+        
+    def setup_genre(self):
+        self.song.genre = None
         try:
-            song.bpm = info.get('bpm') if is_number(info.get('bpm')) else None
+            genres = self.get_or_create_genre( self.info.get('genre'), self.info)
+            for genre in genres:
+                self.song.genres.add( genre )
+                if self.song.album:
+                    self.song.album.genres.add( genre )
+                    self.song.album.save()
+            if len(genres):
+                self.song.genre = genres[0] 
         except Exception as e:
-            self.add_song_error(song, f"BPM:{str(e)}")
+            self.add_song_error(self.song, f"GENRE:{str(e)}")
 
+    def setup_bpm(self):
+        self.song.bpm = None
         try:
-            song.key = info.get('key')
+            self.song.bpm = self.info.get('bpm') if is_number(self.info.get('bpm')) else None
         except Exception as e:
-            self.add_song_error(song, f"KEY:{str(e)}")
+            self.add_song_error(self.song, f"BPM:{str(e)}")
 
-        picture = info.get('picture')[0] if 'picture' in info.keys() else None
+    def setup_key(self):
+        self.song.key = None
+        try:
+            self.song.key = self.info.get('key')
+        except Exception as e:
+            self.add_song_error(self.song, f"KEY:{str(e)}")
+
+    def setup_picture(self):
+        self.song.picture = None
+        picture = self.info.get('picture')[0] if 'picture' in self.info.keys() else None
         if picture is not None:
             try:
-                if song.picture == '':
+                if self.song.picture == '':
                     sha = hashlib.sha512()
                     sha.update(picture)
                     filename = sha.hexdigest()  # 128 caracteres ASCII
                     path = os.path.join('.', "media", "songs", f'{filename}.png')
                     dump_picture(path, picture)
-                    song.picture = f'/media/songs/{filename}.png'
+                    self.song.picture = f'/media/songs/{filename}.png'
             except Exception as e:
-                print("SCAN :: setupsong picture exception :" + str(e))
-                quit()
-                self.add_song_error(song, f"PICTURE:{str(e)};")
-
+                self.add_song_error(self.song, f"PICTURE:{str(e)}")
             try:
-                if song.album is not None:
-                    if song.album.picture is None:
-                        filename = sanitize_filename(song.album.name)
+                if self.song.album is not None:
+                    if self.song.album.picture is None:
+                        filename = sanitize_filename(self.song.album.name)
                         path = os.path.join('.', "media", "albums", f'{filename}.png')
                         dump_picture(path, picture)
-                        song.album.picture = f'/media/albums/{filename}.png'
-                        song.album.save()
+                        self.song.album.picture = f'/media/albums/{filename}.png'
+                        self.song.album.save()
             except Exception as e:
-                print("SETUPALBUMPIC:" + str(e))
-                quit()
-                self.add_song_error(song, f"PICTURE:{str(e)}")
+                self.add_song_error(self.song, f"PICTURE:{str(e)}")
 
-        song.save()
-
-        for tag in self.get_or_create_tags( info.get('comments'), song):
+    def setup_tags(self):
+        self.song.comment = ''
+        for tag in self.get_or_create_tags( self.info.get('comments'), self.song):
             try:
-                song.tags.add(tag)
+                self.song.tags.add(tag)
             except Exception as e:
-                self.add_song_error(song, f"TAGS:{str(e)}")
+                self.add_song_error(self.song, f"TAGS ({tag}): {str(e)}")
+    
+    def setup_lyrics(self):
+        SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
+        self.song.lyrics = saferead(SRT_FILE) if os.path.exists(SRT_FILE) else ''
+        try:
+            self.song.lyrics = self.song.lyrics.replace('"', "'")
+            if self.song.lyrics == '' and self.lyrics:
+                self.echo(f"Generating Lyrics ({self.language})...")
+                self.generator.work(self.song.filename, self.language)
+                self.song.lyrics = saferead(SRT_FILE) if os.path.exists(SRT_FILE) else ''
+        except Exception as e:
+            self.add_song_error(self.song, f"LYRICS:{str(e)}")
 
-        song.save()
+    def setup_song(self):
+        self.song.errors = ''
+        self.song.error  = False
+        self.song.hash   = self.hash
+        self.setup_title()
+        self.setup_duration()
+        self.setup_trackno()
+        self.setup_timestamp()
+        self.setup_album()
+        self.setup_artist()
+        self.setup_bpm()
+        self.setup_key()
+        self.setup_picture()
+        self.song.save()
+        self.setup_genre()
+        self.setup_tags()
+        self.song.save()
+        self.setup_lyrics()
+        self.song.save()
 
-    def update_song(self, path : str, info : dict, hash : str, lyrics : str):
-        song = Song.objects.filter(filename=path).get()
-        self.setup_song( song, info , hash, lyrics)
-        self.echo(f'Updated song {path}', indent=1)
+    def update_song(self, filename : str):
+        self.song = Song.objects.filter(filename=filename).get()
+        self.setup_song()
+        self.echo(f'· Updated song {filename}')
 
-    def create_song(self, path : str, info : dict, hash : str, lyrics : str):
-        song = Song()
-        song.filename = path
-        self.setup_song( song, info , hash, lyrics)
-        self.echo(f'Created song "{path}"', indent=1)
+    def create_song(self, filename : str):
+        self.song = Song()
+        self.song.filename = filename
+        self.setup_song()
+        self.echo(f'· Created song "{filename}"')
 
-    def getLyrics(self, path):
-        lyric_file = path.rstrip('mp3')+'srt'
-        if os.path.exists(lyric_file):
-            return saferead(lyric_file)
-        return ''
-
-    def scan(self, folder, force=False):
+    def scan(self, folder):        
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
         self.folder = folder
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
-            tabs = "  " * len(root.split(folder)[1].split("\\"))
+            self.tabs = "  " * len(root.split(folder)[1].split("\\"))
             last = root.split(folder)[1].split("\\")[-1]
-            print(("  "*50)+"\r"+tabs+last.lstrip('\\').lstrip('/'))
+            print(("  "*50)+"\r"+self.tabs+last.lstrip('\\').lstrip('/'))
+            self.language = 'en'
             for f in files:
+                if f.lower().endswith(".lang"):
+                    self.language = f.strip('.lang')
+                    continue
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
-                    path = os.path.join(root, f)
-                    hash = get_hash(path)
+                    path        = os.path.join(root, f)
+                    self.hash   = get_hash(path)
                     # check whether or not the song object exists
-                    id = os.path.join(root, f)
-                    song = self.get_song(id)
-                    if (song is not None) and (song.hash == hash) and (not song.error) and (not force):
+                    filename    = os.path.join(root, f)
+                    song        = self.get_song(filename)
+                    if (song is not None) and (song.hash == self.hash) and (not song.error) and (not (self.force or self.lyrics)):
                         continue
-                    info = extract_id3_tags(path)
-                    lyrics = self.getLyrics(path)
+                    self.info = self.get_id3tags(path)
                     if song is None:
-                        self.create_song(id , info, hash, lyrics)
+                        self.create_song( filename )
                     else:
-                        self.update_song(id, info, hash, lyrics)
-                    results.append(info)
+                        self.update_song( filename )
+                    if self.song and self.song.error and self.verbose:
+                        for line in self.song.errors.replace('\n', '').split(';'):
+                            if len(line)>0:
+                                self.echo('/!\\ ' + line.strip('\n'))
+                    results.append(self.info)
         return results
 
-    def resolveBasePath(self, BASEPATH):
-        BASEPARTS = BASEPATH.split(':')
-        DRIVE = ''
-        PATH  = ''
-        if isinstance(BASEPARTS, str):
-            PATH = BASEPARTS
-        elif len(BASEPARTS)==1:
-            # Single location ( / , /home/user/music , D: , D , D:\ ....)
-            PATH = BASEPARTS[0]
-        else:
-            # Drive and (optional) Path
-            [DRIVE, PATH] = BASEPARTS
-            PATH = PATH.lstrip(os.path.sep)
-            PATH = PATH.rstrip(os.path.sep)
-        if PATH == '': 
-            PATH = os.path.sep
-        # Remove duplicated os.path.sep in the path
-        PATH_PIECES = PATH.split(os.path.sep)
-        PATH = ''
-        for p in PATH_PIECES:
-            if not len(p): continue 
-            PATH += p
-            PATH += os.path.sep
-        MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, PATH )
-        print(f'SCAN :: self.path = "{PATH}"')
-        print(f'SCAN :: self.music_folder = "{MUSIC_FOLDER}"')
-        self.music_folder   = MUSIC_FOLDER
-        self.path           = PATH
-
-    def handle(self, *args, **options):
-        self.force          = False
-        self.lyrics         = False
-        self.path           = ''
-        self.music_folder   = ''
-        self.resolveBasePath(options["scan_path"][0])
-        if options['force'] is not False:
-            print(("SCAN :: FORCE ANALYSIS: True")
-            self.force = True              
-        if options['generatelyrics'] is not False:
-            print(("SCAN :: GENERATE LYRICS: True")
-            self.lyrics = True
-        results = self.scan( self.music_folder, self.force, self.lyrics )
-        self.echo(f"SCAN :: Finished : {len(results)} files.")
+    
