@@ -191,6 +191,15 @@ def is_timestamp(tag):
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
     
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.verbose        = False
+        self.lyrics         = False 
+        self.force          = False 
+        self.generator      = GenerateLyrics() if self.lyrics else None
+        self.path           = ''
+        self.music_folder   = ''
+        self.language       = 'en'
     def echo(self, text):
         self.stdout.write(self.tabs+text)
     
@@ -237,10 +246,6 @@ class Command(BaseCommand):
         self.force          = options['force'] or False
         self.lyrics         = options['generatelyrics'] or False
         self.verbose        = options['verbose'] or False
-        self.generator      = GenerateLyrics() if self.lyrics else None
-        self.path           = ''
-        self.music_folder   = ''
-        self.language       = 'en'
         self.resolveBasePath(options["scan_path"][0])
         if self.force   : print("SCAN :: Enable Forced Analysis")
         if self.verbose : print("SCAN :: Enable High Verbosity")
