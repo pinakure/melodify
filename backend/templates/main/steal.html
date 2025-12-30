@@ -2,7 +2,7 @@
 
 {% comment %}{% extends 'base.html' %}{% endcomment %} 
 {% load fontawesome_5 %}
-{% block header %}
+{% include "main/widget-title.html" with caption='Búsqueda Profunda' %}
 
 <style>
 
@@ -24,26 +24,23 @@
         padding-left: 8px !important;
     }
 </style>
-{% endblock %}
 
-{% block content-title %}{% endblock %}
-
-
-{% block content %}
 {% csrf_token %}
-<input 
+
+<div class="breathe">
+    <input 
     onkeydown="if (event.keyCode === 13) { document.getElementById('searchbutton').click(); return false; }" 
     type="text" 
     id="searchInput" 
     class="input" 
     placeholder="URL / KEYWORD"
->
-<button 
+    >
+    <button 
     id="searchbutton" 
     class="input" 
     onclick="melodify.loading(); melodify.request('/stealsearch/', { url : melodify.node('searchInput').value}, melodify.showResults)"
->
-    {% fa5_icon "search" %}
-</button>
+    >
+        {% fa5_icon "search" %}
+    </button>
+</div>
 <div id="results"></div>
-{% endblock %}

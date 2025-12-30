@@ -36,6 +36,8 @@ APT_PACKAGES    = [
 
 PIP_PACKAGES    = [
     'spotdl'                        ,
+    'ffmpeg'                        ,
+    'ffprobe'                       ,
     '"cython<3.0.0"'                ,
     'python-for-android'            ,
     'django'                        ,
@@ -125,6 +127,7 @@ class Command(BaseCommand):
         os.system(f'sudo apt install {" ".join(APT_PACKAGES)}')
         self.section('Install Python Packages')
         os.system(f'pip install {" ".join(PIP_PACKAGES)}')
+        os.system('spotdl --download-ffmpeg')
         self.section('Copy Required Files')
         for source,dest in COPY.items():
             os.system(f'sudo cp {source} {dest}')
@@ -163,5 +166,6 @@ class Command(BaseCommand):
         os.system(f'{APP_CMD} migrate')
         os.system(f'{APP_CMD} migrate main')
         os.system(f'{APP_CMD} collectstatic --noinput --settings=backend.settings-server')
-        os.system(f'{APP_CMD} import_schemes')
-        os.system('spotdl --download-ffmpeg')
+        os.system(f'{APP_CMD} importschemes')
+        os.system(f'{APP_CMD} importfonts')
+        os.system(f'{APP_CMD} generatecache')

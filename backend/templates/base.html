@@ -45,7 +45,7 @@
                     {% include 'main/link.html' with url='genre-list'    caption="Géneros"      icon="shapes" %}
                     {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    icon="tag" %}
                     {% include 'main/link.html' with url='playlist-list' caption="Listas"       icon="list" %}
-                    {% include 'main/link.html' with url='steal'         caption="Buscar"       icon="search" %} 
+                    {% include 'main/link.html' with url='steal'         caption="Buscar"       icon="skull-crossbones" %} 
                 </div>
                 <div id="menu"></div>
                 <div id="curtain" onclick="melodify.node('menu').style.display = 'none';melodify.node('curtain').style.display = 'none';">
@@ -119,6 +119,7 @@
         <script src="/static/js/constants.js?version={{ version }}" ></script>
         <script src="/static/js/MelodifyPlayer.js?version={{ version }}"></script>
         <script src="/static/js/Melodify.js?version={{ version }}"></script>
+        <script src="/static/js/Colorizer.js?version={{ version }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', ()=>{
                 melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';

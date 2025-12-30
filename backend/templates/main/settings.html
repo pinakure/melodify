@@ -17,133 +17,72 @@
     }
     .swatch.active {
         border: 1px solid #f00;
-    }   
+    }
+    #swatch-tweak {
+        display: none;
+        width: calc(100% - 200px); 
+        margin-left: auto; 
+        margin-right: 10px; 
+        background: var(--bg-main); 
+        padding: 20px; 
+        border-radius: 8px;
+    }
+    .color-slider span {
+        width           : 32px;
+        text-align      : center;
+    }
+    .color-slider {
+        height          : 32px;
+        max-height      : 32px; 
+        display         : flex; 
+        justify-content : center; 
+        align-items     : center; 
+    }
+    .color-slider input {
+        width           : calc(100% - 64px); 
+        height          : 32px; 
+        margin          : 0px; 
+        padding         : 0px;
+    }
+    .color-slider:nth-child(1) i{ color: #f00; }
+    .color-slider:nth-child(2) i{ color: #0f0; }
+    .color-slider:nth-child(3) i{ color: #00f; }
+    .color-slider:nth-child(4) i{ border-radius: 8px; background:linear-gradient(135deg, #fff, #fff4, #fff0); }
 </style>
 {% include 'main/widget-section.html' with caption="Estilo Visual" icon="eye" %}
 <!-- opciones visuales  -->
-<div id="scheme-wrapper" style="margin: 4px; width: 100%; height: 40px; align-items: center; display: flex;">
-    <label for="{{ id }}" >
-        {% fa5_icon "palette" %}&nbsp;
-        <div style="display: inline-block; width: 160px; text-align: left;">
-            Tema de Color
-        </div>
-    </label>
-    <select onchange="melodify.loadScheme( this.value ); melodify.saveState();" class="input" style="width: 50%" id="schemes">
-        <option value="">-------------</option>
-        {% for scheme in schemes %}
-        <option value="{{ scheme.name }}">{{ scheme.name|capfirst }}</option>
-        {% endfor %}
-    </select>
-</div>
+{% include 'main/widget-select.html' with caption="Tema de Color"   icon="palette"   id="schemes"   onchange="colorizer.setScheme( this.value )" items=schemes %}
 <div id="swatches"      style="width: calc(100% - 200px); margin-left: auto;margin-right: 10px;"></div>
-<div id="swatch-tweak" style="width: calc(100% - 200px); margin-left: auto; margin-right: 10px; background: var(--bg-main); padding: 20px; border-radius: 8px;">
+<div id=""      style="width: calc(100% - 200px); display: flex; justify-content:center ;margin-left: auto;margin-right: 10px;">
+    {% include 'main/widget-button.html'    with id="clone-scheme"          caption="Editar"     icon="brush" style="margin-left: auto;margin-right: 0px;" onclick="colorizer.customizeScheme();"%}
+</div>
+<div id="swatch-tweak">
     <div style="background: rgba(0,0,0,0.5); padding: 15px; color: white; display: flex; flex-direction: column; gap: 10px; border-radius: 5px;">
-        <div style="height: 32px;max-height: 32px; display: flex; justify-content: center; align-items: center; "><i class="fa fa-circle" style="color:#f00"></i>&nbsp;<input style="width: calc(100% - 64px); height: 32px; margin: 0px; padding: 0px;" type="range" id="r-range" min="0" max="255" value="40"> <span id="r-val">40</span></div>
-        <div style="height: 32px;max-height: 32px; display: flex; justify-content: center; align-items: center; "><i class="fa fa-circle" style="color:#0f0"></i>&nbsp;<input style="width: calc(100% - 64px); height: 32px; margin: 0px; padding: 0px;" type="range" id="g-range" min="0" max="255" value="41"> <span id="g-val">41</span></div>
-        <div style="height: 32px;max-height: 32px; display: flex; justify-content: center; align-items: center; "><i class="fa fa-circle" style="color:#00f"></i>&nbsp;<input style="width: calc(100% - 64px); height: 32px; margin: 0px; padding: 0px;" type="range" id="b-range" min="0" max="255" value="61"> <span id="b-val">61</span></div>
-        
-        <div style="margin-top: 10px;">
-            <strong>Resultado: </strong> <span id="hex-code">#28293d</span>
-        </div>
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="r-range" min="0" max="255" value="40" ><span id="r-val" class="small">40</span></div>
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="g-range" min="0" max="255" value="41" ><span id="g-val" class="small">41</span></div>
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="b-range" min="0" max="255" value="61" ><span id="b-val" class="small">61</span></div>
+        <div class="color-slider"><i class="fa"          ></i>&nbsp;<input type="range" id="a-range" min="0" max="255" value="255"><span id="a-val" class="small">255</span></div>
     </div>
 </div>
-{% include 'main/widget-checkbox.html'  with id="use-renderer"          caption="Visualización"         value=False                 icon="music"     onclick="melodify.toggleAnalyzer()" %}
+{% include 'main/widget-button.html'    with id="save-scheme"           caption="Guardar"          icon="save"  style="display: none;margin-left: auto;margin-right: 0px;" onclick="colorizer.saveScheme();"%}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Reproductor"    items=fonts                 icon="font"     onchange="melodify.setPlayerFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Titulos"        items=fonts                 icon="font"     onchange="melodify.setTitleFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Textos"         items=fonts                 icon="font"     onchange="melodify.setTextFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-checkbox.html'  with id="use-renderer"          caption="Visualización"         value=False                 icon="music"    onclick="melodify.toggleAnalyzer()" %}
 <hr class="breathe" style="border: 1px solid #f0f0f008"/>
 <!-- rutas  -->
+{% include 'main/widget-section.html' with caption="Rutas" icon="slash" %}
 {% include 'main/widget-input.html'     with id="library-root"          caption="Carpeta de Música"     value=library_root          icon="file" %}
 <hr class="breathe" style="border: 1px solid #f0f0f008"/>
+<!-- conectividad -->
+{% include 'main/widget-section.html' with caption="Conectividad" icon="spider" %}
 {% include 'main/widget-input.html'     with id="spotify-client-id"     caption="<p class='italic'>Spotify Client ID</p>"     value=spotify_client_id     icon="user" %}
 {% include 'main/widget-input.html'     with id="spotify-client-secret" caption="<p class='italic'>Spotify Client Secret</p>" value=spotify_client_secret icon="key" %}
 {% include 'main/widget-input.html'     with id="discogs-api-token"     caption="<p class='italic'>Discogs API Token</p>"     value=discogs_api_token     icon="compact-disc" %}
 
 
 <script>
-
-    function Colorizer(){
-
-    }
-
-    const colorizer = new Colorizer();
-
-    const rInput = document.getElementById('r-range');
-    const gInput = document.getElementById('g-range');
-    const bInput = document.getElementById('b-range');
-
-    const rVal = document.getElementById('r-val');
-    const gVal = document.getElementById('g-val');
-    const bVal = document.getElementById('b-val');
-
-    const hexCode = document.getElementById('hex-code');
-    const target = document.getElementById('swatch-tweak');
-
-    function updateColor() {
-        const r = rInput.value;
-        const g = gInput.value;
-        const b = bInput.value;
-
-        // Actualizar etiquetas de texto
-        rVal.textContent = r;
-        gVal.textContent = g;
-        bVal.textContent = b;
-
-        // Convertir a HEX para mostrarlo
-        const hex = "#" + [r, g, b].map(x => {
-            const h = parseInt(x).toString(16);
-            return h.length === 1 ? '0' + h : h;
-        }).join('');
-        
-        hexCode.textContent = hex;
-
-        // APLICAR AL CSS: Actualiza la variable para que el fondo cambie
-        document.documentElement.style.setProperty('--bg-main', hex);
-    }
-
-    // Escuchar eventos
-    [rInput, gInput, bInput].forEach(input => {
-        input.addEventListener('input', updateColor);
-    });
-
-    // Inicializar al cargar
-    // updateColor();
-
-    let elements = [
-        'bg-main',
-        'bg-nav',
-        'bg-sidebar',
-        'bg-sidebar-selection',
-        'bg-sidebar-hover',
-        'bg-content-blend',
-        'bg-content',
-        'text-color',
-        'secondary-color',
-        'link-color',
-        'section-color',
-        'confirm-color',
-        'accent-color',
-        'bg-player-title',
-        'shadow-color',
-        'tile-placeholder',
-        'tile-info',
-        'tile-info-text',
-        'gradient-begin',
-        'gradient-end',
-    ];
+    colorizer.initialize();
     melodify.node('schemes').value=melodify.state.settings.scheme;
-    let colors = {};
-    document.getElementById('swatches').innerHTML = '';
-    
-    for( i in elements){
-        
-        document.getElementById('swatches').innerHTML += `<div 
-                title="${ elements[i] }" 
-                id="${ elements[i] }" 
-                class="swatch" 
-                onclick="document.getElementsByClassName('swatch').forEach((swatch)=>swatch.className = 'swatch'); this.className='swatch active';"
-                style="background-color: var(--${elements[i]})"
-        ></div>`;
-    }
-    for( i in elements){
-        colors[ elements[i] ] = getComputedStyle(document.getElementById(elements[i])).getPropertyValue(`--${ elements[i] }` ).trim();
-    }
     melodify.node('use-renderer').checked = melodify.state.enable_analyzer; 
 </script>

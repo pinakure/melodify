@@ -5,59 +5,18 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.conf import settings
 from pathlib import Path
+from .utils import debug, saferead, safewrite, load_array, load_dict
 import hashlib
 import os
 
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
-def debug(text):
-    #return
-    with open(settings.LOG_FILE, 'a') as f:
-        f.write(text+'\n')
-
-def saferead(filename, read_mode='r'):
-    if settings.ANDROID:
-        BASE_DIR = Path(__file__).resolve().parent
-        filename = BASE_DIR / filename
-    debug(f"SAFEREAD :: Trying to open '{filename}'")
-    with open(filename, read_mode) as f:
-        return f.read()
-    
 # ============
 # CONFIG
 # ============
 INDENT_SIZE = 2
 PATH_SEP = '\\' #os.path.sep
-
-def load_array(file):
-    if os.path.splitext(os.path.basename(__file__))[0] == 'main':
-        file = os.path.join(os.path.dirname(__file__), 'config', file)
-    else:
-        file = os.path.join('config', file)
-    
-    payload = []
-    
-    payload = saferead(file)
-    return payload.split('\n')
-
-def load_dict(file):
-    if os.path.splitext(os.path.basename(__file__))[0] == 'main':
-        file = os.path.join(os.path.dirname(__file__), 'config', file)
-    else:
-        file = os.path.join('config', file)
-        
-    payload = {}
-    
-    elements = saferead(file).split('\n')
-    for element in elements:
-        if len(element)==0:continue
-        items = element.split('=')
-        key = items[0]
-        value = items[1].split(',')
-        payload[key] = [ x.strip() for x in value ]
-    return payload
-
 FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
 FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
 FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
@@ -318,6 +277,7 @@ class Command(BaseCommand):
         artist_name = artist_name.split('feat.')[0]
         artist_name = artist_name.split('ft.')[0]
         artist_name = artist_name.split('/')[0]
+        artist_name = artist_name.split(',')[0]
         artist_name = artist_name.lstrip(' ').rstrip(' ')
 
         if len(artist_name)==0: return None

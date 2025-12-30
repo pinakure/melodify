@@ -166,7 +166,17 @@ class Scheme(models.Model):
 
 
 # ===========
-# SCHEMES 
+# FONTS 
+# ===========
+class Font(models.Model):
+    name                = models.CharField(primary_key=True, max_length = 32, default = 'default')
+    font_weight         = models.CharField(max_length=10, default = 'normal',blank=True)
+    font_style          = models.CharField(max_length=32, default = 'normal',blank=True)
+    src                 = models.TextField(blank=False, null=False)
+    
+    
+# ===========
+# NOSTR LOGIN 
 # ===========
 class NostrProfile(models.Model):
     user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='nostr_profile')

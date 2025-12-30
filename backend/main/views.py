@@ -236,6 +236,7 @@ class SettingsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
         context['schemes'               ] = Scheme.objects.all().order_by('name').values('name')
+        context['fonts'                 ] = Font.objects.all().order_by('name').values('name')
         context['scheme_data'           ] = Scheme.objects.all().order_by('name').values()
         context['library_root'          ] = saferead('./config/library-root.cfg').strip('\n')
         context['spotify_client_id'     ] = settings.SPOTIFY_CLIENT_ID
@@ -532,13 +533,14 @@ def steal_search(request):
                     capture_output=True, 
                     text=True
                 )
+                debug(f"STEALSEARCH :: result = '{result}'")
+                debug(f"STEALSEARCH :: stdout = '{result.stdout}'")
                 songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
-                debug(f"STEAL :: songs = '{songs}'")
-                debug(f"STEAL :: stdout = '{result.stdout}'")
-                debug(f"STEAL :: stderr = '{result.stderr}'")
+                debug(f"STEALSEARCH :: songs = '{songs}'")
+                debug(f"STEALSEARCH :: stderr = '{result.stderr}'")
                 return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})
             except Exception as e:
-                debug(f"STEAL :: Exception : {str(e)}")
+                debug(f"STEALSEARCH :: Exception : {str(e)}")
                 return JsonResponse({'status': 'error', 'message': str(e)})
 
         except json.JSONDecodeError:

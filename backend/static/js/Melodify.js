@@ -339,7 +339,7 @@ Melodify.prototype = {
         node.innerHTML = '<i style="font-size: 17px" class="fas fa-spinner spin"></i>'
         melodify.request(
             '/stealget/', 
-            { url : `${ song.url }` }, 
+            { url : `${ song_url }` }, 
             (data)=>{ 
                 melodify.scanSongs(data.songs); 
                 melodify.node(`download-${index}`).innerHTML = '<i style="font-size: 17px" class="fas fa-check"></i>'

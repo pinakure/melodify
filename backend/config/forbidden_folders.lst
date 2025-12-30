@@ -23,5 +23,5 @@ System Volume Information
 sorted
 unsorted
 .sorted
-.unsorted
+#.unsorted
 .backup

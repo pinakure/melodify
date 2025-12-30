@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme
+from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme, Font
 
 
 # ============
@@ -8,6 +8,14 @@ from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme
 # ============
 @admin.register(Scheme)
 class SchemeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+# ============
+#   FONTS
+# ============
+@admin.register(Font)
+class FontAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 

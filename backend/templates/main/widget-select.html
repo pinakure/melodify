@@ -1,0 +1,16 @@
+{% load fontawesome_5 %}
+<!-- main/widget-select.html -->
+<div id="{{ id }}-wrapper" style="margin: 4px; width: 100%; height: 40px; align-items: center; display: flex;">
+    <label for="{{ id }}" >
+        {% fa5_icon icon %}&nbsp;
+        <div style="display: inline-block; width: 160px; text-align: left;">
+            {{ caption }}
+        </div>
+    </label>
+    <select onchange="{{ onchange }}" class="input" style="width: 50%" id="{{ id }}">
+        <option value="">-------------</option>
+        {% for item in items %}
+            <option value="{{ item.name }}">{{ item.name|capfirst }}</option>
+        {% endfor %}
+    </select>
+</div>
