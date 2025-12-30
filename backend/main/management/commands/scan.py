@@ -598,7 +598,7 @@ class Command(BaseCommand):
             for f in files:
                 if f.lower().endswith(".lang"):
                     self.language = f.strip('.lang')
-                    continue
+            for f in files:
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
                     path        = os.path.join(root, f)
