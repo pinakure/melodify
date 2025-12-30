@@ -68,7 +68,7 @@ def ytSearch(url, max_resultados=1):
                 for entry in info['entries']:
                     item = {
                         'name'      : entry.get('title'                     ).encode('ascii', 'ignore').decode('ascii').replace("'", '').replace("'", ''),
-                        'artist'    : entry.get('channel', 'No Artist'      ).encode('ascii', 'ignore').decode('ascii').replace("'", '').replace("'", ''),
+                        'artist'    : 'Youtube',
                         'album'     : entry.get('uploader' , 'No Album'     ).encode('ascii', 'ignore').decode('ascii').replace("'", '').replace("'", ''),
                         'url'       : f'www.youtube.com/watch?v={entry.get('id')}',
                         'type'      : 'youtube',
@@ -106,11 +106,12 @@ def ytDownload(url):
             debug(f'STEAL ::    info.title = {info.get('title')}')
             debug(f'STEAL :: info.filepath = {info['requested_downloads'][0]['filepath']}')
             temp_file = Path(info['requested_downloads'][0]['filepath'])
-            dst_dir   = LIBRARY_DIR / '.unsorted'
+            dst_dir   = LIBRARY_DIR / 'Y' / 'Youtube'
             dest_file = dst_dir / f"{info['title'].split('.')[0]}.mp3"
             debug(f'STEAL :: move {str(temp_file)} ==> {str(dest_file)}')
+            os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             shutil.move(str(temp_file), str(dest_file))
-            return [ '.unsorted' ]
+            return [ 'Youtube' ]
         except Exception as e:
             debug(f"STEAL :: Download Error : {e}")
             return []

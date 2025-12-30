@@ -22,6 +22,6 @@ LOST_DIR
 System Volume Information
 sorted
 unsorted
-.sorted
-#.unsorted
+#.sorted
+.unsorted
 .backup

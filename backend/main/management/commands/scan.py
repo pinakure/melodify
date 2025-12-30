@@ -36,6 +36,9 @@ FORBIDEN_CHARACTERS = [
     '*',
     '~',
     ':',
+    '"',
+    '<',
+    '>',
 ]
 
 def sanitize(text):
@@ -60,7 +63,6 @@ def get_sanitized_year(year : str):
 def get_hash(path : str):
     """Devuelve un hash de 128 caracteres ASCII (SHA-512 en hex) para un fichero MP3."""
     sha = hashlib.sha512()
-    print(path)
     with open(path, "rb") as f:
         # Leer en bloques para archivos grandes
         for chunk in iter(lambda: f.read(8192), b""):
@@ -107,6 +109,8 @@ def is_number(var):
         return False
 
 def is_timestamp(tag):
+    if '/' in tag or '\\' in tag:
+        return ''
     if len(tag) == 4:
         # YYYY
         if is_number(tag):
@@ -169,9 +173,6 @@ def sanitize_tag(tag, song):
 
     timestamp = is_timestamp(tag)
     if len(timestamp) > 0:
-        print("\n")
-        print(song.filename)
-        print(timestamp)
         song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
         return ""
     if is_number(tag):
@@ -238,7 +239,7 @@ def extract_id3_tags(filepath):
             "duration"      : timedelta(seconds=audio.info.length),
         }
     except Exception as e:
-        print("ID3:"+str(e))
+        print("SCAN :: ID3 Exception : "+str(e))
         return {
             "file": filepath,
             "error": str(e)
@@ -253,8 +254,9 @@ class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
     
     def add_arguments(self, parser):
-        parser.add_argument("scan_path", nargs="+", type=str)
-        parser.add_argument("--force", '-f', default=False,nargs="*", type=bool)
+        parser.add_argument("scan_path"                                 , nargs="+" , type=str  )
+        parser.add_argument("--force"           , '-f', default=False   , nargs="*" , type=bool )
+        parser.add_argument("--generatelyrics"  , '-g', default=False   , nargs="*" , type=bool )
 
     def echo(self, text, indent=0):
         self.stdout.write(" "*(indent*INDENT_SIZE)+text)
@@ -264,8 +266,6 @@ class Command(BaseCommand):
             return Song.objects.filter(filename=path).get()
         except Exception:
             return None
-
-
 
     def get_or_create_artist(self, artist_name, info):
         
@@ -440,10 +440,9 @@ class Command(BaseCommand):
                     dump_picture(path, picture)
                     song.picture = f'/media/songs/{filename}.png'
             except Exception as e:
-                print(picture)
-                print("SETUPSONGPIC:" + str(e))
+                print("SCAN :: setupsong picture exception :" + str(e))
                 quit()
-                self.add_song_error(song, f"PICTURE:{str(e)}")
+                self.add_song_error(song, f"PICTURE:{str(e)};")
 
             try:
                 if song.album is not None:
@@ -494,7 +493,6 @@ class Command(BaseCommand):
                 continue
             tabs = "  " * len(root.split(folder)[1].split("\\"))
             last = root.split(folder)[1].split("\\")[-1]
-            # print(("  "*50)+"\r"+tabs+root.split(folder)[1].lstrip('\\').lstrip('/'))
             print(("  "*50)+"\r"+tabs+last.lstrip('\\').lstrip('/'))
             for f in files:
                 if f.lower().endswith(".mp3"):
@@ -515,9 +513,7 @@ class Command(BaseCommand):
                     results.append(info)
         return results
 
-    def handle(self, *args, **options):
-        FORCE_ANALYSIS = False
-        BASEPATH = options["scan_path"][0]
+    def resolveBasePath(self, BASEPATH):
         BASEPARTS = BASEPATH.split(':')
         DRIVE = ''
         PATH  = ''
@@ -533,7 +529,7 @@ class Command(BaseCommand):
             PATH = PATH.rstrip(os.path.sep)
         if PATH == '': 
             PATH = os.path.sep
-        print(PATH)
+        # Remove duplicated os.path.sep in the path
         PATH_PIECES = PATH.split(os.path.sep)
         PATH = ''
         for p in PATH_PIECES:
@@ -541,16 +537,22 @@ class Command(BaseCommand):
             PATH += p
             PATH += os.path.sep
         MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, PATH )
-        print(f' ---  os.path.sep: {os.path.sep}')
-        print(f' ---        DRIVE: {DRIVE}')
-        print(f' ---         PATH: {PATH}')
-        print(f' --- MUSIC_FOLDER: {MUSIC_FOLDER}')
-        if options['force'] is not False:
-            print(("*"*80)+'\n'+" Forcing analysis...\n"+("*"*80))
-            force = True
-                        
-        self.echo(f"[{datetime.now().strftime('%H:%I:%S')}] Scanning media..." + '\n' + ('-'*80))
-        self.echo(f"Folder: {MUSIC_FOLDER}")
-        results = self.scan(MUSIC_FOLDER, FORCE_ANALYSIS)
+        print(f'SCAN :: self.path = "{PATH}"')
+        print(f'SCAN :: self.music_folder = "{MUSIC_FOLDER}"')
+        self.music_folder   = MUSIC_FOLDER
+        self.path           = PATH
 
-        self.echo("\n"+f"Scan complete: {len(results)} files.")
+    def handle(self, *args, **options):
+        self.force          = False
+        self.lyrics         = False
+        self.path           = ''
+        self.music_folder   = ''
+        self.resolveBasePath(options["scan_path"][0])
+        if options['force'] is not False:
+            print(("SCAN :: FORCE ANALYSIS: True")
+            self.force = True              
+        if options['generatelyrics'] is not False:
+            print(("SCAN :: GENERATE LYRICS: True")
+            self.lyrics = True
+        results = self.scan( self.music_folder, self.force, self.lyrics )
+        self.echo(f"SCAN :: Finished : {len(results)} files.")
