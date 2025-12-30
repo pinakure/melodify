@@ -563,7 +563,7 @@ def scan_artist(request):
             
             if not artist:
                 return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
-            songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist), False)
+            songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist))
             return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
 
         except json.JSONDecodeError:
