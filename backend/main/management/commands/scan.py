@@ -1,192 +1,17 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.files import File
-from main.models import Song, Album, Artist, Playlist, Tag, Genre
-from datetime import datetime, timedelta
-from django.utils import timezone
-from pathlib import Path
-from main.utils import saferead, load_dict, dump_picture
-from config.forbidden import FORBIDDEN_FOLDERS, FORBIDDEN_TAGS, FORBIDDEN_PREFIXES, FORBIDDEN_SUFFIXES, CODENAME_PREFIXES 
-from .generatelyrics import Command as GenerateLyrics
+from django.core.management.base    import BaseCommand, CommandError
+from django.core.files              import File
+from django.utils                   import timezone
+from main.models                    import Song, Album, Artist, Tag, Genre
+from main.utils                     import Utils, Sanitizer
+from datetime                       import datetime, timedelta
+from .generatelyrics                import Command as GenerateLyrics
 import platform
 import hashlib
 import os
 
-# ============
-# CONFIG
-# ============
 INDENT_SIZE         = 2
 PATH_SEP            = os.path.sep
-
 ARTIST_ALIASES      = {}
-
-EMOJI_REPLACEMENT = {
-    '♥' : '❤',
-    '♥' : '❤️',
-}
-
-FORBIDEN_CHARACTERS = [
-    '/',
-    '\\',
-    '?',
-    '!',
-    '*',
-    '~',
-    ':',
-    '"',
-    '<',
-    '>',
-]
-
-def sanitize(text):
-    text = text.replace('/','')
-    text = text.replace('&','and')
-    text = text.replace('"','')
-    return text
-
-def sanitize_filename(text):
-    for target in FORBIDEN_CHARACTERS:
-        text = text.replace(target, '')
-    return text    
-
-def sanitize_name(name):
-    return name.strip().lower().title()
-
-def sanitize_tag(tag, song):
-    if is_forbidden_tag(tag):
-        return ""
-    if is_codename(tag):
-        song.codename = tag
-        return ""
-    if is_comment_tag(tag):
-        song.comment += tag
-        return ""
-
-    timestamp = is_timestamp(tag)
-    if len(timestamp) > 0:
-        song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
-        return ""
-    if is_number(tag):
-        return ""
-    tag = tag.replace(' - ', ', ')
-    for emoji,key in EMOJI_REPLACEMENT.items():
-        tag = tag.replace(key, emoji)
-
-    tag = tag.rstrip()
-    tag = tag.rstrip('.')
-    return tag
-
-def sanitize_year(year : str):
-    year = year.split('-')[0]
-    if int(year)<1000: return "1000"
-    return year
-
-def get_hash(path : str):
-    """Devuelve un hash de 128 caracteres ASCII (SHA-512 en hex) para un fichero MP3."""
-    sha = hashlib.sha512()
-    with open(path, "rb") as f:
-        # Leer en bloques para archivos grandes
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha.update(chunk)
-    return sha.hexdigest()  # 128 caracteres ASCII
-
-def is_codename(tag: str) -> bool:
-    """Devuelve True si la tag es un codename."""
-    for prefix in CODENAME_PREFIXES:
-        if len(prefix)==0:continue
-        if tag.startswith(prefix) : return True
-    return False
-
-def is_ignored_path(path: str) -> bool:
-    """Devuelve True si la ruta está dentro de alguna carpeta ignorada."""
-    p = Path(path).resolve()
-
-    # Comprobamos cada parte del path
-    for part in p.parts:
-        for folder in FORBIDDEN_FOLDERS:
-            if len(folder)==0:continue
-            if part.startswith(folder):return True
-
-    return False
-
-def is_comment_tag(tag: str) -> bool:
-    """Devuelve True si la tag tiene espacios"""
-    return " " in tag
-
-def is_forbidden_tag(tag: str) -> bool:
-    """Devuelve True si la tag está prohibida."""
-    for fb in FORBIDDEN_TAGS:
-        if fb == tag: return True
-    for fb in FORBIDDEN_PREFIXES:
-        if len(fb)==0:continue
-        if tag.lower().startswith(fb): return True
-    for fb in FORBIDDEN_SUFFIXES:
-        if len(fb)==0:continue
-        if tag.lower().endswith(fb): return True
-    return False
-
-def is_number(var):
-    try:
-        test = int(var)
-        return True
-    except:
-        return False
-
-def is_timestamp(tag):
-    if '/' in tag or '\\' in tag:
-        return ''
-    if len(tag) == 4:
-        # YYYY
-        if is_number(tag):
-            return f'{tag}0101'
-    if len(tag) == 7:
-        # YYYY-MM
-        if is_number(tag[0:4]):
-            if is_number(tag[5:7]):
-                return f'{tag[0:4]}{tag[5:7]}01'
-        # MM-YYYY
-        else:
-            if is_number(tag[0:2]):
-                if is_number(tag[3:7]):
-                    return f'{tag[3:7]}{tag[0:2]}01'
-        return ''
-    if len(tag) == 8:
-        if is_number(tag[0:4]):
-            if int(tag[0:4]) < 2500:
-                if not is_number(tag[6:8]):
-                    # YYYYMMXX
-                    return f'{tag[0:4]}{tag[4:6]}01'
-                elif not is_number(tag[4:6]):
-                    # YYYYXXXX
-                    if is_number(tag[0:4]):
-                        return f'{tag[0:4]}0101'
-                else:
-                    # YYYYMMDD
-                    return f'{tag[0:4]}{tag[4:6]}{tag[6:8]}'
-        elif is_number(tag[0:2]):
-            # DD-MM-YY
-            if not is_number(tag[2]):
-                if is_number(tag[3:5]):
-                    if not is_number(tag[5]):
-                        if is_number(tag[6:8]):
-                            return f'20{tag[0:2]}{tag[3:5]}{tag[6:8]}'
-        return ''
-    if len(tag) == 10:
-        # 0000-00-00
-        if is_number(tag[0:4]):
-            if is_number(tag[5:7]):
-                if is_number(tag[8:10]):
-                    return f'{tag[0:4]}{tag[5:7]}{tag[8:10]}'
-        # 00-00-0000
-        if is_number(tag[0:2]):
-            if is_number(tag[3:5]):
-                if is_number(tag[6:10]):
-                    return f'{tag[6:10]}{tag[3:5]}{tag[0:2]}'
-        return ''
-    return ''
-
-
-
-
 
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
@@ -253,6 +78,10 @@ class Command(BaseCommand):
         if self.lyrics  : print("SCAN :: Enable Generate Lyrics using AI")
         self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder ))} songs.")
     
+    def get_aliases(self):
+        LIBRARY_ROOT    = Utils.library_path()
+        pass
+
     def get_id3tags(self, filepath):
         """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
         from mutagen.mp3 import MP3
@@ -350,7 +179,7 @@ class Command(BaseCommand):
                 artist.picture = None
                 artist.save()
                 if os.path.isdir(os.path.join(self.folder, '.artists')):
-                    image_file = os.path.join(self.folder, '.artists', f'{sanitize(artist_name)}.jpg')
+                    image_file = os.path.join(self.folder, '.artists', f'{ Sanitizer.clean(artist_name) }.jpg')
                     if os.path.isfile( image_file ):
                             with open(image_file, 'rb') as f:
                                 artist.picture.save(os.path.basename(image_file), File(f), save=True)
@@ -367,7 +196,7 @@ class Command(BaseCommand):
         genre_name.replace(','  , '/')
         genres = genre_name.split('/')
         for genre_name in genres:
-            genre_name = sanitize_name(genre_name)
+            genre_name = Sanitizer.name(genre_name)
             try:
                 genre = Genre.objects.filter( name__iexact=genre_name ).get()
                 return [genre]
@@ -380,15 +209,15 @@ class Command(BaseCommand):
                 
     def get_or_create_tags(self, tags_text, song=None):
         if tags_text is None: return []
-        tags_text=sanitize_name(tags_text)
-        tags = []
-        tag_list = tags_text.split(', ')
-        res = []
+        tags_text   = Sanitizer.name(tags_text)
+        tags        = []
+        tag_list    = tags_text.split(', ')
+        res         = []
         [res.append(val) for val in tag_list if val not in res]
         tag_list = res
         for tag_token in tag_list:
             tag = None
-            tag_token = sanitize_tag( tag_token, song )
+            tag_token = Sanitizer.tag( tag_token, song )
             if len(tag_token) == 0: continue
             try:
                 tag = Tag.objects.filter( name=tag_token ).get()
@@ -456,7 +285,7 @@ class Command(BaseCommand):
         self.song.timestamp = None
         try:
             YEAR        = self.info.get('year') or "1000" # We use 1000 as 'special' value for discarding malformed timestamps
-            TIMESTAMP   = datetime( int( sanitize_year( YEAR ) ), 1, 1)
+            TIMESTAMP   = datetime( int( Sanitizer.year( YEAR ) ), 1, 1)
             self.song.timestamp = timezone.make_aware( TIMESTAMP ) 
             if self.song.timestamp.year == 1000: 
                 # Invalid Year, no audio from year 1000 could be recorded!
@@ -501,7 +330,7 @@ class Command(BaseCommand):
     def setup_bpm(self):
         self.song.bpm = None
         try:
-            self.song.bpm = self.info.get('bpm') if is_number(self.info.get('bpm')) else None
+            self.song.bpm = self.info.get('bpm') if Utils.is_number(self.info.get('bpm')) else None
         except Exception as e:
             self.add_song_error(self.song, f"BPM:{str(e)}")
 
@@ -522,16 +351,16 @@ class Command(BaseCommand):
                     sha.update(picture)
                     filename = sha.hexdigest()  # 128 caracteres ASCII
                     path = os.path.join('.', "media", "songs", f'{filename}.png')
-                    dump_picture(path, picture)
+                    Utils.dump_picture(path, picture)
                     self.song.picture = f'/media/songs/{filename}.png'
             except Exception as e:
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
             try:
                 if self.song.album is not None:
                     if self.song.album.picture is None:
-                        filename = sanitize_filename(self.song.album.name)
+                        filename = Sanitizer.filename(self.song.album.name)
                         path = os.path.join('.', "media", "albums", f'{filename}.png')
-                        dump_picture(path, picture)
+                        Utils.dump_picture(path, picture)
                         self.song.album.picture = f'/media/albums/{filename}.png'
                         self.song.album.save()
             except Exception as e:
@@ -547,13 +376,13 @@ class Command(BaseCommand):
     
     def setup_lyrics(self):
         SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
-        self.song.lyrics = saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
         try:
             self.song.lyrics = self.song.lyrics.replace('"', "'")
             if self.song.lyrics == '' and self.lyrics:
                 self.echo(f"Generating Lyrics ({self.language})...")
-                self.generator.work(self.song.filename, self.language)
-                self.song.lyrics = saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+                self.generator.work(self.song.filename, self.language, verbose=False, tabs=self.tabs)
+                self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
         except Exception as e:
             self.add_song_error(self.song, f"LYRICS:{str(e)}")
 
@@ -597,8 +426,10 @@ class Command(BaseCommand):
                 self.generator = GenerateLyrics() if self.lyrics else None
                 self.generator.initialize('small')
 
+        self.get_aliases()
+
         for root, _, files in os.walk(folder):
-            if is_ignored_path(root):
+            if Utils.is_ignored_path(root):
                 continue
             self.tabs = "  " * len(root.split(folder)[1].split("\\"))
             last = root.split(folder)[1].split("\\")[-1]
@@ -611,7 +442,7 @@ class Command(BaseCommand):
                 if f.lower().endswith(".mp3"):
                     print(("  "*50)+"\r"+f, end="\r")
                     path        = os.path.join(root, f)
-                    self.hash   = get_hash(path)
+                    self.hash   = Utils.get_hash(path)
                     # check whether or not the song object exists
                     filename    = os.path.join(root, f)
                     song        = self.get_song(filename)

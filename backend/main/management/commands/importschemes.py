@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand
-from main.models import Scheme
-from main.utils import saferead
+from django.core.management.base    import BaseCommand
+from main.models                    import Scheme
+from main.utils                     import Utils
 import os 
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         for scheme_file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
             scheme_name = scheme_file.split('.')[0]
             print(f"Processing {scheme_name}")
-            contents    = saferead(os.path.join(path, scheme_file)).lstrip('\n').lstrip(':root {\n').lstrip('\n').rstrip('}').rstrip('\n').replace('\t', '').replace(';', '')
+            contents    = Utils.saferead(os.path.join(path, scheme_file)).lstrip('\n').lstrip(':root {\n').lstrip('\n').rstrip('}').rstrip('\n').replace('\t', '').replace(';', '')
             lines       = contents.split('\n')
             try:
                 fields      = { parts[0].strip().replace('--','').replace('-', '_'): parts[1].strip() for line in lines if ':' in line for parts in [line.split(':', 1)] }

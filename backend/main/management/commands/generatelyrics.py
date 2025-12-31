@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand
-from main.models import Scheme
-from main.utils import saferead
+from django.core.management.base    import BaseCommand
+from main.models                    import Scheme
+from main.utils                     import Utils
 import os 
 
 class Command(BaseCommand):
@@ -17,10 +17,10 @@ class Command(BaseCommand):
         # 'small' es rápido; 'medium' es mejor para música si tienes buena RAM/GPU
         self.model = stable_whisper.load_model(model)
 
-    def work(self, filename, language):
+    def work(self, filename, language, verbose=False,tabs=''):
         # 'mel_filters' mejorados ayudan a ignorar un poco el ruido musical
-        print(f'Analyzing ({language}) {filename}...') 
-        result = self.model.transcribe(filename, language=language, fp16=False) 
+        print(tabs+f'> Analyzing ({language}) {filename}...') 
+        result = self.model.transcribe(filename, language=language, fp16=False, verbose=verbose) 
 
         srtfile  = filename.rstrip('.mp3')+'.srt'
         karfile  = filename.rstrip('.mp3')+'.kar'

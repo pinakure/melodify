@@ -9,7 +9,6 @@ Script
 ~~~~~~~~~~~~~~~~~
 Fronted Duties
 ~~~~~~~~~~~~~~~~~
-· make sure scan script works
 
 ~~~~~~~~~~~~~~~~~
 Data Models

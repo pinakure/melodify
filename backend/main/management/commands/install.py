@@ -1,8 +1,5 @@
 from django.core.management.base import BaseCommand
-from main.models import Scheme
-from main.utils import saferead
 import platform
-import shutil
 import os 
 
 APP_NAME        = f'melodify'

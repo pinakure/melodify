@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Font
-from main.utils import safewrite
+from main.utils import Utils
 import os 
 
 class Command(BaseCommand):
@@ -20,6 +20,6 @@ class Command(BaseCommand):
             contents += '\t'+f"src        :  {font.src          };"+'\n'
             contents += '}\n'
         path = os.path.join('.', 'static', 'css')
-        size = safewrite(os.path.join(path, 'fonts.css'), contents)
+        size = Utils.safewrite(os.path.join(path, 'fonts.css'), contents)
         print(f"Regenerated font cache.")
         print(f'{len(fonts)} fonts compiled. {size} bytes written.')

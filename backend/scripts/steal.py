@@ -1,33 +1,26 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
+from pathlib        import Path
 import shutil
 import sys
 import os
 import io
 import re
-
-# 1. Add your backend directory to the sys.path so Python can find 'backend.settings'
 BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(BASE_DIR))
-
-
-# 2. Set the environment variable for your Django settings
-# Replace 'backend.settings' with the actual path to your settings.py (e.g., 'melodify.settings')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-
-# 3. Setup Django
+sys.path.append(str(BASE_DIR))                                      # Add backend directory to the sys.path so Python can find 'backend.settings'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings') # Set the environment variable for your Django settings
 import django
-django.setup()
-
-from django.conf import settings
-from main.utils import saferead, debug
+django.setup()                                                      # Setup Django
+from django.conf    import settings
+from main.utils     import Utils, debug
 debug("-"*80)
 debug(f"STEAL :: Imported Django")
-from spotdl import Spotdl
+from spotdl         import Spotdl
 debug(f"STEAL :: Imported Spot DL")
 import yt_dlp
 debug(f"STEAL :: Imported YTDLP")
-
+debug(f"STEAL :: Module Initialization Complete")
+debug("-"*80)
+#------------------------------------------------------------------------------
 help            = "Steal"
 initialized     = False
 client_id       = settings.SPOTIFY_CLIENT_ID        # move this data to user 
@@ -38,8 +31,7 @@ spotdl          =  Spotdl(
     client_secret   = client_secret, 
     no_cache        = True,
 )
-LIBRARY_ROOT = saferead('config/library-root.cfg').strip('\n')
-LIBRARY_DIR = Path(LIBRARY_ROOT).resolve()
+LIBRARY_ROOT    = Utils.library_path()
 
 debug(f"STEAL :: Spot DL Initialized")
 
@@ -106,7 +98,7 @@ def ytDownload(url):
             debug(f'STEAL ::    info.title = {info.get('title')}')
             debug(f'STEAL :: info.filepath = {info['requested_downloads'][0]['filepath']}')
             temp_file = Path(info['requested_downloads'][0]['filepath'])
-            dst_dir   = LIBRARY_DIR / 'Y' / 'Youtube'
+            dst_dir   = LIBRARY_ROOT / 'Y' / 'Youtube'
             dest_file = dst_dir / f"{info['title'].split('.')[0]}.mp3"
             debug(f'STEAL :: move {str(temp_file)} ==> {str(dest_file)}')
             os.makedirs(os.path.dirname(dest_file), exist_ok=True)
@@ -152,7 +144,7 @@ def getSong(url):
             letter       = artist_clean[0].upper() if artist_clean else "#"
 
             # 2. Construir rutas seguras
-            dst_dir     = LIBRARY_DIR / letter / artist_clean / album_clean
+            dst_dir     = LIBRARY_ROOT / letter / artist_clean / album_clean
             dest_file   = dst_dir / title_clean
 
             if dest_file.exists():

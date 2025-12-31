@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand
-from main.models import Font
-from main.utils import saferead
+from django.core.management.base    import BaseCommand
+from main.models                    import Font
+from main.utils                     import Utils
 import os 
 
 class Command(BaseCommand):
@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         path = os.path.join('.', 'static', 'css')
-        contents = saferead(os.path.join(path, 'fonts.css')).lstrip('\n').lstrip(':root {\n').lstrip('\n').rstrip('}').rstrip('\n').replace('\t', '').replace(';', '')
+        contents = Utils.saferead(os.path.join(path, 'fonts.css')).lstrip('\n').lstrip(':root {\n').lstrip('\n').rstrip('}').rstrip('\n').replace('\t', '').replace(';', '')
         fonts = contents.replace(' ', '').replace('\n\n', '').replace('\nurl', 'url').replace('@font-face{\n','').split('}')
         for font in fonts:    
             try:

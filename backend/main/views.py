@@ -1,24 +1,20 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, TemplateView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Case, When, Count, Value, Min
+from django.views.decorators.csrf   import csrf_exempt
 from main.management.commands.scan  import Command as Scan
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.management import execute_from_command_line
-from django.forms.models import model_to_dict
-from django.shortcuts import redirect
-from django.db.models import Q
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.http import JsonResponse, HttpResponse
-from django.conf import settings            
-from .models import *
+from django.contrib.auth.models     import AnonymousUser
+from django.contrib.auth.forms      import AuthenticationForm
+from django.core.paginator          import Paginator, EmptyPage, PageNotAnInteger
+from django.forms.models            import model_to_dict
+from django.views.generic           import ListView, DetailView, TemplateView
+from django.contrib.auth            import authenticate, login, logout, get_user_model
+from django.db.models               import Case, When, Count, Value, Min
+from django.db.models               import Q
+from django.http                    import JsonResponse, HttpResponse
+from django.conf                    import settings            
+from main.models                    import *
+from main.utils                     import Utils, debug
 import subprocess
 import json
 import os
-from main.utils import saferead, debug
 
 scanner = Scan()
 
@@ -238,7 +234,7 @@ class SettingsView(TemplateView):
         context['schemes'               ] = Scheme.objects.all().order_by('name').values('name')
         context['fonts'                 ] = Font.objects.all().order_by('name').values('name')
         context['scheme_data'           ] = Scheme.objects.all().order_by('name').values()
-        context['library_root'          ] = saferead('./config/library-root.cfg').strip('\n')
+        context['library_root'          ] = Utils.saferead('./config/library-root.cfg').strip('\n')
         context['spotify_client_id'     ] = settings.SPOTIFY_CLIENT_ID
         context['spotify_client_secret' ] = settings.SPOTIFY_CLIENT_SECRET
         return context
@@ -464,7 +460,7 @@ def play_ajax(request, pk):
 
             # get song binary data from file 
             song = Song.objects.filter(id=pk).get()
-            data = saferead(song.filename, 'rb')
+            data = Utils.saferead(song.filename, 'rb')
             response = HttpResponse(data, content_type='application/octet-stream')
             # response['Content-Disposition'] = 'attachment; filename="archivo.bin"'
             return response
@@ -554,7 +550,7 @@ def steal_search(request):
 def scan_artist(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
-    LIBRARY_ROOT = saferead('./config/library-root.cfg').strip('\n')
+    LIBRARY_ROOT = Utils.library_path()
     if request.method == 'POST':
         try:
             # Leer los datos JSON del cuerpo de la petición

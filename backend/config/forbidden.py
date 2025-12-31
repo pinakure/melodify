@@ -1,5 +1,3 @@
-from main.utils import load_array
-
 FORBIDDEN_FOLDERS                   = [
     '$RECYCLE.BIN'                  ,
     '.android_secure'               ,                       
@@ -67,3 +65,22 @@ CODENAME_PREFIXES                   = [
     'CWEP'                          ,              
     'BMEP'                          ,              
 ] 
+
+FORBIDDEN_CHARACTERS                = [
+    '/'                             ,
+    '\\'                            ,
+    '?'                             ,
+    '!'                             ,
+    '*'                             ,
+    '~'                             ,
+    ':'                             ,
+    '"'                             ,
+    '<'                             ,
+    '>'                             ,
+]
+
+EMOJI_REPLACEMENT                   = {
+    '♥' : '❤'                     ,
+    '♥' : '❤️'                     ,
+}
+
