@@ -326,7 +326,10 @@ class Command(BaseCommand):
     
     def setup_lyrics(self):
         SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
-        self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        try:
+            self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        except Exception as e:
+            self.add_song_error(self.song, f"LYRICS:{str(e)}")
         try:
             self.song.lyrics = self.song.lyrics.replace('"', "'")
             if self.song.lyrics == '' and self.lyrics:
