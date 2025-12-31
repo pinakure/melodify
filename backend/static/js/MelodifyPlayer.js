@@ -311,7 +311,7 @@ MelodifyPlayer.prototype = {
         });
     },
 
-    updateLyrics : function(){
+    updateLyrics : function(percent, pc, seek){
         if(melodify.lyrics_editor){
             var song_position = melodify.node('songPosition');
             if(!song_position) melodify.lyrics_editor = false;
@@ -372,7 +372,7 @@ MelodifyPlayer.prototype = {
         // If the howl is still playing, continue stepping.
 		if (this.howl.playing()) {
 			requestAnimationFrame(self.step.bind(self));
-            this.updateLyrics();
+            this.updateLyrics(percent, pc, seek);
             this.updateAnalyzer();
 		}
 	},
