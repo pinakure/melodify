@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Font
-from .scan import safewrite
+from main.utils import safewrite
 import os 
 
 class Command(BaseCommand):

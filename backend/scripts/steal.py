@@ -20,7 +20,7 @@ import django
 django.setup()
 
 from django.conf import settings
-from main.management.commands.scan import saferead, debug
+from main.utils import saferead, debug
 debug("-"*80)
 debug(f"STEAL :: Imported Django")
 from spotdl import Spotdl

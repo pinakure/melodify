@@ -7,12 +7,12 @@ def debug(text):
     with open(settings.LOG_FILE, 'a', encoding='utf-8') as f:
         f.write(text+'\n')
 
-def saferead(filename, read_mode='r'):
+def saferead(filename, read_mode='r', **args):
     if settings.ANDROID:
         BASE_DIR = Path(__file__).resolve().parent
         filename = BASE_DIR / filename
     debug(f"SAFEREAD :: Trying to open '{filename}'")
-    with open(filename, read_mode) as f:
+    with open(filename, read_mode, **args) as f:
         return f.read()
 
 def safewrite(filename, contents, binary=False):

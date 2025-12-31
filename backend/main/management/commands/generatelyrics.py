@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Scheme
-from .scan import saferead
+from main.utils import saferead
 import os 
 
 class Command(BaseCommand):
@@ -23,7 +23,9 @@ class Command(BaseCommand):
         result = self.model.transcribe(filename, language=language, fp16=False) 
 
         srtfile  = filename.rstrip('.mp3')+'.srt'
+        karfile  = filename.rstrip('.mp3')+'.kar'
         print(f"Generating { srtfile }...")
+        result.to_srt_vtt( karfile, word_level=True  ) #segment_level=False # Esto mantiene la sincronización por palabra pero limpia el formato
         result.to_srt_vtt( srtfile, word_level=False ) #segment_level=False # Esto mantiene la sincronización por palabra pero limpia el formato
 
     def handle(self, *args, **options):
