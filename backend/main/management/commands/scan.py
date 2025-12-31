@@ -86,15 +86,26 @@ class Command(BaseCommand):
                 if file.lower().endswith(".aka"):
                     artist = file.split( os.path.sep )[-1].rstrip('.aka').lower()
                     self.aliases[ artist ] = []
-                    for alias in Utils.saferead(file).split('\n'):
+                    for alias in Utils.saferead(os.path.join(root, file), read_mode='r', encoding='utf-8').split('\n'):
                         self.aliases[ artist ].append( alias.lower() )
 
     def get_aliases(self, artist_name):
+        query = artist_name.lower()
         for artist in self.aliases:
-            if artist == artist_name.lower():
+            if artist == query:
                 payload = self.aliases[ artist ]
-                return payload.insert(0, artist )
-        return [ ] 
+                # self.echo(f"! Aliases found for { artist_name }. Name has { len(payload)+1 } aliases.")
+                payload.insert(0, artist )
+                return payload
+            for aliases in self.aliases:
+                for alias in self.aliases[ aliases ]:
+                    if query == alias.lower():
+                        # self.echo(f"! Aliases found for artist '{ artist_name }'.")
+                        # self.echo(f"  His true name is '{ artist.title() }'.")
+                        payload = self.aliases[ artist ]
+                        payload.insert(0, artist )
+                        return payload
+        return [ artist_name ] 
 
     def get_id3tags(self, filepath):
         """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
@@ -184,18 +195,13 @@ class Command(BaseCommand):
             return album
 
     def get_or_create_artist(self, artist_name, info):
-        
         if artist_name is None: return None
-        artist_name = artist_name.rstrip().lstrip()
-        # Remove featuring from artist name
-        artist_name = artist_name.split('Ft.')[0]
-        artist_name = artist_name.split('Feat.')[0]
-        artist_name = artist_name.split('feat.')[0]
-        artist_name = artist_name.split('ft.')[0]
-        artist_name = artist_name.split('/')[0]
-        artist_name = artist_name.split(',')[0]
-        artist_name = artist_name.lstrip(' ').rstrip(' ')
 
+        artists     = Sanitizer.artists( artist_name )
+        aliases     = self.get_aliases( artists[0] )
+        # self.echo(f"# Looking for artist { aliases[0] }...")
+        
+        artist_name = aliases[0]
         if len(artist_name)==0: return None
         try:
             artist = Artist.objects.filter( name__iexact=artist_name ).get()
@@ -206,18 +212,18 @@ class Command(BaseCommand):
                 return artist
             except Exception as e:
                 artist = Artist()
-                artist.name     = artist_name
-                artist.aliases  = ''
+                artist.name     = artist_name.title()
+                artist.aliases  = ','.join(aliases)
                 artist.bio      = ''
                 artist.picture = None
                 artist.save()
-                if os.path.isdir(os.path.join(self.folder, '.artists')):
-                    image_file = os.path.join(self.folder, '.artists', f'{ Sanitizer.clean(artist_name) }.jpg')
+                if os.path.isdir(Utils.library_path('.artists')):
+                    image_file = Utils.library_path(os.path.join('.artists', f'{ Sanitizer.clean(artist_name.title()) }.jpg'))
                     if os.path.isfile( image_file ):
                             with open(image_file, 'rb') as f:
                                 artist.picture.save(os.path.basename(image_file), File(f), save=True)
                                 artist.save()
-                self.echo(f'+ Created artist "{ artist_name }"')
+                self.echo(f'+ Created artist "{ artist.name }"')
                 return artist
 
     def get_or_create_genre(self, genre_name, info):
@@ -274,6 +280,7 @@ class Command(BaseCommand):
         try:
             self.song.artist = self.get_or_create_artist( self.info.get('artist'), self.info)
         except Exception as e:
+            self.echo(str(e))
             self.add_song_error(self.song, f"ARTIST:{str(e)}")
         try:
             if self.song.album:

@@ -6,8 +6,8 @@ from pathlib            import Path
 import hashlib
 import os
 
-def debug(**kwargs):
-    return Utils.debug(**kwargs)
+def debug(text, **kwargs):
+    return Utils.debug(text, **kwargs)
 
 class Utils:    
 
@@ -18,9 +18,9 @@ class Utils:
         Utils.LIBRARY_ROOT = Path(Utils.saferead('config/library-root.cfg').strip('\n')).resolve() 
         return os.path.join( Utils.LIBRARY_ROOT, folder )
     
-    def debug(text):
+    def debug(text, **kwargs):
         #return
-        with open(settings.LOG_FILE, 'a', encoding='utf-8') as f:
+        with open(settings.LOG_FILE, 'a', encoding='utf-8', **kwargs) as f:
             f.write(text+'\n')
 
     def saferead(filename, read_mode='r', **args):
@@ -68,7 +68,7 @@ class Utils:
         return payload
         
     def dump_picture(filename, data):
-        # Guarda los datos binarios de la imagen en un archivo
+        """Guarda los datos binarios de la imagen en un archivo."""
         with open(filename, 'wb') as img_file:
             img_file.write(data)
 
@@ -83,8 +83,7 @@ class Utils:
 
     def is_number(var):
         try:
-            test = int(var)
-            return True
+            return isinstance(int(var), int)
         except:
             return False
     
@@ -144,9 +143,11 @@ class Utils:
     def is_codename(tag: str) -> bool:
         """Devuelve True si la tag es un codename."""
         for prefix in CODENAME_PREFIXES:
-            if len(prefix)==0:continue
             if tag.startswith(prefix) : return True
         return False
+    
+    def is_empty(text):
+        return len(text.strip(' ').strip('\n').strip('\t')) == 0
 
     def is_ignored_path(path: str) -> bool:
         """Devuelve True si la ruta está dentro de alguna carpeta ignorada."""
@@ -155,7 +156,6 @@ class Utils:
         # Comprobamos cada parte del path
         for part in p.parts:
             for folder in FORBIDDEN_FOLDERS:
-                if len(folder)==0:continue
                 if part.startswith(folder):return True
 
         return False
@@ -166,13 +166,11 @@ class Utils:
 
     def is_forbidden_tag(tag: str) -> bool:
         """Devuelve True si la tag está prohibida."""
-        for fb in FORBIDDEN_TAGS:
-            if fb == tag: return True
+        for fb in FORBIDDEN_TAGS: 
+            if fb == tag.lower(): return True
         for fb in FORBIDDEN_PREFIXES:
-            if len(fb)==0:continue
             if tag.lower().startswith(fb): return True
         for fb in FORBIDDEN_SUFFIXES:
-            if len(fb)==0:continue
             if tag.lower().endswith(fb): return True
         return False
 
@@ -197,7 +195,7 @@ class Sanitizer:
         return name.strip().lower().title()
 
     def tag(tag, song):
-        if Utils.is_forbidden_tag(tag):
+        if Utils.is_empty(tag) or Utils.is_forbidden_tag(tag):
             return ""
         if Utils.is_codename(tag):
             song.codename = tag
@@ -219,7 +217,24 @@ class Sanitizer:
         tag = tag.rstrip()
         tag = tag.rstrip('.')
         return tag
-
-
-
-
+    
+    def artists( artist_name ):
+        FEAT_TAGS = [
+            ' ft.'      ,
+            ' ft '      ,
+            ' feat.'    ,
+            ' feat '    ,
+            ' prod.'    ,
+            ' prod '    ,
+            '/'         ,
+            '\\'        ,
+            ','         ,
+            ' vs.'      ,
+            ' vs '      ,
+            ' versus '  ,
+            ' versus.'  ,
+        ]
+        artist  = artist_name.lower()
+        for tag in FEAT_TAGS:
+            artist=artist.replace(tag, '|')
+        return [ q.lstrip().rstrip().title() for q in artist.split('|')]

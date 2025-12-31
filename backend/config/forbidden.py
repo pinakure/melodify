@@ -29,8 +29,9 @@ FORBIDDEN_FOLDERS                   = [
 ]
 
 FORBIDDEN_TAGS                      = [
-    '?'                             ,    
-    '??'                            ,        
+    '?'                             ,
+    '??'                            ,
+    'ignore-timetamp'               ,
 ]
 
 FORBIDDEN_PREFIXES                  = [
@@ -53,7 +54,6 @@ FORBIDDEN_PREFIXES                  = [
 
 FORBIDDEN_SUFFIXES                  = [
     '.com'                          ,
-    '.COM'                          ,
 ] 
 
 CODENAME_PREFIXES                   = [
