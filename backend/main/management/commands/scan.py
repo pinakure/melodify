@@ -3,9 +3,9 @@ from django.core.files import File
 from main.models import Song, Album, Artist, Playlist, Tag, Genre
 from datetime import datetime, timedelta
 from django.utils import timezone
-from django.conf import settings
 from pathlib import Path
-from .utils import debug, saferead, safewrite, load_array, load_dict, dump_picture
+from main.utils import saferead, load_dict, dump_picture
+from config.forbidden import FORBIDDEN_FOLDERS, FORBIDDEN_TAGS, FORBIDDEN_PREFIXES, FORBIDDEN_SUFFIXES, CODENAME_PREFIXES 
 from .generatelyrics import Command as GenerateLyrics
 import platform
 import hashlib
@@ -16,11 +16,8 @@ import os
 # ============
 INDENT_SIZE         = 2
 PATH_SEP            = os.path.sep
-FORBIDDEN_FOLDERS   = load_array('forbidden_folders.lst')
-FORBIDDEN_TAGS      = load_array('forbidden_tags.lst')
-FORBIDDEN_PREFIXES  = load_array('forbidden_prefixes.lst')
-CODENAME_PREFIXES   = load_array('codename_prefixes.lst')
-ARTIST_ALIASES      = load_dict('artist_aliases.lst')
+
+ARTIST_ALIASES      = {}
 
 EMOJI_REPLACEMENT = {
     '♥' : '❤',
@@ -122,6 +119,9 @@ def is_forbidden_tag(tag: str) -> bool:
     for fb in FORBIDDEN_PREFIXES:
         if len(fb)==0:continue
         if tag.lower().startswith(fb): return True
+    for fb in FORBIDDEN_SUFFIXES:
+        if len(fb)==0:continue
+        if tag.lower().endswith(fb): return True
     return False
 
 def is_number(var):
@@ -547,13 +547,13 @@ class Command(BaseCommand):
     
     def setup_lyrics(self):
         SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
-        self.song.lyrics = saferead(SRT_FILE) if os.path.exists(SRT_FILE) else ''
+        self.song.lyrics = saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
         try:
             self.song.lyrics = self.song.lyrics.replace('"', "'")
             if self.song.lyrics == '' and self.lyrics:
                 self.echo(f"Generating Lyrics ({self.language})...")
                 self.generator.work(self.song.filename, self.language)
-                self.song.lyrics = saferead(SRT_FILE) if os.path.exists(SRT_FILE) else ''
+                self.song.lyrics = saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
         except Exception as e:
             self.add_song_error(self.song, f"LYRICS:{str(e)}")
 

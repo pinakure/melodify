@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from main.models import Scheme
-from .scan import saferead
+from main.utils import saferead
 import os 
 
 class Command(BaseCommand):

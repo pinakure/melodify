@@ -1,4 +1,0 @@
-Pillow
-Django
-mutagen
-django-fontawesome-5
