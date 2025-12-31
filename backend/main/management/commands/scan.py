@@ -200,6 +200,7 @@ class Command(BaseCommand):
         self.path           = ''
         self.music_folder   = ''
         self.language       = 'en'
+
     def echo(self, text):
         self.stdout.write(self.tabs+text)
     
@@ -249,9 +250,7 @@ class Command(BaseCommand):
         self.resolveBasePath(options["scan_path"][0])
         if self.force   : print("SCAN :: Enable Forced Analysis")
         if self.verbose : print("SCAN :: Enable High Verbosity")
-        if self.lyrics  : 
-            print("SCAN :: Enable Generate Lyrics using AI")
-            self.generator.initialize('small')
+        if self.lyrics  : print("SCAN :: Enable Generate Lyrics using AI")
         self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder ))} songs.")
     
     def get_id3tags(self, filepath):
@@ -593,6 +592,11 @@ class Command(BaseCommand):
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
         self.folder = folder
+        if self.lyrics:
+            if self.generator is None:
+                self.generator = GenerateLyrics() if self.lyrics else None
+                self.generator.initialize('small')
+
         for root, _, files in os.walk(folder):
             if is_ignored_path(root):
                 continue
