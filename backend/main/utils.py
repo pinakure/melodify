@@ -13,10 +13,10 @@ class Utils:
 
     LIBRARY_ROOT = None
 
-    def library_path():
-        if Utils.LIBRARY_ROOT: return Utils.LIBRARY_ROOT
+    def library_path(folder=''):
+        if Utils.LIBRARY_ROOT: return os.path.join( Utils.LIBRARY_ROOT, folder )
         Utils.LIBRARY_ROOT = Path(Utils.saferead('config/library-root.cfg').strip('\n')).resolve() 
-        return Utils.LIBRARY_ROOT
+        return os.path.join( Utils.LIBRARY_ROOT, folder )
     
     def debug(text):
         #return

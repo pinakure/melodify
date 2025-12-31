@@ -234,7 +234,7 @@ class SettingsView(TemplateView):
         context['schemes'               ] = Scheme.objects.all().order_by('name').values('name')
         context['fonts'                 ] = Font.objects.all().order_by('name').values('name')
         context['scheme_data'           ] = Scheme.objects.all().order_by('name').values()
-        context['library_root'          ] = Utils.saferead('./config/library-root.cfg').strip('\n')
+        context['library_root'          ] = Utils.library_path()
         context['spotify_client_id'     ] = settings.SPOTIFY_CLIENT_ID
         context['spotify_client_secret' ] = settings.SPOTIFY_CLIENT_SECRET
         return context

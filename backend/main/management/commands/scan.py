@@ -9,10 +9,6 @@ import platform
 import hashlib
 import os
 
-INDENT_SIZE         = 2
-PATH_SEP            = os.path.sep
-ARTIST_ALIASES      = {}
-
 class Command(BaseCommand):
     help = "Scans specified path looking for mp3 files to be scanned and added to the media library"
     
@@ -77,10 +73,28 @@ class Command(BaseCommand):
         if self.verbose : print("SCAN :: Enable High Verbosity")
         if self.lyrics  : print("SCAN :: Enable Generate Lyrics using AI")
         self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder ))} songs.")
+
+    def add_song_error(self, song, exception, error=True):
+        song.errors = song.errors + str(exception) + ';\n'
+        if error:
+            song.error = error
     
-    def get_aliases(self):
-        LIBRARY_ROOT    = Utils.library_path()
-        pass
+    def load_aliases(self):
+        self.aliases = {}
+        for root, _, files in os.walk( Utils.library_path('.artists') ):
+            for file in files:
+                if file.lower().endswith(".aka"):
+                    artist = file.split( os.path.sep )[-1].rstrip('.aka').lower()
+                    self.aliases[ artist ] = []
+                    for alias in Utils.saferead(file).split('\n'):
+                        self.aliases[ artist ].append( alias.lower() )
+
+    def get_aliases(self, artist_name):
+        for artist in self.aliases:
+            if artist == artist_name.lower():
+                payload = self.aliases[ artist ]
+                return payload.insert(0, artist )
+        return [ ] 
 
     def get_id3tags(self, filepath):
         """Devuelve un diccionario con los metadatos ID3 de un archivo MP3."""
@@ -149,6 +163,25 @@ class Command(BaseCommand):
             return Song.objects.filter(filename=path).get()
         except Exception:
             return None
+
+    def get_or_create_album(self, album_name, info):
+        if album_name is None: return None
+        try:
+            album = Album.objects.filter( name=album_name ).get()
+            return album
+        except Exception as e:
+            album = Album()
+            album.name = album_name
+            album.codename = info.get('codename') or None
+            album.brief = ''
+            album.picture = None
+            album.booklet = None
+            album.edition = None
+            album.limited = False
+            album.edition = 'Vanila'
+            album.save()
+            self.echo(f'+ Created album "{album_name}"')
+            return album
 
     def get_or_create_artist(self, artist_name, info):
         
@@ -229,70 +262,6 @@ class Command(BaseCommand):
             tags.append(tag)
         return tags
 
-    def get_or_create_album(self, album_name, info):
-        if album_name is None: return None
-        try:
-            album = Album.objects.filter( name=album_name ).get()
-            return album
-        except Exception as e:
-            album = Album()
-            album.name = album_name
-            album.codename = info.get('codename') or None
-            album.brief = ''
-            album.picture = None
-            album.booklet = None
-            album.edition = None
-            album.limited = False
-            album.edition = 'Vanila'
-            album.save()
-            self.echo(f'+ Created album "{album_name}"')
-            return album
-
-    def add_song_error(self, song, exception, error=True):
-        song.errors = song.errors + str(exception) + ';\n'
-        if error:
-            song.error = error
-
-    def setup_title(self):
-        try:
-            self.song.title = self.info.get('title')
-            if self.song.title is None:
-                self.add_song_error(self.song, "Title not found. Using filename as fallback.")
-                self.song.title = str(self.song.filename).split(PATH_SEP)[-1]
-        except Exception as e:
-            self.song.title = "Desconocido"
-            self.add_song_error( self.song, f"TITLE:{str(e)}" )
-
-    def setup_duration(self):
-        try:
-            self.song.duration = self.info.get('duration')
-        except Exception as e:
-            self.song.duration = 1
-            self.add_song_error( self.song, f"DURATION:{str(e)}")
-    
-    def setup_trackno(self):
-        value = self.info.get('track_number') or 0
-        try:
-            self.song.track_number = int(value.split('/')[0])
-        except:            
-            try:
-                self.song.track_number = int(value)
-            except Exception as e:            
-                self.song.track_number = None
-                self.add_song_error(self.song, f"TRACK:{str(e)}")
-
-    def setup_timestamp(self):
-        self.song.timestamp = None
-        try:
-            YEAR        = self.info.get('year') or "1000" # We use 1000 as 'special' value for discarding malformed timestamps
-            TIMESTAMP   = datetime( int( Sanitizer.year( YEAR ) ), 1, 1)
-            self.song.timestamp = timezone.make_aware( TIMESTAMP ) 
-            if self.song.timestamp.year == 1000: 
-                # Invalid Year, no audio from year 1000 could be recorded!
-                self.song.timestamp = None
-        except Exception as e:
-            self.add_song_error(self.song, f"TIMESTAMP:{str(e)}")
-
     def setup_album(self):
         self.song.album = None
         try:
@@ -312,7 +281,21 @@ class Command(BaseCommand):
                 self.song.album.save()
         except Exception as e:
             self.add_song_error(self.song, f"ARTIST:{str(e)}")
-        
+    
+    def setup_bpm(self):
+        self.song.bpm = None
+        try:
+            self.song.bpm = self.info.get('bpm') if Utils.is_number(self.info.get('bpm')) else None
+        except Exception as e:
+            self.add_song_error(self.song, f"BPM:{str(e)}")   
+
+    def setup_duration(self):
+        try:
+            self.song.duration = self.info.get('duration')
+        except Exception as e:
+            self.song.duration = 1
+            self.add_song_error( self.song, f"DURATION:{str(e)}")
+
     def setup_genre(self):
         self.song.genre = None
         try:
@@ -327,19 +310,24 @@ class Command(BaseCommand):
         except Exception as e:
             self.add_song_error(self.song, f"GENRE:{str(e)}")
 
-    def setup_bpm(self):
-        self.song.bpm = None
-        try:
-            self.song.bpm = self.info.get('bpm') if Utils.is_number(self.info.get('bpm')) else None
-        except Exception as e:
-            self.add_song_error(self.song, f"BPM:{str(e)}")
-
     def setup_key(self):
         self.song.key = None
         try:
             self.song.key = self.info.get('key')
         except Exception as e:
             self.add_song_error(self.song, f"KEY:{str(e)}")
+    
+    def setup_lyrics(self):
+        SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
+        self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        try:
+            self.song.lyrics = self.song.lyrics.replace('"', "'")
+            if self.song.lyrics == '' and self.lyrics:
+                self.echo(f"Generating Lyrics ({self.language})...")
+                self.generator.work(self.song.filename, self.language, verbose=False, tabs=self.tabs)
+                self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        except Exception as e:
+            self.add_song_error(self.song, f"LYRICS:{str(e)}")
 
     def setup_picture(self):
         self.song.picture = None
@@ -366,26 +354,6 @@ class Command(BaseCommand):
             except Exception as e:
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
 
-    def setup_tags(self):
-        self.song.comment = ''
-        for tag in self.get_or_create_tags( self.info.get('comments'), self.song):
-            try:
-                self.song.tags.add(tag)
-            except Exception as e:
-                self.add_song_error(self.song, f"TAGS ({tag}): {str(e)}")
-    
-    def setup_lyrics(self):
-        SRT_FILE = self.song.filename.rstrip('.mp3')+'.srt'
-        self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
-        try:
-            self.song.lyrics = self.song.lyrics.replace('"', "'")
-            if self.song.lyrics == '' and self.lyrics:
-                self.echo(f"Generating Lyrics ({self.language})...")
-                self.generator.work(self.song.filename, self.language, verbose=False, tabs=self.tabs)
-                self.song.lyrics = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
-        except Exception as e:
-            self.add_song_error(self.song, f"LYRICS:{str(e)}")
-
     def setup_song(self):
         self.song.errors = ''
         self.song.error  = False
@@ -406,16 +374,57 @@ class Command(BaseCommand):
         self.setup_lyrics()
         self.song.save()
 
-    def update_song(self, filename : str):
-        self.song = Song.objects.filter(filename=filename).get()
-        self.setup_song()
-        self.echo(f'· Updated song {filename}')
+    def setup_tags(self):
+        self.song.comment = ''
+        for tag in self.get_or_create_tags( self.info.get('comments'), self.song):
+            try:
+                self.song.tags.add(tag)
+            except Exception as e:
+                self.add_song_error(self.song, f"TAGS ({tag}): {str(e)}")
+
+    def setup_title(self):
+        try:
+            self.song.title = self.info.get('title')
+            if self.song.title is None:
+                self.add_song_error(self.song, "Title not found. Using filename as fallback.")
+                self.song.title = str(self.song.filename).split( os.path.sep )[-1]
+        except Exception as e:
+            self.song.title = "Desconocido"
+            self.add_song_error( self.song, f"TITLE:{str(e)}" )
+
+    def setup_trackno(self):
+        value = self.info.get('track_number') or 0
+        try:
+            self.song.track_number = int(value.split('/')[0])
+        except:            
+            try:
+                self.song.track_number = int(value)
+            except Exception as e:            
+                self.song.track_number = None
+                self.add_song_error(self.song, f"TRACK:{str(e)}")
+
+    def setup_timestamp(self):
+        self.song.timestamp = None
+        try:
+            YEAR        = self.info.get('year') or "1000" # We use 1000 as 'special' value for discarding malformed timestamps
+            TIMESTAMP   = datetime( int( Sanitizer.year( YEAR ) ), 1, 1)
+            self.song.timestamp = timezone.make_aware( TIMESTAMP ) 
+            if self.song.timestamp.year == 1000: 
+                # Invalid Year, no audio from year 1000 could be recorded!
+                self.song.timestamp = None
+        except Exception as e:
+            self.add_song_error(self.song, f"TIMESTAMP:{str(e)}")
 
     def create_song(self, filename : str):
         self.song = Song()
         self.song.filename = filename
         self.setup_song()
         self.echo(f'· Created song "{filename}"')
+
+    def update_song(self, filename : str):
+        self.song = Song.objects.filter(filename=filename).get()
+        self.setup_song()
+        self.echo(f'· Updated song {filename}')
 
     def scan(self, folder):        
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
@@ -426,7 +435,7 @@ class Command(BaseCommand):
                 self.generator = GenerateLyrics() if self.lyrics else None
                 self.generator.initialize('small')
 
-        self.get_aliases()
+        self.load_aliases()
 
         for root, _, files in os.walk(folder):
             if Utils.is_ignored_path(root):
