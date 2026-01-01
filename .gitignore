@@ -3509,5 +3509,3 @@ backend/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_buil
 backend/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/other_builds/pyjnius-sdl2/armeabi-v7a__ndk_target_21/pyjnius/setup.cfg
 melodify.log
 backend/codigomelodifymelodify.log
-melodify.apk/
-melodify.apk/build melodify.apk/CHANGELOG melodify.apk/LICENSE melodify.apk/logs melodify.apk/pyproject.toml melodify.apk/README.rst melodify.apk/src melodify.apk/tests
