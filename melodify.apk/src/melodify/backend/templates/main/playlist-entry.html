@@ -1,0 +1,8 @@
+<!-- main/playlist-entry.html -->
+<li onclick="melodify.navigate('{{ url }}')" class="sidebar-entry">
+    <div class="sidebar-entry-picture" style="background-image:url('{% if picture and picture != '' and picture != 'None' %}{{ picture }}{% else %}static/images/song.png{% endif %}')"></div>
+    <div class="sidebar-entry-content">
+        <p class="sidebar-entry-primary">{% if use_index %}{{ index }} - {% endif %}{{ title }}</p>
+        <p class="sidebar-entry-secondary">{{ subtitle }}</p>
+    </div>
+</li>

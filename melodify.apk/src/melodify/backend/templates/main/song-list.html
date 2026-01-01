@@ -1,0 +1,90 @@
+<!-- main/song-list.html  -->
+{% load static %}
+{% load fontawesome_5 %}
+{% load utils %}
+<div class="song-list">
+    {% if header is not None %}
+        {% if caption is not None %}
+            {% include 'main/widget-section.html' with caption=caption icon=icon counter_id='song-counter' counter_value=data.count %}
+        {% else %}
+            {% include 'main/widget-section.html' with caption="Pistas" icon="music" counter_id='song-counter' counter_value=data.count %}
+        {% endif %}
+        <br/>    
+    {% else %}
+        <div class="counter medium">
+            <h3>{{ data.count }} Pistas</h3> 
+        </div>
+    {% endif %}
+    {% csrf_token %}
+    {% for song in data %}
+    <div class="tile-item song-item" data-song-name="{{ song.title|lower }}">
+        
+        <div class="song-tracknumber">{{ forloop.counter }}</div>
+        
+        <button 
+            class           = "play-button" 
+            id              = "song-{{ song.pk }}"
+            data-artistname = "{{ song.artist.name }}" 
+            data-lyrics     = "{{ song.lyrics }}" 
+            data-songname   = "{{ song.title }}" 
+            data-src        = "/play/{{ song.pk }}/song.mp3" 
+            data-picture    = "{{ song.picture }}" 
+            data-id         = "{{ song.pk }}"
+            {% if not forloop.last %}
+                data-next-id="{{ data|get_next_song_id:forloop.counter0 }}"
+            {% else %}
+                data-next-id="{{ data.0.id }}"
+            {% endif %}
+            onclick="melodify.playSong(this)">
+            <div class="playBtn"></div>
+        </button>
+        
+        <div class="song-art">
+            {% if song.picture %}
+                <div class="song-image" style="background-image: url('{{ song.picture }}')" alt="{{ song.title }} cover"></div>
+            {% else %}
+                <div class="placeholder-song-image"><span>💿</span></div>
+            {% endif %}
+        </div>
+        
+        <div class="song-info">
+            <a onclick="melodify.navigate(`{% url 'song-detail' pk=song.pk %}`)">
+                <h4 class="song-name">{{ song.title }}</h4>
+                <p class="song-artist small">{{ song.artist }}</p>
+            </a>
+        </div>
+        
+        <div class="tile-buttons" style="float: right; z-index: 1000;">
+            <p class="small">{{ song.duration|strftime:"%H:%i:%s" }}</p>                    
+            <div style="display: flex" >
+                <p>
+                    <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.fav == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="var(--accent-color); opacity: 0.5"%}</button>
+                    <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.fav == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="var(--accent-color)"%}</button>
+                </p>
+                <button 
+                    type            = "button" 
+                    class           = "input confirm" 
+                    id              = "enqueue-song"     
+                    data-artistname = "{{ song.artist.name }}" 
+                    data-lyrics     = "{{ song.lyrics }}" 
+                    data-songname   = "{{ song.title }}" 
+                    data-src        = "/play/{{ song.pk }}/song.mp3" 
+                    data-picture    = "{{ song.picture }}" 
+                    data-id         = "{{ song.pk }}"
+                    title           = "Agregar a la cola" 
+                    onclick         = "melodify.enqueueSong(this)"
+                >{% fa5_icon 'clock' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"            onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+                {% if delete_button is not None %}
+                    <button type="button" id="delete-entry"     class="input accent"  title="Eliminar de la lista"      onclick="melodify.remSongFromPlaylist('{{ playlist.id }}', '{{ song.pk }}')">{% fa5_icon 'trash' color="#000"%}</button>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+        
+    {% empty %}
+    <p id="no-songs-message">No se encontraron canciones.</p>
+    {% endfor %}
+</div>
+

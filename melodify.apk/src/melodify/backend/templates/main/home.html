@@ -1,0 +1,22 @@
+<!-- templates/app/home.html -->
+
+{% load fontawesome_5 %}
+
+{% include "main/widget-title.html"  with caption='Tu Biblioteca' subcaption=user.username %}
+{% include "main/widget-search.html" with type='' %}
+<p></p>
+<!-- Listas -->
+<div id="loading" style="display: none;">Cargando playlists...</div>
+{% include 'main/widget-section.html' with caption="Listas" icon="list" counter_id='playlist-count' counter_value=0 %}
+<div class="tile-container" style="display: flex; gap: 20px; margin-top: 16px; margin-bottom: 32px;overflow-x: auto;" id="tileContainer"></div>
+<!-- Favoritos -->
+{% include 'main/song-list.html' with data=favorites header=True caption="Favoritos" icon="heart" %}
+<!-- Seleccion aleatoria -->
+{% include 'main/song-list.html' with data=songs header=True caption="Selección Aleatoria" icon="random" %}
+
+<script>
+    const searchInput = document.getElementById('searchInput'); 
+    searchInput.addEventListener('input', melodify.handlePlaylistFilter);
+    melodify.triggerSearch(melodify.handlePlaylistScroll, melodify.loadPlaylists); 
+</script>
+

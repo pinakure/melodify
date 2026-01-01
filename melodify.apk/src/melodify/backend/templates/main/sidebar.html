@@ -1,0 +1,44 @@
+{% load fontawesome_5 %}
+<!-- main/sidebar.html -->
+<script>
+    function showTab(calling_node, id){
+        var selectors = document.getElementsByClassName('tab-selector');
+        for(s in selectors){
+            selectors[s].className = "tab-selector";
+        }
+        calling_node.className = "tab-selector active";
+        var tabs = document.getElementsByClassName('tab');
+        for(t in tabs){
+            tabs[t].className = "tab hidden";
+        }
+        document.getElementById(id).className = "tab";
+    }
+</script>
+<aside class="sidebar">
+    <div class="sidebar-content">
+        <ul id="sidebar-categories" class="labels">
+            <li id="section-0" class="tab-selector active" style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=0; melodify.saveState(); showTab(this, 'library');">Tu Biblioteca</li>   
+            <li id="section-1" class="tab-selector"        style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=1; melodify.saveState(); showTab(this, 'playlist');">Reproduciendo</li>   
+        </ul>
+        <div class="tabs" >
+            <div id="sidebar-inner">
+                <div class="tab" id="library">
+                    <div class="sidebar-items-wrapper">
+                        <div class="sidebar-search"></div>
+                        <ul class="sidebar-items">
+                            {% for item in sidebar %}
+                                {% include 'main/playlist-entry.html' with index=forloop.counter title=item.primary subtitle=item.secondary use_index=item.use_index picture=item.picture url=item.url %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="tab hidden" id="playlist">
+                    <button type="button" class="input secondary" style="float: right; margin-right: 8px;font-size: 16px; font-weight: 800;" title="Vaciar cola de reproducción" onclick="melodify.emptyQueue()">{% fa5_icon "trash" color="#000" %}</button>   
+                    <div class="sidebar-items-wrapper">
+                        <div id="list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>

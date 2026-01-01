@@ -1,0 +1,88 @@
+<!-- main/settings.html -->
+{% load utils %}
+{% load fontawesome_5 %}
+{% include "main/widget-title.html" with caption="Ajustes" %}
+{% include "main/widget-back.html" %}
+{% csrf_token %}
+<style>
+    .swatch {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 5%;
+        height: 32px;
+        border: 1px solid #0008;
+    }
+    .swatch:hover {
+        border: 1px dotted var(--accent-color);
+    }
+    .swatch.active {
+        border: 1px solid #f00;
+    }
+    #swatch-tweak {
+        display: none;
+        width: calc(100% - 200px); 
+        margin-left: auto; 
+        margin-right: 10px; 
+        background: var(--bg-main); 
+        padding: 20px; 
+        border-radius: 8px;
+    }
+    .color-slider span {
+        width           : 32px;
+        text-align      : center;
+    }
+    .color-slider {
+        height          : 32px;
+        max-height      : 32px; 
+        display         : flex; 
+        justify-content : center; 
+        align-items     : center; 
+    }
+    .color-slider input {
+        width           : calc(100% - 64px); 
+        height          : 32px; 
+        margin          : 0px; 
+        padding         : 0px;
+    }
+    .color-slider:nth-child(1) i{ color: #f00; }
+    .color-slider:nth-child(2) i{ color: #0f0; }
+    .color-slider:nth-child(3) i{ color: #00f; }
+    .color-slider:nth-child(4) i{ border-radius: 8px; background:linear-gradient(135deg, #fff, #fff4, #fff0); }
+</style>
+{% include 'main/widget-section.html' with caption="Estilo Visual" icon="eye" %}
+<!-- opciones visuales  -->
+{% include 'main/widget-select.html' with caption="Tema de Color"   icon="palette"   id="schemes"   onchange="colorizer.setScheme( this.value )" items=schemes %}
+<div id="swatches"      style="width: calc(100% - 200px); margin-left: auto;margin-right: 10px;"></div>
+<div id=""      style="width: calc(100% - 200px); display: flex; justify-content:center ;margin-left: auto;margin-right: 10px;">
+    {% include 'main/widget-button.html'    with id="clone-scheme"          caption="Editar"     icon="brush" style="margin-left: auto;margin-right: 0px;" onclick="colorizer.customizeScheme();"%}
+</div>
+<div id="swatch-tweak">
+    <div style="background: rgba(0,0,0,0.5); padding: 15px; color: white; display: flex; flex-direction: column; gap: 10px; border-radius: 5px;">
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="r-range" min="0" max="255" value="40" ><span id="r-val" class="small">40</span></div>
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="g-range" min="0" max="255" value="41" ><span id="g-val" class="small">41</span></div>
+        <div class="color-slider"><i class="fa fa-circle"></i>&nbsp;<input type="range" id="b-range" min="0" max="255" value="61" ><span id="b-val" class="small">61</span></div>
+        <div class="color-slider"><i class="fa"          ></i>&nbsp;<input type="range" id="a-range" min="0" max="255" value="255"><span id="a-val" class="small">255</span></div>
+    </div>
+</div>
+{% include 'main/widget-button.html'    with id="save-scheme"           caption="Guardar"          icon="save"  style="display: none;margin-left: auto;margin-right: 0px;" onclick="colorizer.saveScheme();"%}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Reproductor"    items=fonts                 icon="font"     onchange="melodify.setPlayerFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Titulos"        items=fonts                 icon="font"     onchange="melodify.setTitleFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-select.html'    with id="player-font"           caption="Fuente Textos"         items=fonts                 icon="font"     onchange="melodify.setTextFont( this.value ); melodify.saveState();" %}
+{% include 'main/widget-checkbox.html'  with id="use-renderer"          caption="Visualización"         value=False                 icon="music"    onclick="melodify.toggleAnalyzer()" %}
+<hr class="breathe" style="border: 1px solid #f0f0f008"/>
+<!-- rutas  -->
+{% include 'main/widget-section.html' with caption="Rutas" icon="slash" %}
+{% include 'main/widget-input.html'     with id="library-root"          caption="Carpeta de Música"     value=library_root          icon="file" %}
+<hr class="breathe" style="border: 1px solid #f0f0f008"/>
+<!-- conectividad -->
+{% include 'main/widget-section.html' with caption="Conectividad" icon="spider" %}
+{% include 'main/widget-input.html'     with id="spotify-client-id"     caption="<p class='italic'>Spotify Client ID</p>"     value=spotify_client_id     icon="user" %}
+{% include 'main/widget-input.html'     with id="spotify-client-secret" caption="<p class='italic'>Spotify Client Secret</p>" value=spotify_client_secret icon="key" %}
+{% include 'main/widget-input.html'     with id="discogs-api-token"     caption="<p class='italic'>Discogs API Token</p>"     value=discogs_api_token     icon="compact-disc" %}
+
+
+<script>
+    colorizer.initialize();
+    melodify.node('schemes').value=melodify.state.settings.scheme;
+    melodify.node('use-renderer').checked = melodify.state.enable_analyzer; 
+</script>

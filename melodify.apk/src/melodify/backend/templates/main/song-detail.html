@@ -1,0 +1,147 @@
+<!-- main/song-detail.html -->
+{% load static %}
+{% load utils %}
+{% load fontawesome_5 %}
+
+{% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+{% include "main/widget-admin.html" with object='artist' id=artist.pk %}
+{% include "main/widget-back.html" %}
+{% if song.picture %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.picture %}
+{% elif song.album.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.album.picture %}
+{% elif song.artist.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=song.artist.picture.url %}
+{% else %}
+
+{% endif %}
+
+<style>
+
+.album-item div {
+    display         : flex;
+}
+
+.album-item {
+    display: flex;             /* Activa el modo horizontal */
+    flex-direction: row;       /* Asegura que los hijos vayan de izquierda a derecha */
+    align-items: flex-start;   /* Alinea los hijos al borde superior */
+    gap: 20px;                 /* Espacio entre la imagen y el texto (ajusta a tu gusto) */
+    width: 100%;    
+}
+.album-item > div:last-child {
+    flex: 1;                   /* Hace que el texto ocupe el resto del espacio */
+}
+
+</style>
+{% csrf_token %}
+
+<div class="song-detail-container" >    
+    <div class="album-item">
+        <div style="display: inline-block;display: inline-block;word-break: break-word;word-wrap: break-word;width: 200px;">
+            <!-- cover art  -->
+            {% if song.album.pk %}
+            <a onclick="melodify.navigate(`{% url 'album-detail' song.album.pk %}`)">
+                <div class="album-art" style="justify-content: left !important;">
+                    {% if song.album.picture %}
+                        <div class="album-image" style="background-image: url('{{ song.album.picture }}')" alt="{{ song.album.name }} cover"></div>
+                    {% else %}
+                        <div class="placeholder-image">💿</div>
+                    {% endif %}
+                </div>
+                <h4>{{ song.album.name }}</h4>
+            </a>
+            {%endif%}
+            <div style="display: flex; justify-content: space-around; margin-top: 8px;gap:4px;" >
+                <button type="button" id="bookmark-song-{{ song.pk }}"      class="input transparent {% if song.fav == True  %}hidden{% endif %}" title="Agregar a Favoritos"       onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#8888"%}</button>
+                <button type="button" id="unbookmark-song-{{ song.pk }}"    class="input transparent {% if song.fav == False %}hidden{% endif %}" title="Eliminar de Favoritos"     onclick="melodify.bookmarkSong('{{ song.id }}', false)">{% fa5_icon 'heart' color="#ffff"%}</button>
+                <button 
+                    type            = "button" 
+                    class           = "input confirm" 
+                    id              = "song-{{ song.pk }}"          
+                    data-artistname = "{{ song.artist.name }}" 
+                    data-lyrics     = "{{ song.lyrics }}" 
+                    data-songname   = "{{ song.title }}" 
+                    data-src        = "/play/{{ song.pk }}/song.mp3"
+                    data-picture    = "{{ song.picture }}" 
+                    data-id         = "{{ song.pk }}"
+                    data-next-id    = "{{ song.pk }}"
+                    title           = "Reproducir" 
+                    onclick         = "melodify.playSong(this); melodify.navigate(`/player/?&song={{ song.pk }}&`)"
+                >{% fa5_icon 'play' color="#000"%}</button>
+                <button 
+                    type            = "button" 
+                    class           = "input confirm" 
+                    id              = "enqueue-song"     
+                    data-artistname = "{{ song.artist.name }}" 
+                    data-lyrics     = "{{ song.lyrics }}" 
+                    data-songname   = "{{ song.title }}" 
+                    data-src        = "/play/{{ song.pk }}/song.mp3"
+                    data-picture    = "{{ song.picture }}" 
+                    data-id         = "{{ song.pk }}"
+                    title           = "Agregar a la cola" 
+                    onclick         = "melodify.enqueueSong(this)"
+                >{% fa5_icon 'clock' color="#000"%}</button>
+                <button type="button" id="show-playlists"   class="input confirm" title="Añadir a lista"    onclick="melodify.showPlaylists( this, '{{ song.pk }}' )">{% fa5_icon 'list' color="#000"%}</button>
+            </div>
+        </div>
+        <div style="display: inline-block">
+            <!-- lista de artistas -->
+            {% if song.album.pk %}
+                <p class="labels">
+                    <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
+                    {% for artist in song.album.artists.all %}
+                    <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
+                    {% endfor %}
+                </p>
+            {%endif%}
+
+            <!-- Datos de cancion -->
+            {% if song.tags.all.count > 0 %}
+            <p class="labels"><strong>Tags:</strong>{% for tag in song.tags.all %}<a onclick="melodify.navigate(`{% url 'tag-detail' tag.pk %}`)">{{ tag }}</a>{% endfor %}</p>
+            {% endif %}
+            
+            {% if song.genre %}
+                <p class="labels"><strong>Género: </strong>
+                    <a onclick="melodify.navigate(`{% url 'genre-detail' song.genre.pk %}`)">{{ song.genre }}</a>
+                </p>
+            {% endif %}
+            
+            <p>
+                <strong>Duración:</strong> 
+                {{ song.duration|strftime:'' }}
+            </p> 
+            
+        </div>
+    </div>
+    {% if song.lyrics %}
+        <div id="static-lyrics" class="italic breathe">
+            <script>
+                var node = document.getElementById('static-lyrics');
+                var lyrics = `{{ song.lyrics }}`;
+                lyrics = lyrics.split('\n\n');
+                var payload = {};
+                html = '';
+                try{
+                    for(l in lyrics){
+                        var lyric = lyrics[l].split('\n');
+                        var index = lyric[0];
+                        var time  = lyric[1].split(' --&gt; ');
+                        var start = time[0];
+                        var end   = time[1];
+                        var text  = lyric[2];
+                        payload[ index ] = {
+                            start : start,
+                            end   : end,
+                            text  : text, 
+                        };
+                        html += (`<li style="margin-bottom: 4px;">${text}</li>`);
+                    }
+                } catch{
+
+                }
+                node.innerHTML=html;
+            </script>
+        </div>
+    {% endif %} 
+</div>

@@ -1,0 +1,28 @@
+:root {
+    --bg-main               : #ff4da6; /* Rosa vibrante */
+    --bg-nav                : #e60073; /* Fucsia oscuro */
+    --bg-sidebar            : #ff80bf; /* Rosa pastel saturado */
+    --bg-sidebar-selection  : #cc0066; /* Rosa fuerte para selección */
+    --bg-sidebar-hover      : #ff66b3; /* Brillo al pasar el ratón */
+    --bg-content-blend      : #ff3399E6; 
+    --bg-content            : #ff3399;
+    --text-color            : #ffffff;
+    --secondary-color       : #ffe6f2; /* Blanco rosado */
+    --link-color            : #ffffff;
+    --section-color         : #b30059; /* El tono más oscuro para contraste */
+    --confirm-color         : #00ffcc; /* Turquesa neón (contrasta perfecto con rosa) */
+    --accent-color          : #fff000; /* Amarillo eléctrico */
+    --bg-player-title       : #cc0066;
+    --shadow-color          : #660033;
+    --tile-placeholder      : #ff99cc;
+    --tile-info             : #d6006d;
+    --tile-info-text        : #ffccf2;
+    --gradient-begin        : #ff0080;
+    --gradient-end          : #ff66b3;
+    --nav-height            : 60px;
+    --sidebar-width         : 432px;
+    --default-font          : 'lunchtype-regular';
+    --player-font           : 'lunchtype-regular';
+    --player-font-size      : 24px;
+    --renderer              : scanlines;
+}

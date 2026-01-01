@@ -1,0 +1,13 @@
+{% extends 'base.html' %} 
+{% block content %}
+<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        
+        if( melodify.state.current_page != ''){
+            melodify.navigate(melodify.state.current_page, [], false);
+        } else {
+            melodify.navigate('home');
+        }
+    });
+</script>
+{% endblock %}

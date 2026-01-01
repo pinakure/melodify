@@ -1,0 +1,130 @@
+{% load static %}
+{% load fontawesome_5 %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible"      content="IE=Edge">
+        <meta http-equiv="content-language"     content="en">
+        <meta name="viewport"                   content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="msapplication-TileColor"    content="#ffffff">
+        <meta name="msapplication-TileImage"    content="{% static 'images/favicon.png' %}">
+        <meta name="theme-color"                content="#ffffff">
+
+        <style id="scheme">{% include 'schemes/default.css' %}</style>
+        <link rel="icon" 				href="{% static 'images/favicon.png'            %}" type="image/png">
+        <link rel="icon"                href="{% static 'images/favicon-192x192.png'    %}" type="image/png" sizes="192x192">
+        <link rel="icon"                href="{% static 'images/favicon-32x32.png'      %}" type="image/png" sizes="32x32"  >
+        <link rel="icon"                href="{% static 'images/favicon-96x96.png'      %}" type="image/png" sizes="96x96"  >
+        <link rel="icon"                href="{% static 'images/favicon-16x16.png'      %}" type="image/png" sizes="16x16"  >
+
+        <link rel="shortcut icon" 		href="{% static 'images/favicon.ico'            %}" type="image/x-icon">
+        <link rel="apple-touch-icon" 	href="{% static 'images/favicon.png'            %}">
+        <link rel="stylesheet" 			href="{% static 'css/fonts.css'                 %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/base.css'                  %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/sidebar.css'               %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/player-styles.css'         %}?version={{ version }}">
+        <link rel="stylesheet" 			href="{% static 'css/song-list.css'             %}?version={{ version }}">
+        <!-- Esta linea de estilos debe ser la última (CSS) para que los estilos responsivos tengan efecto  -->
+        <link rel="stylesheet" 			href="{% static 'css/vertical.css'              %}">
+        <script src="{% static 'js/interact.min.js' %}"></script>
+        <script src="{% static 'js/srt-editor.js'   %}?version={{ version }}"></script>
+
+        <title>Melodify</title>
+        {% fontawesome_5_static %}        
+        {% block header %}{% endblock %}
+    </head>
+    <body>
+        <div class="main-container">
+            <!-- Barra Superior -->
+            <header class="navbar">
+                <div id="navbar-links" class="navbar-links">
+                    {% include 'main/link.html' with url='home'          caption="Biblioteca"   icon="user" display="none" %}
+                    {% include 'main/link.html' with url='album-tiles'   caption="Álbumes"      icon="compact-disc" %}
+                    {% include 'main/link.html' with url='artist-list'   caption="Artistas"     icon="users" %}
+                    {% include 'main/link.html' with url='genre-list'    caption="Géneros"      icon="shapes" %}
+                    {% include 'main/link.html' with url='tag-list'      caption="Etiquetas"    icon="tag" %}
+                    {% include 'main/link.html' with url='playlist-list' caption="Listas"       icon="list" %}
+                    {% include 'main/link.html' with url='steal'         caption="Buscar"       icon="skull-crossbones" %} 
+                </div>
+                <div id="menu"></div>
+                <div id="curtain" onclick="melodify.node('menu').style.display = 'none';melodify.node('curtain').style.display = 'none';">
+                </div>
+                <a id="logo-link" onclick="melodify.navigate('home')">
+                    <div id="melodify-logo">
+                        <div class="benzene">⌬</div>
+                    </div>
+                </a>
+                <div id="logo-no-link" style="cursor: pointer;" onclick="melodify.node('menu').style.display = 'inline-block'; melodify.node('curtain').style.display = 'inline-block';">
+                    <div id="melodify-logo">
+                        <div class="benzene">⌬</div>
+                    </div>
+                </div>
+                {% include "main/widget-megasearch.html" %}
+                <div id="header-buttons">
+                    {% include "main/widget-settings.html" %}
+                    {% include "main/widget-profile.html" %}
+                </div>                 
+                {% block back %}{% endblock %}
+            </header>
+            <!-- Contenedor del Panel Doble -->
+            <div class="content-container">
+                <!-- Lado Izquierdo -->
+                {% include 'main/sidebar.html' %}
+                <!-- Lado Derecho -->
+                <main class="main">
+                    <div class="main-content" {% block background %}{% endblock %} id="main-content">
+                        {% block content %}{% endblock %}
+                    </div>
+                    <div class="search-results" id="search-results"></div>
+                    <!-- <div class="main-overlay"></div> -->
+                    <div id="playlists-window" class="playlists" style="z-index: 2000">
+                        <button type="button" style="float: right" id="close-playlists" class="input accent" title="Cancelar" onclick="melodify.hidePlaylists()">{% fa5_icon 'times'%}</button>
+                        <h4>{% fa5_icon 'list' %} Añadir a Lista</h4>               
+                        <div class="wrapper">
+                            <ul>
+                                {% for playlist in playlists %}
+                                    <li onclick="melodify.addSongToPlaylist('{{ playlist.id }}')">
+                                        <div class="playlist-entry-picture"></div>
+                                        <div>
+                                            {{ playlist.title }}
+                                        </div>
+                                        <div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <!-- Barra Inferior -->
+            <div id="loading-wrapper">
+                <div id="loading-content">
+                </div>
+            </div>
+
+            <div id="login-window-wrapper">
+                <div id="login-window">
+                    {% include 'main/login.html' %}
+                </div>
+            </div>
+            <div class="playbar" id="playbar" renderer="themed" style="position: relative;">
+                {% include 'main/bottom-player.html' %}
+            </div>
+        </div>
+        <div id="toaster"></div>
+        <script src="/static/js/howler.min.js"></script>
+        <script src="/static/js/utils.js?version={{ version }}" ></script>
+        <script src="/static/js/constants.js?version={{ version }}" ></script>
+        <script src="/static/js/MelodifyPlayer.js?version={{ version }}"></script>
+        <script src="/static/js/Melodify.js?version={{ version }}"></script>
+        <script src="/static/js/Colorizer.js?version={{ version }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', ()=>{
+                melodify.user_id = '{% if user.id is not None %}{{ user.id }}{% else %}0{% endif %}';
+                melodify.initialize();
+            });
+        </script>
+    </body>
+</html>

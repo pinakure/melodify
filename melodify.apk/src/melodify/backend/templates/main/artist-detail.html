@@ -1,0 +1,35 @@
+<!-- main/artist-detail.html -->
+{% load fontawesome_5 %}
+{% include "main/widget-title.html" with caption=artist.name subcaption="Artista" %}
+{% include "main/widget-admin.html" with object='artist' id=artist.pk %}
+{% include "main/widget-back.html" %}
+{% include "main/widget-refresh.html" with type="artist" callback="melodify.scanArtist" parameter=artist.id info="Forzar reescaneado de artista" %}
+{% if artist.picture.name %}
+    {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=artist.picture.url %}
+{% endif %}
+<div class="artist-profile">
+    <!-- Artist Aliases  -->
+    <div class="aka medium italic shadowed blend-25">
+        <strong class="medium italic shadowed">AKA</strong>
+        <span class="medium italic shadowed">
+            {% if artist.aliases %}
+                {{ artist.aliases }}
+            {% else %}
+                Desconocido
+            {% endif %}
+        </span>
+    </div>
+    <!-- Artist bio  -->
+    <div class="bio medium">
+        <p class="shadowed">
+            {% if artist.bio %}
+                {{ artist.bio|linebreaksbr }}
+            {% else %}
+                No hay información de este artista disponible.
+            {% endif %}
+        </p>
+    </div>
+    {% include 'main/widget-genres.html' with data=artist.genres %}
+    {% include 'main/album-list.html' with data=albums_list %}
+    {% include 'main/song-list.html' with data=songs header=True %}
+</div>

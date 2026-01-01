@@ -1,0 +1,8 @@
+<!-- main/playlist-detail.html  -->
+{% load fontawesome_5 %}
+{% include "main/widget-title.html" with caption=playlist.title subcaption="Lista de" subcaption_suffix=playlist.usuario.username subcaption_link="/user/" subcaption_link_suffix=playlist.usuario.id counter_id='songs-count' counter_value=songs.count %}
+{% include "main/widget-back.html"  %}
+<div class="playlist-detail">
+    {% include 'main/album-list.html' with data=albums_list %}
+    {% include 'main/song-list.html' with data=songs header=True delete_button=True %}
+</div>

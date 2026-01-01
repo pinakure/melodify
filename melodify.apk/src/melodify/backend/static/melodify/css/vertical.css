@@ -1,0 +1,149 @@
+@media (orientation: portrait){
+    /* Vertical Layout */
+
+    /* Reduce Song List Button Gap */
+
+    /* Hide Sidebar Completely and Move Main Content To Fit Screen */
+    .sidebar {   
+        display: none !important;
+    }
+    .main {
+        flex-basis: 100%;
+        zoom: 0.8;
+    }
+
+    /* Extender Ventana de Playlists */
+    .playlists {
+        width : 100% !important;
+        max-width : 100% !important;
+        left: 0px;
+    }
+
+    /* Player time counters, smaller */
+    #timer,
+    #duration{
+        margin-top: 4px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    #track {
+        font-size: 14px;
+        line-height: 16px;
+        position: absolute;
+        bottom: 0px;
+        padding-left: 8px;
+        padding-right: 8px;
+        left: 0px;
+        width: 100%;
+        background-color: var(--bg-player-title);
+    }
+    /* bring next and prev buttons together  */
+    #shufBtn { left : calc( calc(50% - 16px) - 140px ); }
+    #prevBtn { left : calc( calc(50% - 16px) -  80px ); }
+    #nextBtn { right: calc( calc(50% - 16px) -  80px ); }
+    #repBtn  { right: calc( calc(50% - 16px) - 140px ); }
+    #loading-audio,
+    #shufBtn,
+    #repBtn,
+    #prevBtn,
+    #nextBtn,
+    #playBtn,
+    #pauseBtn {
+        top: 8px;
+    }
+    /* small bottom player progress bar */
+    @if(var(--small-bar)){
+        #progress,
+        #progress-wrapper {
+            width: calc( 100% - 25%);
+            position: absolute;
+            height: 4px;
+        }
+        #waveform-wrapper{
+            left: 12.5%;
+            width: 75%;
+        }
+        #waveform {
+            top: 0px;
+            left: 0;
+            height: 100%;
+        }
+        #progress-wrapper {
+            left: 12.5%;
+            z-index: 0;
+            top: 6px;
+            background-color: var(--bg-player-title);
+        }
+        #progress{
+            z-index: 1000;
+            top: 0px;
+            width: 0px;
+        }
+
+    }
+    .searchInput {
+        left: auto;
+        right: 8px;
+    }
+    /* Make song-list song title text smaller */
+    .song-name {
+        font-size: 14px !important;
+    }
+
+    .navbar-links {
+        display: none !important;
+    }
+
+    #menu {
+        position: absolute;
+        top: var(--nav-height);
+        left: 4px;
+        border-radius: 8px !important;
+        display: none;
+        z-index: 5000;
+    }
+    #menu a:first-child {
+        display: inline-block !important;
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+    }
+    #menu a:last-child {
+        border-bottom-left-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+    }
+    #menu *:hover {
+        filter: brightness(1.5);
+    }
+    #menu a{
+        margin-right: 20px;
+        text-decoration: none;
+        font-family: 'lunchtype-medium';
+        color: var(--text-color);
+        transition: color 0.3s;
+        display: list-item;
+        height: 32px;
+        line-height: 16px;
+        vertical-align: middle;
+        padding: 8px;
+        width: 100%;
+        background: var(--bg-sidebar);    
+    }
+    /* Hide logo with home link and show linkless logo */
+    #logo-link { display: none !important;}
+    #logo-no-link { display: inline-block !important;}
+    #megasearch {
+        width: calc(100% - 118px );
+    }
+}
+
+@media (max-width: 1200px) {
+  #navbar-links a {
+    font-size: 0; /* Hace el texto invisible */
+    /* transition: none; */
+  }
+  
+  #navbar-links a .fas {
+    font-size: 24px !important; /* Mantiene el tamaño del icono */
+  }
+}

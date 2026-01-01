@@ -1,0 +1,18 @@
+server {
+    listen 80;
+    server_name melodify.com melodify.com.82.223.13.41.nip.io melodify.local;
+
+    location /static/ {
+        alias /static/melodify/;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/src/melodify/melodify.sock;
+    }
+
+    location /media/ {
+        alias /src/melodify/backend/media/; 
+    }
+}

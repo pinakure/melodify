@@ -1,0 +1,753 @@
+/* --- 1. Estilos Globales y Modo Oscuro --- */
+/* @import 'schemes/default.css'; */ */
+/*@import 'schemes/purple.css'; */
+
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    list-style: none;
+}
+#navbar-links a,
+.fas{
+    transition: color 200ms ease-in, font-size 200ms ease-in !important;
+}
+#megasearch  { margin-right: 8px; width: 213px; transition: width 100ms ease-in-out !important;}
+
+@keyframes glow {
+    0% {
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 1px var(--accent-color) inset;
+    }
+    50% {
+        filter: brightness(1.5);
+        box-shadow: 0px 0px 8px var(--bg-content-blend) inset;
+    }
+    100% {
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 1px var(--accent-color) inset;
+    }
+}
+
+/* Customize Scrollbars */
+::-webkit-scrollbar {
+    height: 0px;
+    width: 8px;  /* width: 0px;  */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+    position: absolute;
+}
+::-webkit-scrollbar-thumb { background: var(--bg-sidebar); border-radius: 4px;}
+*:focus{
+    outline: none;
+}
+ 
+/* Setup typographics */
+p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'lunchtype-regular'; }
+.light          { font-family: 'lunchtype-light';}
+.light.italic   { font-family: 'lunchtype-light-italic';}
+.regular        { font-family: 'lunchtype-regular';}
+.italic         { font-family: 'lunchtype-regular-italic';}
+/* .italic         { font-style: italic; } */
+.bold           { font-family: 'lunchtype-medium';}
+/* .bold           { font-weight: bold ;} */
+.bold.italic    { font-family: 'lunchtype-medium-italic';}
+.small          { font-size: 12px; }
+.medium         { font-size: 13px; }
+.big            { font-size: 16px; }
+.display        { font-size: 32px; }
+
+/* Colors */
+.confirm         { background-color: var(--confirm-color) !important; }
+.accent          { background-color: var(--accent-color) !important; }
+.section         { background-color:var(--bg-sidebar) ;padding:4px; border-radius: 4px; margin-top: 16px;}
+/* Generics */
+.shadowed  { text-shadow: 0px 0px 7px #000;}
+.blend-50  { opacity: 0.5; }
+.blend-75  { opacity: 0.75; }
+.blend-25  { opacity: 0.25; }
+.absolute  { position: absolute;}
+.inline-block { display: inline-block; }
+.margin-2  { margin: 2px; }
+.margin-4  { margin: 4px; }
+.margin-6  { margin: 6px; }
+.margin-8  { margin: 8px; }
+.margin-10 { margin: 10px; }
+
+body {
+    background-color: var(--bg-main);
+}
+
+#melodify-logo{
+    display: inline-block;
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    border-radius: 24px;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+    border: 2px dashed var(--shadow-color);
+    box-shadow: 0px 0px 1px var(--accent-color);
+}
+#melodify-logo .benzene{
+    display: inline-block;
+    font-size: 48px;
+    line-height: 49px;
+    width: 100%;
+    text-align: center;
+    height: 100%;
+    background-color: var(--shadow-color);
+    color: var(--accent-color);
+    padding:0;
+    position: absolute;
+    text-shadow: 1px 1px 0px #0008;
+    box-shadow: 0px 0px 16px var(--accent-color) inset;
+    left: -0px;
+    top: 0px;
+}
+
+
+body, html {
+    height: 100%;
+    font-family: sans-serif;
+    background-color: var(--bg-main);
+    overflow: hidden; /* Oculta el scrolling global */
+}
+
+/* --- 2. Contenedor Principal (Flexbox Vertical) --- */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- 3. Barra de Navegación Fija --- */
+.navbar {
+    background-color: var(--bg-main);
+    padding: 10px 20px;
+    display: flex;
+    padding-left: 80px;/* make room for navbar */
+    justify-content: space-between;
+    align-items: center;
+    height: var(--nav-height); /* Altura fija para la barra superior */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
+    z-index: 10;
+}
+/* --- 3. Barra de Navegación Fija --- */
+.playbar {
+    background-color: var(--bg-main);
+    padding: 10px 20px;
+    display: flex;
+    position: relative;
+    padding: 0;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px; /* Altura fija para la barra inferior */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); */
+    z-index: 10;
+}
+
+/* Nav Link Customization */
+.navbar-links a, .navbar-links a span {
+    margin-right: 20px;
+    text-decoration: none;
+    font-family: 'lunchtype-medium';
+    color: var(--link-color);
+    transition: color 0.3s;
+}
+* {
+    transition: color 0.3s, background-color 0.3s;
+}
+.navbar-links a:hover {
+    color: var(--accent-color);
+}
+
+/* --- 4. Panel Doble (Flexbox Horizontal) --- */
+.content-container {
+    display: flex;
+    /* Ocupa el espacio restante después de la navbar */
+    flex: 1; 
+    overflow: hidden; /* Importante para contener el scrolling interno */
+}
+
+/* --- 6. Contenido Principal (75%) --- */
+.main {
+    position: relative;
+    flex-basis: calc( 100% - var(--sidebar-width));
+    background-color: var(--bg-main);
+    padding-left: 4px;
+    border: 0px solid #0000;
+    /* Permite scrolling vertical SOLO aquí */
+    overflow-y: hidden; 
+    overflow-x: hidden;
+}
+
+
+.main-content {
+    border-radius       : 8px;
+    background-color    : var(--bg-content);
+    padding             : 20px;
+    width               : 100%;
+    height              : 100%;
+    overflow-y          : auto; 
+    overflow-x          : hidden;
+    background-position : center;
+    background-size     : cover;
+    background-repeat   : no-repeat;
+}
+.main-overlay {
+    position: absolute;
+    top: 0px;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    box-shadow: -64px -64px 64px #000 inset;
+}
+
+/* Common */
+.album-art{
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.album-image{
+    width: 200px;
+    height: 200px;
+    background-color: var(--bg-main);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+}
+
+.placeholder-image {
+    width               : 200px;
+    height              : 200px;
+    background-color    : var(--bg-content);
+    font-size           : 128px;
+    color               : var(--tile-placeholder);
+    border-radius       : 8px;
+}
+
+/* Hyperlink customization */
+a, a:hover, a:visited, a:active {
+    text-decoration: none;
+}
+
+a { 
+    color: var(--link-color) !important;
+}
+a:hover { 
+    color: var(--accent-color) !important;
+}
+
+/* Labels A */
+.labels {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.labels > a, 
+.labels > li {
+    display: inline-block;
+    display: inline-flex;    
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 2px;
+    height: 32px;
+    align-items: center;
+    margin-bottom: 2px;
+    font-size: 14px;
+    font-family: 'lunchtype-medium';
+    border: 1px solid var(--tile-info-text);
+    border-radius: 16px;
+    background-color: var(--tile-info-text);
+    user-select: none !important;
+    cursor: pointer;
+    margin-right: 4px;
+}
+.labels > a:hover, 
+.labels > li:hover{
+    filter: brightness(2);
+} 
+.breathe {
+    margin: 16px;
+}
+
+/* Link de atrás, cuando hay */
+.back-link {
+    margin-top: 20px;
+    display: inline-block;
+    color: var(--link-color);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* Cuadro de búsqueda (cuando hay)*/
+.input,
+input {
+    height: calc( var(--nav-height) / 1.5 );
+    color: var(--text-color);
+    border-radius: calc( var(--nav-height) / 1.5 );
+    font-weight: bold;
+    border: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    background-color: var(--bg-main);
+    min-width: calc( var(--nav-height) / 1.5 );
+}
+button.input{
+    background-color: var(--bg-sidebar-selection);
+    color: var(--secondary-color);
+    min-width: 40px;
+    min-height: 40px;
+}
+#header-buttons {
+    max-height: var(--nav-height);
+    min-width: 100px;
+    overflow: hidden;
+    display: inline-block;
+}
+i.fas, i.fa {
+    min-width: 16px;
+    min-height: 16px;
+}
+
+button.input:hover {
+    filter: brightness(1.2);
+}
+button.input:active {
+    filter: brightness(0.9);
+    background-color: var(--accent-color) !important;
+}
+
+.searchInput::placeholder {
+    color: var(--tile-placeholder);
+}
+.searchInput {
+    left: auto;
+    right: 8px;
+    /*
+    width: 25%;
+    left: 37.5%;
+    */
+    top: calc( calc( var(--nav-height) - var(--nav-height) / 1.5 ) / 2);
+    position: absolute;
+    background-color: var(--bg-sidebar);
+}
+.mega-search::placeholder {
+    color: var(--tile-placeholder);
+}
+.mega-search {
+    position: relative; 
+    margin-top: 6px;
+    margin-right: 8px;
+    margin-left: auto;
+    margin-bottom: 6px;
+    /* position: absolute; */
+    background-color: var(--bg-sidebar);
+}
+
+
+button.input.transparent:active,
+button.input.transparent:hover,
+button.input.transparent {
+    background-color: transparent !important;
+}
+
+button.input:disabled:active,
+button.input:disabled:hover,
+button.input:disabled{
+    background-color: var(--bg-sidebar-selection) !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.fullsize {
+    width: 100%;
+    height: 100%;
+}
+
+a:hover { 
+    cursor: pointer;
+}
+
+#fullplayer {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    background-color: #555555;
+    background: linear-gradient(-130deg , #555555, #404040);
+    border-radius: 7px;
+    box-shadow: 0px 3px 2px #0006;
+    border: 2px ridge #888888;
+}
+
+.card-item:nth-child(1n)  a .circular-item, .tile-item.album-item:nth-child(1n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 1n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 1n) .album-image, .sidebar-entry:nth-child( 1n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(36deg); }
+.card-item:nth-child(2n)  a .circular-item, .tile-item.album-item:nth-child(2n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 2n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 2n) .album-image, .sidebar-entry:nth-child( 2n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(72deg); }
+.card-item:nth-child(3n)  a .circular-item, .tile-item.album-item:nth-child(3n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 3n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 3n) .album-image, .sidebar-entry:nth-child( 3n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(108deg); }
+.card-item:nth-child(4n)  a .circular-item, .tile-item.album-item:nth-child(4n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 4n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 4n) .album-image, .sidebar-entry:nth-child( 4n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(144deg); }
+.card-item:nth-child(5n)  a .circular-item, .tile-item.album-item:nth-child(5n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 5n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 5n) .album-image, .sidebar-entry:nth-child( 5n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(180deg); }
+.card-item:nth-child(6n)  a .circular-item, .tile-item.album-item:nth-child(6n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 6n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 6n) .album-image, .sidebar-entry:nth-child( 6n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(216deg); }
+.card-item:nth-child(7n)  a .circular-item, .tile-item.album-item:nth-child(7n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 7n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 7n) .album-image, .sidebar-entry:nth-child( 7n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(252deg); }
+.card-item:nth-child(8n)  a .circular-item, .tile-item.album-item:nth-child(8n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 8n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 8n) .album-image, .sidebar-entry:nth-child( 8n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(288deg); }
+.card-item:nth-child(9n)  a .circular-item, .tile-item.album-item:nth-child(9n)  a .album-art .nopicture, .tile-item.song-item:nth-child( 9n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child( 9n) .album-image, .sidebar-entry:nth-child( 9n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(324deg); }
+.card-item:nth-child(10n) a .circular-item, .tile-item.album-item:nth-child(10n) a .album-art .nopicture, .tile-item.song-item:nth-child(10n) > .album-image.nopicture,  .tile-item.playlist-item:nth-child(10n) .album-image, .sidebar-entry:nth-child(10n) .sidebar-entry-picture.nopicture{ filter: hue-rotate(360deg); }
+
+/* Album / Playlist list styling */
+.tile-info {
+    /* bottom          : 4px;
+    left            : 72px;
+    display         : inline-block;
+    padding-bottom  : 4px; */
+}  
+.tile-info {
+    padding-left    : 15px;
+    padding-right   : 15px;
+    padding-bottom  : 10px;
+    background-color: var(--bg-content);
+}
+.tile-info p {
+    margin          : 0;
+    color           : var(--tile-info-text);
+    font-size       : 0.9em;
+}
+.album-grid {
+    grid-template-columns   : repeat(auto-fill, minmax(180px, 1fr));
+    display                 : grid;
+    gap                     : 20px;
+}
+.album-item {
+    /* text-align              : center; */
+    border                  : none;
+    padding                 : 10px;
+    border-radius           : 5px;
+}
+.album-item img, 
+.placeholder-image {
+    width                   : 100%;
+    /* height                  : 180px; */
+    border-radius           : 8px;
+    object-fit              : cover;
+    display                 : block;
+    margin-bottom           : 10px;
+}
+.album-image,
+.placeholder-image {
+    background-color        : #f0f0f0;
+    /* display                 : flex; */
+    background-size         : contain !important; 
+    align-items             : center;
+    justify-content         : center;
+}
+/* Artist detail styling  */
+.aka,
+.aka *{
+    color           : var(--accent-color);
+    font-size       : 13px;
+}
+.aka *{
+    margin          : 8px;
+}
+
+.bio *{
+    color: var(--secondary-color);
+    margin: 16px;
+}
+
+.album-image {
+    background-size: contain;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#lyrics{
+    /* width: fit-content; */
+    /* display: inline-block; */
+}
+
+.lyric, .lyric-animation {
+    position    : absolute;
+    overflow    : hidden;
+    display     : inline-block;
+    top         : 0px;
+    left        : 0px;
+    /* width       : fit-content; */
+    word-break  : break-all;
+    height      : 30px;
+    max-height  : 30px;
+    /* font-size   : 8vw; */
+}
+.lyric {
+    text-shadow : 2px 2px 0px #0008;
+}
+.lyric-animation {
+    text-shadow : 0px 0px 1px var(--accent-color);
+    color       : var(--accent-color);
+    height      : 30px;
+    max-height  : 30px;
+    animation   : lyricAnimation 1.0s 1 linear;
+}
+
+@-webkit-keyframes lyricAnimation {
+    0% { 
+        width: 0%; 
+    }
+    100% {
+        width:100%;
+    }
+}
+@keyframes lyricAnimation {
+    0% { 
+        width:0%;
+    } 
+    100% {
+        width:100%;
+    }
+}
+#logo-no-link { display: none; }
+#logo-link { display: inline-block;}
+#curtain {
+    position: absolute;
+    display: none;
+    top: 0px;
+    left: 0px;  
+    width: 100%;
+    height: 100%;
+    z-index: 3000;
+}
+#menu {
+    display: none;
+}
+
+#search-results ul {
+    margin: 0px;
+}
+
+#search-results ul li:hover {
+    filter: brightness(1.3);
+}
+
+#search-results ul li {
+    cursor:pointer;
+    text-transform: capitalize;
+    /* height: 32px; */
+    /* line-height: 16px; */
+    vertical-align: middle;
+    padding: 8px;
+    background: var(--bg-sidebar);
+}
+
+#toaster {
+    display: flex;
+    position: absolute;
+    top: var(--nav-height);
+    padding: 8px;
+    left: 0px;
+    width: 100%;
+    height: calc(100% - calc(var(--nav-height) * 2));
+    justify-content: flex-start;
+    text-align: center;
+    align-items: flex-start;
+    flex-direction: column;
+    pointer-events: none;
+}
+.toast {
+    font-family: 'lunchtype-medium';
+    width: fit-content; 
+    position: relative;
+    top: 0px;
+    height: 52px;
+    max-height: 52px;
+    box-shadow: 0px 0px 16px #000;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg-sidebar), var(--bg-main));
+    padding: 16px;
+    border-radius: 7px;
+    pointer-events: none;
+    margin-bottom: 8px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+.toast.error {
+    color: #fd0; 
+    background: linear-gradient(180deg, #c00000, #421000);
+}
+.toast-fade {
+    opacity: 0;
+    transform: translateY(-10px); /* Efecto opcional de subida al desaparecer */
+}
+
+/* login  */
+#login-window-wrapper{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    background-color: #0008;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+#login-window{
+    pointer-events: all;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    padding: 8px;
+    max-width: 400px;
+    height: 260px;
+    background: var(--bg-sidebar);
+    opacity: 0.98;
+    z-index: 10000;
+    border-radius: 7px;
+    box-shadow: 0px 0px 16px #000;
+    position: relative;
+}
+
+.modal-footer {
+    display : flex;
+    justify-content: center;
+    padding: 16px;
+} 
+.modal-body {
+    display : flex; 
+    flex-direction: column;
+    gap     : 20px;
+}
+
+#loginForm {
+    width: 100%;
+    display: inline-block;
+}
+#login-window button {
+    display: inline-block;
+    color: var(--text-color);
+}
+#login-window input {
+    width   : calc(100% - 32px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#button-profile {
+    animation: glow 2s infinite ease-in-out;
+    background: linear-gradient(45deg, #f00, #f000), 
+    linear-gradient(135deg, #0f0, #f000), 
+    linear-gradient(225deg, #00f, #f000), 
+    linear-gradient(315deg, #ff0, #f000);
+}
+
+
+/* Loading */
+#loading-wrapper {
+    position            : absolute;
+    background-color    : transparent;
+    top                 : 0px;
+    left                : 0px;
+    width               : 100%;
+    height              : 100%;
+    user-select         : none;
+    z-index             : 20000;
+    display             : flex;
+    display             : none;
+    justify-content     : center;
+    align-items         : center;
+    opacity             : 0.9;
+}
+#loading-content {
+    display             : flex;
+    justify-content     : center;
+    align-items         : center;
+    font-size           : 200px;
+    left                : calc(50% - 128px);
+    top                 : calc(50% - 128px);
+    width               : 256px;
+    height              : 256px;
+    background-color    : transparent;
+    border-radius       : 100%;  
+    z-index             : 21000;
+}
+
+#loading-audio {
+    position            : absolute;
+    left                : calc(50% - calc(calc( var(--nav-height) / 1.75 ) / 2) );
+    top                 : 0px;
+    width               : calc( var(--nav-height) / 1.75 );
+    height              : calc( var(--nav-height) / 1.75 );
+    color               : var(--accent-color);
+    display             : flex;
+    justify-content     : center;
+    align-items         : center;
+    border-radius       : 100%;  
+    font-size           : calc( var(--nav-height) / 1.75 );
+    display             : none;
+}
+
+.fadein {
+    -webkit-animation   : sk-fadein 5s 1 ease-in-out; 
+    animation           : sk-fadein 5s 1 ease-in-out;
+}
+
+.spin {
+    -webkit-animation   : sk-spin 1s infinite linear; 
+    animation           : sk-spin 1s infinite linear;
+}
+
+@keyframes sk-scaleout {
+  0% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 50% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+    opacity: 0;
+  } 100% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 
+}
+@keyframes sk-spin {
+  0% { 
+    transform: rotate(0deg);
+  } 100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes sk-fadein {
+  0% { 
+    opacity: 0;
+} 100% {
+    opacity: 1;
+  }
+}   

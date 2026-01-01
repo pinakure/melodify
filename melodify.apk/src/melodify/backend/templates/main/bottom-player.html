@@ -1,0 +1,40 @@
+<!-- main/bottom-player.html  -->
+{% load fontawesome_5 %}
+
+<div id="analyzer">
+	{% for i in analyzer_range %}
+		<div class="analyzer-bar" id="analyzer-bar-{{ i }}"></div>
+	{% endfor %}
+</div>
+<div id="title">
+    <div id="timer">0:00</div>
+    <div id="duration">0:00</div>
+</div>
+<a id="track"
+    onclick="var song_id = melodify.node('track').getAttribute('data-song-id'); if(song_id != '') melodify.navigate('/player', [`song=${ song_id }`]);"
+    data-song-id="">
+</a>
+
+<div id="waveform-wrapper">
+    <div id="waveform"></div>
+</div>
+<div id="bar"></div>
+<div id="progress-wrapper">
+    <div id="progress"></div>
+</div>
+<div class="btn" id="playlistBtn"></div>
+<div class="btn" id="volumeBtn"></div>
+<div id="loading-audio"       >{% fa5_icon 'spinner'        color="var(--link-color)" class="spin" %}</div>
+<div class="btn" id="playBtn" 	data-enabled="false" 	>{% fa5_icon 'play'           color="var(--link-color)" %}</div>
+<div class="btn" id="pauseBtn"	data-enabled="true" 	>{% fa5_icon 'pause'          color="var(--link-color)" %}</div>
+<div class="btn" id="shufBtn" 	data-mode="NO-SHUFFLE" 	>{% fa5_icon 'random'         color="var(--link-color)" %}</div>
+<div class="btn" id="prevBtn" 	data-enabled="false" 	>{% fa5_icon 'step-backward'  color="var(--link-color)" %}</div>
+<div class="btn" id="nextBtn" 	data-enabled="false" 	>{% fa5_icon 'step-forward'   color="var(--link-color)" %}</div>
+<div class="btn" id="repBtn"  	data-mode="REPEAT" 		>{% fa5_icon 'undo-alt'         color="var(--link-color)" %}</div>
+
+<!-- Volume -->
+<div id="volume" class="fadeout">
+	<div id="barFull" class="bar"></div>
+    <div id="barEmpty" class="bar"></div>
+    <div id="sliderBtn"></div>
+</div>

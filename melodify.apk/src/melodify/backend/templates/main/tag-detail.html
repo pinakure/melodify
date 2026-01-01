@@ -1,0 +1,9 @@
+<!-- main/tag-detail.html  -->
+{% include "main/widget-title.html" with caption=tag.name subcaption="Etiqueta" %}
+{% include "main/widget-admin.html" with object='tag' id=tag.pk %}
+{% include "main/widget-back.html"  %}
+{% include "main/background.html"   with value="linear-gradient(45deg, #1234, #fec4);" %}
+<div class="tag-detail">
+    {% include 'main/album-list.html' with data=albums_list %}
+    {% include 'main/song-list.html' with data=songs header=True %}
+</div>

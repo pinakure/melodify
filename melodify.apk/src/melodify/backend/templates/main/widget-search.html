@@ -1,0 +1,11 @@
+<!-- main/widget-search.html -->
+<input 
+    type="text" 
+    id="searchInput" 
+    style="margin-right: 64px;margin-top: 6px;" 
+    class="searchInput" 
+    placeholder="Filtrar {{ type }}..."
+    {% if bind is not None %}
+        onkeyup="melodify.filter('{{ bind }}')"
+    {% endif %}    
+    >

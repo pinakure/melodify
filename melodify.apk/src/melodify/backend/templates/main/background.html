@@ -1,0 +1,13 @@
+<!-- main/background.html -->
+<style>
+    .main-content {
+        {% if blend_mode is not None %}
+            background-blend-mode : {{ blend_mode }} !important;
+        {% endif %}
+        {% if picture is not None %}
+            background-image: {{ value }}, url('{{ picture }}') !important;
+        {% else %}
+            background-image: {{ value }} !important;
+        {% endif %}
+    }
+</style>

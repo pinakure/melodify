@@ -1,0 +1,9 @@
+<!-- main/widget-back.html  -->
+ {% load fontawesome_5 %}
+<button 
+    onclick="melodify.state.history.pop(); melodify.navigate(melodify.state.history.pop())" 
+    title="Volver" 
+    class="back-link input confirm" 
+    style="position:absolute; top: 0px; right: 16px;margin-bottom: 32px;">
+    {% fa5_icon "arrow-left" color="#000"%}
+</button>

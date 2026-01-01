@@ -1,0 +1,60 @@
+<!-- templates/app/album_tiles.html -->
+{% load fontawesome_5 %}
+<style>
+    .tile-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px 0; 
+    }
+
+    .tile-item {
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s;
+        text-align: center;
+    }
+
+    .tile-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    h3.album-name {
+        margin: 0 0 5px 0;
+        font-size: 16px !important;   
+        padding-bottom: 8px;
+        height: 18px;
+        overflow: hidden;
+    }
+</style>
+
+
+{% include "main/widget-title.html" with caption='Álbumes' counter_id='album-count' counter_value=albums.count %}
+{% include "main/widget-search.html" with type='álbumes' %}
+
+<div id="loading" style="display: none;">Cargando albumes...</div>
+
+<div class="tile-container" id="tileContainer"></div>
+
+<script>
+    const scrollbox = document.getElementsByClassName('main-content')[0];
+    melodify.next_page = 1;
+    // melodify.loadAlbums();
+
+    // Carga inicial y listeners
+
+    scrollbox.addEventListener('scroll', melodify.handleAlbumScroll);
+    
+    searchInput.addEventListener('input', () => {
+        // Usamos un pequeño retardo (debounce) para no saturar el servidor con peticiones
+        clearTimeout(this.searchTimeout); 
+        this.searchTimeout = setTimeout(() => melodify.triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums), 300);
+    });
+
+    melodify.triggerSearch(melodify.handleAlbumScroll, melodify.loadAlbums); 
+    
+</script>
