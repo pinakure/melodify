@@ -1,6 +1,6 @@
-from django.db import models
-from django.conf import settings
-
+from django.db          import models
+from django.conf        import settings
+from django.utils.html  import mark_safe
 # ============
 #   ARTIST
 # ============
@@ -65,13 +65,20 @@ class Album(models.Model):
 class Song(models.Model):
     title        = models.CharField(max_length=200, default="Untitled")
     filename     = models.CharField(max_length=255, default="untitled.mp3")
+    
     artist       = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
+    artists_and  = models.ManyToManyField(Artist, blank=True, related_name="artists_and")
+    artists_feat = models.ManyToManyField(Artist, blank=True, related_name="artists_feat")
+    artists_vs   = models.ManyToManyField(Artist, blank=True, related_name="artists_vs")
+    artists_prod = models.ManyToManyField(Artist, blank=True, related_name="artists_prod")
+    
     genre        = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True, related_name="genre")
     genres       = models.ManyToManyField(Genre, blank=True, related_name="genres")
     comment      = models.TextField(blank=True)
     
     track_number = models.PositiveIntegerField(default=1, null=True, blank=True)
     lyrics       = models.TextField(blank=True)
+    karaoke      = models.TextField(blank=True)
     picture      = models.CharField(max_length=512, default="", null=True, blank=True)
 
     times_played = models.PositiveIntegerField(default=0)
@@ -94,6 +101,27 @@ class Song(models.Model):
     def get_tags(self):
         tags = [ x.name for x in self.tags.all()]
         return ", ".join(tags)
+    
+    def get_artist_count(self):
+        count =  self.artists_and.all().count()
+        count += self.artists_feat.all().count()
+        count += self.artists_vs.all().count()
+        count += self.artists_prod.all().count()
+        return count+1
+      
+    def pretty_artist(self):
+        def artist_link(artist):
+            return f'<a onclick="melodify.navigate(`/artist/{ artist.pk }/`)">{ artist.name }</a>'
+        artist = artist_link(self.artist)
+        artist += " & " if len(self.artists_and.all())>0 else ''
+        artist += ", ".join([ artist_link(x) for x in self.artists_and.all()])
+        artist += " Ft. " if len(self.artists_feat.all())>0 else ''
+        artist += ", ".join([ artist_link(x) for x in self.artists_feat.all()])
+        artist += " Vs " if len(self.artists_vs.all())>0 else ''
+        artist += ", ".join([ artist_link(x) for x in self.artists_vs.all()])
+        artist += " Produced By " if len(self.artists_prod.all())>0 else ''
+        artist += ", ".join([ artist_link(x) for x in self.artists_prod.all()])
+        return artist
 
     def __str__(self):
         return self.title
