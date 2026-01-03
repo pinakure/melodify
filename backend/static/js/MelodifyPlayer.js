@@ -9,6 +9,7 @@ function MelodifyPlayer() {
     this.playlist       = [];
     this.index          = 0;
     this.howl           = null;
+    this.karaoke        = true;
     this.lyrics         = null;
     this.current_lyric  = "";
     this.current_lyric_index = 0;
@@ -179,7 +180,7 @@ MelodifyPlayer.prototype = {
 			pauseBtn.style.display = 'none';
 		}
 
-        this.loadLyrics( song.lyrics );
+        this.loadLyrics( melodify.player.karaoke ? song.karaoke : song.lyrics );
 
 		self.index = index;
         melodify.player.updatePlaylist(this.playlist);
@@ -363,20 +364,29 @@ MelodifyPlayer.prototype = {
                 // melodify.node('debug').innerHTML=`${now} - ${lyric.start} - ${lyric.end}`;
                 if( melodify.player.lyrics_last != lyric.start){
                     try {
+                        if( !melodify.player.karaoke ){
                             melodify.node('lyrics').innerHTML = `
-                            <div class="lyric-wrapper">
-                                <p class="lyric">${ lyric.text }</p>
-                                <p class="lyric-animation"></p>
-                            </div>
-                            <p class="blend-50">${ next.text ?? ''}</p>
-                        `;
-                        melodify.player.current_lyric       = lyric.text;
-                        melodify.player.current_lyric_index = 1;
-                        melodify.player.current_lyric_rate  = ( lyric.end - lyric.start ) / lyric.text.length;
-                        clearInterval(melodify.player.lyrics_interrupt);
-                        melodify.player.lyrics_interrupt = setInterval(melodify.player.updateCurrentLyric, melodify.player.current_lyric_rate);
-                        melodify.player.updateCurrentLyric();
-                        melodify.player.lyrics_last = lyric.start;
+                                <div class="lyric-wrapper">
+                                    <p class="lyric">${ lyric.text }</p>
+                                    <p class="lyric-animation"></p>
+                                </div>
+                                <p class="blend-50">${ next.text ?? ''}</p>
+                            `;
+                            melodify.player.current_lyric       = lyric.text;
+                            melodify.player.current_lyric_index = 1;
+                            melodify.player.current_lyric_rate  = ( lyric.end - lyric.start ) / lyric.text.length;
+                            clearInterval(melodify.player.lyrics_interrupt);
+                            melodify.player.lyrics_interrupt = setInterval(melodify.player.updateCurrentLyric, melodify.player.current_lyric_rate);
+                            melodify.player.updateCurrentLyric();
+                            melodify.player.lyrics_last = lyric.start;
+                        } else {
+                            melodify.node('lyrics').innerHTML = `
+                                <div class="lyric-wrapper">
+                                    <p class="lyric">${ lyric.text }</p>
+                                </div>
+                                <p class="blend-50">${ next.text ?? ''}</p>
+                            `;
+                        }
                     } catch{
 
                     }

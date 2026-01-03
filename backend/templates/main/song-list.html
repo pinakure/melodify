@@ -24,7 +24,8 @@
         <button 
             class           = "play-button" 
             id              = "song-{{ song.pk }}"
-            data-artistname = "{{ song.artist.name }}" 
+            data-artistname = "{{ song.artist.name }}"
+            data-karaoke    = "{{ song.karaoke }}"  
             data-lyrics     = "{{ song.lyrics }}" 
             data-songname   = "{{ song.title }}" 
             data-src        = "/play/{{ song.pk }}/song.mp3" 
@@ -66,6 +67,7 @@
                     class           = "input confirm" 
                     id              = "enqueue-song"     
                     data-artistname = "{{ song.artist.name }}" 
+                    data-karaoke    = "{{ song.karaoke }}" 
                     data-lyrics     = "{{ song.lyrics }}" 
                     data-songname   = "{{ song.title }}" 
                     data-src        = "/play/{{ song.pk }}/song.mp3" 

@@ -129,6 +129,7 @@ Melodify.prototype = {
         const artistName = buttonElement.getAttribute('data-artistname');
         const songName   = buttonElement.getAttribute('data-songname');
         const lyrics     = buttonElement.getAttribute('data-lyrics');
+        const karaoke    = buttonElement.getAttribute('data-karaoke');
         const audioUrl   = buttonElement.getAttribute('data-src');
         const pictureUrl = buttonElement.getAttribute('data-picture');
         const songId     = buttonElement.getAttribute('data-id');
@@ -142,6 +143,7 @@ Melodify.prototype = {
             id          : songId,
             song_id     : songId,
             lyrics      : lyrics,
+            karaoke     : karaoke,
             artist_name : artistName,
             song_name   : songName,
             next        : nextSong,
