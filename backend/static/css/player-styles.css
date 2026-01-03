@@ -391,7 +391,7 @@ a#track:hover {
 .playbar[renderer="themed-reverse"],
 .playbar[renderer="scanlines"] {
   background: repeating-linear-gradient(
-    to bottom,
+    to top,
     var(--bg-content-blend) 0px,
     var(--bg-content-blend) 1px,   /* Color 1 for 1px */
     #000 1px,   /* Color 2 starts immediately */
@@ -401,7 +401,7 @@ a#track:hover {
 .playbar[renderer="scanlines"] #analyzer {
   mix-blend-mode  : soft-light;
   background: repeating-linear-gradient(
-    to bottom,
+    to top,
     var(--accent-color) 0px,
     var(--accent-color) 1px,   /* Color 1 for 1px */
     #000 1px,   /* Color 2 starts immediately */
@@ -413,15 +413,47 @@ a#track:hover {
   mix-blend-mode  : screen;
 }
 .playbar[renderer="fire"] #analyzer .analyzer-bar {
-  background      : linear-gradient(180deg, #00f, #f00, #800, #f80, #ff0, #fff);
   mix-blend-mode  : multiply;
   margin-right    : 0px;
+  background      : linear-gradient(
+    to top, 
+    var(--text-color  )  0px, var(--text-color  )  5px, #0008 5px, #0000  8px,
+    var(--text-color  )  8px, var(--text-color  ) 13px, #0008 13px,#0000 16px,
+    var(--link-color  ) 16px, var(--link-color  ) 21px, #0008 21px,#0000 24px,
+    var(--link-color  ) 24px, var(--link-color  ) 29px, #0008 20px,#0000 32px,
+    var(--accent-color) 32px, var(--accent-color) 37px, #0008 37px,#0000 40px,
+    var(--accent-color) 40px, var(--accent-color) 45px, #0008 45px,#0000 48px,
+    var(--bg-sidebar  ) 48px, var(--bg-sidebar  ) 53px, #0008 53px,#0000 56px,
+    var(--bg-content  ) 56px, var(--bg-content  ) 61px, #0008 61px,#0000 64px,
+    #000 64px
+  );
+  border-left     : 3px #0000 solid;
+  margin-left     : 3px;
+  /* background      : linear-gradient(180deg, #00f, #f00, #800, #f80, #ff0, #fff); */
 }
 .playbar[renderer="themed"] #analyzer .analyzer-bar {
   background      : linear-gradient(180deg, var(--link-color), var(--accent-color, var(--text-color), var(--bg-sidebar)));
-  mix-blend-mode  : multiply;
+  mix-blend-mode  : overlay;
 }
 .playbar[renderer="themed-reverse"] #analyzer .analyzer-bar {
   background      : linear-gradient(0deg, var(--link-color), var(--accent-color, var(--text-color), var(--bg-sidebar)));
   mix-blend-mode  : multiply;
+}
+.playbar[renderer="vumeter"] #analyzer .analyzer-bar {
+  background      : linear-gradient(
+    to top, 
+    #084  0px, #084  5px, #0008 5px, #0000  8px,
+    #0f8  8px, #0f8 13px, #0008 13px,#0000 16px,
+    #0f0 16px, #0f0 21px, #0008 21px,#0000 24px,
+    #8f0 24px, #8f0 29px, #0008 20px,#0000 32px,
+    #ff0 32px, #ff0 37px, #0008 37px,#0000 40px,
+    #f80 40px, #f80 45px, #0008 45px,#0000 48px,
+    #f40 48px, #f40 53px, #0008 53px,#0000 56px,
+    #f00 56px, #f00 61px, #0008 61px,#0000 64px,
+    #000 64px
+  );
+  border-left     : 3px #0000 solid;
+  margin-left     : 3px;
+  mix-blend-mode  : lighten;
+  margin-right    : 0px;
 }
