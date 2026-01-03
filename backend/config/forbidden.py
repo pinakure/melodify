@@ -23,7 +23,8 @@ FORBIDDEN_FOLDERS                   = [
     'System Volume Information'     ,                               
     'sorted'                        ,               
     'unsorted'                      ,               
-    '#.sorted'                      ,               
+    '.sorted'                       ,               
+    '.vgm'                          ,               
     '.unsorted'                     ,               
     '.backup'                       ,               
 ]
