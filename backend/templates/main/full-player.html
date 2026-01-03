@@ -4,10 +4,10 @@
 {% load fontawesome_5 %}
 
 {% if not song %}
-    {% include "main/widget-title.html" with caption="Reproduciendo" subcaption="Nada en la lista" %}
+    {% include "main/widget-title.html" with caption="Reproduciendo" subcaption="<br/>Nada en la lista" class="blend-50"  style="line-height: 14px; margin-top: 8px;" %}
 {% else %}
-    {% include "main/widget-title.html" with caption="Reproduciendo"%}
-    {% include "main/widget-title.html" with caption=song.title subcaption="Canción de" subcaption_suffix=song.artist.name subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True %}
+    {% include "main/widget-title.html" with caption="Reproduciendo"  class="blend-50" %}
+    {% include "main/widget-title.html" with caption=song.title subcaption="<br/>Canción de" subcaption_suffix=song.pretty_artist subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True style="line-height: 14px; margin-top: 8px;" %}
 {% endif %}
 {% include "main/widget-back.html" %}
 {% if song.picture %}

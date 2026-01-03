@@ -10,6 +10,9 @@ function MelodifyPlayer() {
     this.index          = 0;
     this.howl           = null;
     this.lyrics         = null;
+    this.current_lyric  = "";
+    this.current_lyric_index = 0;
+    this.lyrics_interrupt = null;
     this.lyrics_index   = 1;
     this.lyrics_last    = 0;
     this.buffer         = null;
@@ -38,7 +41,7 @@ MelodifyPlayer.prototype = {
         repBtn .setAttribute('data-mode', REPEAT_MODES[ melodify.state.repeat_mode ]);
         shufBtn.setAttribute('data-mode', melodify.state.shuffle ? 'SHUFFLE' : 'NO-SHUFFLE');
         playBtn.setAttribute('data-enabled', 'true');
-        if(( melodify.player.playlist.length > 0 && melodify.player.index           > 0) 
+        if(( melodify.player.playlist.length > 0 && melodify.player.index           > 0)
         || ( melodify.state.repeat_mode      > 0 && melodify.player.playlist.length > 1)
         || ( melodify.state.shuffle              && melodify.player.playlist.length > 1)
         ){
@@ -46,8 +49,8 @@ MelodifyPlayer.prototype = {
         } else {
             prevBtn.setAttribute('data-enabled', 'false');
         }
-        if(( melodify.player.playlist.length > 0 && melodify.player.index           < (melodify.player.playlist.length-1)) 
-        || ( melodify.state.repeat_mode      > 0 && melodify.player.playlist.length > 1                                  ) 
+        if(( melodify.player.playlist.length > 0 && melodify.player.index           < (melodify.player.playlist.length-1))
+        || ( melodify.state.repeat_mode      > 0 && melodify.player.playlist.length > 1                                  )
         || ( melodify.state.shuffle              && melodify.player.playlist.length > 1                                  )
         ){
             nextBtn.setAttribute('data-enabled', 'true');
@@ -62,7 +65,7 @@ MelodifyPlayer.prototype = {
         melodify.player.updateButtons();
         melodify.saveState();
     },
-    
+
     toggleShuffle: function(){
         melodify.state.shuffle ^= 1;
         if(melodify.state.shuffle) melodify.state.repeat_mode = 1;
@@ -82,12 +85,12 @@ MelodifyPlayer.prototype = {
                     var start = time[0];
                     var end   = time[1];
                     var text  = lyric[2];
-                    var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
-                    var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); }; 
+                    var get_start_time = (hms = start.split(',')[0])=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); };
+                    var get_end_time   = (hms = end.split(',')[0]  )=>{ const [hours, minutes, seconds] = hms.split(':'); return parseInt(hours) * 60 * 60 + parseInt(minutes) * 60 + parseInt(seconds); };
                     this.lyrics[ index ] = {
                         start : (get_start_time()*1000)+parseInt(start.split(',')[1]),
                         end   : (get_end_time()  *1000)+parseInt(end.split(',')[1]),
-                        text  : text, 
+                        text  : text,
                     };
                 }
             } catch {}
@@ -116,12 +119,12 @@ MelodifyPlayer.prototype = {
 		if(!data)return;
 		this.howl = new Howl({
             src: [ data.file ],
-            html5: false, 
+            html5: false,
             onplay: function() {
                 duration.innerHTML = self.formatTime(Math.round(melodify.player.howl.duration()));
-                
+
                 requestAnimationFrame(self.step.bind(self));
-                
+
                 // Sync lyrics bar size with song duration
                 node = melodify.node('timelineTrack');
                 if(node) {
@@ -161,7 +164,7 @@ MelodifyPlayer.prototype = {
                 requestAnimationFrame(self.step.bind(self));
             }
         });
-    
+
 		this.howl.play();
 
 		track.innerHTML = data.title;
@@ -175,7 +178,7 @@ MelodifyPlayer.prototype = {
 			playBtn.style.display = 'none';
 			pauseBtn.style.display = 'none';
 		}
-    
+
         this.loadLyrics( song.lyrics );
 
 		self.index = index;
@@ -299,8 +302,8 @@ MelodifyPlayer.prototype = {
         this.lyrics_index=1;
         this.lyrics_last =0;
 	},
-    
-    updateAnalyzer : function(){  
+
+    updateAnalyzer : function(){
         if(!melodify.state.enable_analyzer) return;
         melodify.player.analyzer.getByteFrequencyData( melodify.player.buffer );
         analyzer_bars.forEach((bar, i) => {
@@ -311,6 +314,26 @@ MelodifyPlayer.prototype = {
         });
     },
 
+    updateCurrentLyric : function(){
+        // melodify.node('debug').innerHTML=`
+        //     <ul>
+        //     <li>${melodify.player.current_lyric}</li>
+        //     <li>${melodify.player.current_lyric_rate}</li>
+        //     <li>${melodify.player.current_lyric_rate}</li>
+        //     <li>${melodify.player.current_lyric_index}/${melodify.player.current_lyric.length}</li>
+        //     </ul>
+        // `;
+        node = document.getElementsByClassName('lyric-animation')[0];
+        if(node){
+            node.innerHTML=melodify.player.current_lyric.substring(0, melodify.player.current_lyric_index );
+            if( melodify.player.current_lyric_index < melodify.player.current_lyric.length ){
+                melodify.player.current_lyric_index++;
+            } else {
+                clearInterval(melodify.player.lyrics_interrupt);
+            }
+        }
+    },
+
     updateLyrics : function(percent, pc, seek){
         if(melodify.lyrics_editor){
             var song_position = melodify.node('songPosition');
@@ -318,13 +341,13 @@ MelodifyPlayer.prototype = {
             else {
                 song_position.style.width = pc;
                 wrapper = melodify.node('timelineContainer');
-                wrapper.scrollTo({ left: (wrapper.scrollWidth - wrapper.clientWidth) * (percent/100), behavior:'smooth'}); 
+                wrapper.scrollTo({ left: (wrapper.scrollWidth - wrapper.clientWidth) * (percent/100), behavior:'smooth'});
                 index = 0;
                 for (const [i, block] of editor.blocks.entries()) {
                     if (seek >= block.start && seek < block.end) {
                         editor.highlightTimelineBlock(index);
-                        // auto-select node 
-                        if( editor.auto_select) 
+                        // auto-select node
+                        if( editor.auto_select)
                             editor.scrollToEditor(index);
                         break;
                     }
@@ -341,12 +364,18 @@ MelodifyPlayer.prototype = {
                 if( melodify.player.lyrics_last != lyric.start){
                     try {
                             melodify.node('lyrics').innerHTML = `
-                            <div class="lyric-wrapper" style="position: relative;height: 32px;">
+                            <div class="lyric-wrapper">
                                 <p class="lyric">${ lyric.text }</p>
-                                <p class="lyric-animation" style="color: var(--accent-color); animation-duration:${ lyric.end - lyric.start }ms;">${ lyric.text }</p>
+                                <p class="lyric-animation"></p>
                             </div>
                             <p class="blend-50">${ next.text ?? ''}</p>
                         `;
+                        melodify.player.current_lyric       = lyric.text;
+                        melodify.player.current_lyric_index = 1;
+                        melodify.player.current_lyric_rate  = ( lyric.end - lyric.start ) / lyric.text.length;
+                        clearInterval(melodify.player.lyrics_interrupt);
+                        melodify.player.lyrics_interrupt = setInterval(melodify.player.updateCurrentLyric, melodify.player.current_lyric_rate);
+                        melodify.player.updateCurrentLyric();
                         melodify.player.lyrics_last = lyric.start;
                     } catch{
 
@@ -368,7 +397,7 @@ MelodifyPlayer.prototype = {
         var percent             = (((seek / this.howl.duration()) * 100) || 0);
         var pc                  = `${percent}%`;
 		progress.style.width    = pc;
-        
+
         // If the howl is still playing, continue stepping.
 		if (this.howl.playing()) {
 			requestAnimationFrame(self.step.bind(self));
