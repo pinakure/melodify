@@ -3533,3 +3533,4 @@ backend/reload.sh
 backend/backend/settings-server.py
 backend/backend/wsgi_server.py
 */__pycache__
+backend/.cache
