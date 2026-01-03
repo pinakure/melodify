@@ -8,6 +8,7 @@ from django.views.generic           import ListView, DetailView, TemplateView
 from django.contrib.auth            import authenticate, login, logout, get_user_model
 from django.db.models               import Case, When, Count, Value, Min
 from django.db.models               import Q
+from django.utils.html              import mark_safe
 from django.http                    import JsonResponse, HttpResponse
 from django.conf                    import settings            
 from main.models                    import *
@@ -59,8 +60,10 @@ def get_playlists(user):
     
 # returns song object with virtual 'fav' field embedded, tuned for given user_id
 def get_song(song_id, user_id):
-    return Song.objects.filter(id = song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=user_id))).get()
-        
+    song =  Song.objects.filter(id = song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=user_id))).get()
+    song.pretty_artist = mark_safe(song.pretty_artist()) 
+    song.artist_count  = song.get_artist_count() 
+    return song
 
 
 class AlbumTileView(ListView):
@@ -146,7 +149,7 @@ class ArtistDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
         artist = self.object
-        context['songs'] = Song.objects.filter(artist=artist).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk)))
+        context['songs'] = Song.objects.filter(Q(artist=artist) | Q(artists_and__name__icontains=artist)| Q(artists_feat__name__icontains=artist)| Q(artists_vs__name__icontains=artist)| Q(artists_prod__name__icontains=artist)).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=self.request.user.pk)))
         context['albums_list'] = Album.objects.filter(artists__pk=artist.id).all().order_by('-release')
         return context
     
