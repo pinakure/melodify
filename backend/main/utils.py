@@ -206,6 +206,7 @@ class Sanitizer:
 
         timestamp = Utils.is_timestamp(tag)
         if len(timestamp) > 0:
+            print(f"TIMESTAMP :: {timestamp}")
             song.timestamp = timezone.make_aware(datetime(int(timestamp[0:4]),int(timestamp[4:6]),int(timestamp[6:8])))
             return ""
         if Utils.is_number(tag):
@@ -218,23 +219,74 @@ class Sanitizer:
         tag = tag.rstrip('.')
         return tag
     
-    def artists( artist_name ):
+    def artists_and( artist_name ):
+        AND_TAGS = [
+            '&'         ,
+            '/'         ,
+            '\\'        ,
+            # ','         ,
+        ]
+        if not any(tag in artist_name for tag in AND_TAGS): return []    
+        artist  = artist_name.lower()
+        for tag in AND_TAGS:
+            artist=artist.replace(tag, '|')
+        return [ q.lstrip().rstrip().title() for q in artist.split('|')][1:]
+
+    def artists_feat( artist_name ):
         FEAT_TAGS = [
             ' ft.'      ,
             ' ft '      ,
             ' feat.'    ,
             ' feat '    ,
-            ' prod.'    ,
-            ' prod '    ,
-            '/'         ,
-            '\\'        ,
-            ','         ,
+        ]
+        if not any(tag in artist_name for tag in FEAT_TAGS): return []    
+        artist  = artist_name.lower()
+        for tag in FEAT_TAGS:
+            artist=artist.replace(tag, '|')
+        return [ q.lstrip().rstrip().title() for q in artist.split('|')][1:]
+        
+    def artists_vs( artist_name ):
+        VERSUS_TAGS = [
             ' vs.'      ,
             ' vs '      ,
             ' versus '  ,
             ' versus.'  ,
         ]
+        if not any(tag in artist_name for tag in VERSUS_TAGS): return []    
         artist  = artist_name.lower()
-        for tag in FEAT_TAGS:
+        for tag in VERSUS_TAGS:
+            artist=artist.replace(tag, '|')
+        return [ q.lstrip().rstrip().title() for q in artist.split('|')][1:]
+        
+    def artists_prod( artist_name ):
+        PROD_TAGS = [
+            ' prod.'    ,
+            ' prod '    ,
+        ]
+        if not any(tag in artist_name for tag in PROD_TAGS): return []    
+        artist  = artist_name.lower()
+        for tag in PROD_TAGS:
+            artist=artist.replace(tag, '|')
+        return [ q.lstrip().rstrip().title() for q in artist.split('|')][1:]
+
+    def artists( artist_name ):
+        TAGS = [
+            '&'         ,
+            '/'         ,
+            '\\'        ,
+            # ','         ,
+            ' ft.'      ,
+            ' ft '      ,
+            ' feat.'    ,
+            ' feat '    ,
+            ' vs.'      ,
+            ' vs '      ,
+            ' versus.'  ,
+            ' versus '  ,
+            ' prod.'    ,
+            ' prod '    ,
+        ]
+        artist  = artist_name.lower()
+        for tag in TAGS:
             artist=artist.replace(tag, '|')
         return [ q.lstrip().rstrip().title() for q in artist.split('|')]
