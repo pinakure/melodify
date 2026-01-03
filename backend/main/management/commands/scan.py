@@ -1,10 +1,12 @@
-from django.core.management.base    import BaseCommand, CommandError
+from django.core.management.base    import BaseCommand
 from django.core.files              import File
 from django.utils                   import timezone
 from main.models                    import Song, Album, Artist, Tag, Genre
 from main.utils                     import Utils, Sanitizer
 from datetime                       import datetime, timedelta
 from .generatelyrics                import Command as GenerateLyrics
+from .getartist                     import Command as GetArtist
+import itertools
 import platform
 import hashlib
 import os
@@ -23,7 +25,8 @@ class Command(BaseCommand):
         self.language       = 'en'
 
     def echo(self, text):
-        self.stdout.write(self.tabs+text)
+        self.stdout.write("\r"+(" "*os.get_terminal_size().columns)+"\r"+self.tabs+text)
+        # self.stdout.write(self.tabs+text)
     
     def add_arguments(self, parser):
         parser.add_argument("scan_path"                                 , nargs="+" , type=str  )
@@ -65,6 +68,7 @@ class Command(BaseCommand):
         self.path           = PATH
 
     def handle(self, *args, **options):
+        self.artistmetadata = GetArtist().initialize()
         self.force          = options['force'] or False
         self.lyrics         = options['generatelyrics'] or False
         self.verbose        = options['verbose'] or False
@@ -174,6 +178,12 @@ class Command(BaseCommand):
             return Song.objects.filter(filename=path).get()
         except Exception:
             return None
+   
+    def get_song_by_hash(self, hash : str):
+        try:
+            return Song.objects.filter(hash=hash).get()
+        except Exception:
+            return None
 
     def get_or_create_album(self, album_name, info):
         if album_name is None: return None
@@ -194,14 +204,8 @@ class Command(BaseCommand):
             self.echo(f'+ Created album "{album_name}"')
             return album
 
-    def get_or_create_artist(self, artist_name, info):
+    def get_or_create_artist(self, artist_name, aliases=[], type=''):
         if artist_name is None: return None
-
-        artists     = Sanitizer.artists( artist_name )
-        aliases     = self.get_aliases( artists[0] )
-        # self.echo(f"# Looking for artist { aliases[0] }...")
-        
-        artist_name = aliases[0]
         if len(artist_name)==0: return None
         try:
             artist = Artist.objects.filter( name__iexact=artist_name ).get()
@@ -210,10 +214,10 @@ class Command(BaseCommand):
             try:
                 artist = Artist.objects.filter( aliases__icontains=artist_name.lower() ).get()
                 return artist
-            except Exception as e:
+            except Exception as e:    
                 artist = Artist()
                 artist.name     = artist_name.title()
-                artist.aliases  = ','.join(aliases)
+                artist.aliases  = ','.join(aliases) if len(aliases) > 1 else ''
                 artist.bio      = ''
                 artist.picture = None
                 artist.save()
@@ -223,7 +227,8 @@ class Command(BaseCommand):
                             with open(image_file, 'rb') as f:
                                 artist.picture.save(os.path.basename(image_file), File(f), save=True)
                                 artist.save()
-                self.echo(f'+ Created artist "{ artist.name }"')
+                self.artistmetadata.get_artist_metadata( artist_name )
+                self.echo(f'+ Created { f"{type} " if type!="" else ""}artist "{ artist.name }"')
                 return artist
 
     def get_or_create_genre(self, genre_name, info):
@@ -277,16 +282,42 @@ class Command(BaseCommand):
 
     def setup_artist(self):
         self.song.artist = None
+        # self.echo("--------------- SETUP ARTIST ------------------------------------------")
         try:
-            self.song.artist = self.get_or_create_artist( self.info.get('artist'), self.info)
+            artist_name = self.info.get('artist')
+            class Payload:
+                artists      = Sanitizer.artists( artist_name )
+                artists_and  = Sanitizer.artists_and( artist_name )
+                artists_feat = Sanitizer.artists_feat( artist_name )
+                artists_vs   = Sanitizer.artists_vs( artist_name )
+                artists_prod = Sanitizer.artists_prod( artist_name )
+                aliases      = self.get_aliases( artists[0] )
+            # self.echo("--------------- PAYLOAD ------------------------------------------")
+            # print(f'{self.tabs}- ARTISTS', Payload.artists)
+            # print(f'{self.tabs}-     AND', Payload.artists_and)
+            # print(f'{self.tabs}-    FEAT', Payload.artists_feat)
+            # print(f'{self.tabs}-      VS', Payload.artists_vs)
+            # print(f'{self.tabs}-    PROD', Payload.artists_prod)
+            # print(f'{self.tabs}- ALIASES', Payload.aliases)
+            # print(f'{self.tabs}-  ARTIST', Payload.aliases[0])
+            self.song.artist = self.get_or_create_artist( Payload.aliases[0], Payload.aliases)
+            self.song.save()
+            for _and    in Payload.artists_and  : self.song.artists_and.add ( self.get_or_create_artist( _and , type='coauthor') )
+            for ft      in Payload.artists_feat : self.song.artists_feat.add( self.get_or_create_artist( ft   , type='featured') )
+            for vs      in Payload.artists_vs   : self.song.artists_vs.add  ( self.get_or_create_artist( vs   , type='versus') )
+            for prod    in Payload.artists_prod : self.song.artists_prod.add( self.get_or_create_artist( prod , type='producer') )
+            self.song.save()
         except Exception as e:
             self.echo(str(e))
             self.add_song_error(self.song, f"ARTIST:{str(e)}")
         try:
             if self.song.album:
                 self.song.album.artists.add(self.song.artist)
+                for artist in itertools.chain( self.song.artists_and.all(), self.song.artists_feat.all(), self.song.artists_vs.all(), self.song.artists_prod.all()):
+                    self.song.album.artists.add( artist )
                 self.song.album.save()
         except Exception as e:
+            self.echo(f"ERROR :: {str(e)}")
             self.add_song_error(self.song, f"ARTIST:{str(e)}")
     
     def setup_bpm(self):
@@ -339,6 +370,13 @@ class Command(BaseCommand):
         except Exception as e:
             self.add_song_error(self.song, f"LYRICS:{str(e)}")
 
+    def setup_karaoke(self):
+        SRT_FILE = self.song.filename.rstrip('.mp3')+'.kar.srt'
+        try:
+            self.song.karaoke = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
+        except Exception as e:
+            self.add_song_error(self.song, f"KARAOKE:{str(e)}")
+
     def setup_picture(self):
         self.song.picture = None
         picture = self.info.get('picture')[0] if 'picture' in self.info.keys() else None
@@ -382,6 +420,7 @@ class Command(BaseCommand):
         self.setup_tags()
         self.song.save()
         self.setup_lyrics()
+        self.setup_karaoke()
         self.song.save()
 
     def setup_tags(self):
@@ -464,7 +503,7 @@ class Command(BaseCommand):
                     self.hash   = Utils.get_hash(path)
                     # check whether or not the song object exists
                     filename    = os.path.join(root, f)
-                    song        = self.get_song(filename)
+                    song        = self.get_song_by_hash(self.hash) #self.get_song(filename)
                     if (song is not None) and (song.hash == self.hash) and (not song.error) and (not (self.force or self.lyrics)):
                         continue
                     self.info = self.get_id3tags(path)
