@@ -9,7 +9,7 @@ function MelodifyPlayer() {
     this.playlist       = [];
     this.index          = 0;
     this.howl           = null;
-    this.karaoke        = true;
+    this.karaoke        = false;
     this.lyrics         = null;
     this.current_lyric  = "";
     this.current_lyric_index = 0;
