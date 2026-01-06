@@ -60,11 +60,11 @@ def ytSearch(url, max_resultados=1):
             if 'entries' in info and len(info['entries']) > 0:
                 for entry in info['entries']:
                     item = {
-                        'name'      : entry.get('title'                     ).encode('ascii', 'ignore').decode('ascii').replace("'", '').replace("'", ''),
-                        'artist'    : 'Youtube',
-                        'album'     : entry.get('uploader' , 'No Album'     ).encode('ascii', 'ignore').decode('ascii').replace("'", '').replace("'", ''),
-                        'url'       : f'www.youtube.com/watch?v={entry.get('id')}',
-                        'type'      : 'youtube',
+                        "name"      : f"{entry.get('title'                     ).encode('ascii', 'ignore').decode('ascii').replace("'", '´')}",
+                        "artist"    : f"Youtube",
+                        "album"     : f"{entry.get('uploader' , 'No Album'     ).encode('ascii', 'ignore').decode('ascii').replace("'", '´')}",
+                        "url"       : f"www.youtube.com/watch?v={entry.get('id')}",
+                        "type"      : f"youtube",
                     }
                     payload.append(
                         item
@@ -116,11 +116,11 @@ def searchSong(url):
     payload = []
     for song in song_objs:
         payload.append({ 
-            'name'  : song.name,
-            'artist': song.artist,
-            'url'   : song.url,
-            'album' : song.album_name,
-            'type'  : 'spotify',
+            "name"  : f"{song.name.replace("'", '´')}",
+            "artist": f"{song.artist.replace("'", '´')}",
+            "album" : f"{song.album_name.replace("'", '´')}",
+            "url"   : f"{song.url       }",
+            "type"  : "spotify",
         }) 
     if not 'open.spotify.com' in url:
         for song in ytSearch(url, 3):

@@ -493,7 +493,7 @@ def steal_get(request):
                 timeout=3600,
                 text=True
             )
-            songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
+            songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
             debug(f"STEAL :: stderr = {result.stderr}")
             debug(f"STEAL :: result = {result.stdout}")
             debug(f"STEAL :: songs = {songs}")
@@ -534,7 +534,7 @@ def steal_search(request):
                 )
                 debug(f"STEALSEARCH :: result = '{result}'")
                 debug(f"STEALSEARCH :: stdout = '{result.stdout}'")
-                songs = result.stdout.replace("'''", '').replace('"', '').replace('\n', '').replace("'", '"')
+                songs = result.stdout.replace("'''", '').replace('\n', '').replace("'", '"')
                 debug(f"STEALSEARCH :: songs = '{songs}'")
                 debug(f"STEALSEARCH :: stderr = '{result.stderr}'")
                 return JsonResponse({'status': 'success', 'message': 'Search OK', 'songs' : json.loads(songs)})

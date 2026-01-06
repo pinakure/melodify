@@ -2,7 +2,7 @@ from django.core.management.base    import BaseCommand
 from django.core.files              import File
 from django.utils                   import timezone
 from main.models                    import Song, Album, Artist, Tag, Genre
-from main.utils                     import Utils, Sanitizer
+from main.utils                     import Utils, Sanitizer, debug
 from datetime                       import datetime, timedelta
 from .generatelyrics                import Command as GenerateLyrics
 from .getartist                     import Command as GetArtist
@@ -381,10 +381,18 @@ class Command(BaseCommand):
             self.song.karaoke = Utils.saferead(SRT_FILE, 'r', encoding='utf-8') if os.path.exists(SRT_FILE) else ''
         except Exception as e:
             self.add_song_error(self.song, f"KARAOKE:{str(e)}")
-
     def setup_picture(self):
+        from pathlib import Path
         self.song.picture = None
         picture = self.info.get('picture')[0] if 'picture' in self.info.keys() else None
+        if picture is None:
+            try:
+                filename = Path(os.path.join('.', 'media', 'songs', f'{ self.song.title }.mp3'))
+                if filename.exists():
+                    picture = Utils.saferead(str(filename), 'rb')
+            except Exception as e:
+                debug(f"SCAN :: Failed to read '{ filename }'")
+        
         if picture is not None:
             try:
                 if self.song.picture == '':
