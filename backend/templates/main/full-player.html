@@ -7,7 +7,11 @@
     {% include "main/widget-title.html" with caption="Reproduciendo" subcaption="<br/>Nada en la lista" class="blend-50"  style="line-height: 14px; margin-top: 8px;" %}
 {% else %}
     {% include "main/widget-title.html" with caption="Reproduciendo"  class="blend-50" %}
-    {% include "main/widget-title.html" with caption=song.title subcaption="<br/>Canción de" subcaption_suffix=song.pretty_artist subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True style="line-height: 14px; margin-top: 8px;" %}
+    {%if song.artist is not None %}
+        {% include "main/widget-title.html" with caption=song.title subcaption="<br/>Canción de" subcaption_suffix=song.pretty_artist subcaption_link='/artist/' subcaption_link_suffix=song.artist.pk link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True style="line-height: 14px; margin-top: 8px;" %}
+    {% else %}
+        {% include "main/widget-title.html" with caption=song.title subcaption="<br/>Canción" link_url="/admin/main/song/" link_object=song.pk link_url_suffix="/change" link_hint="Edit Song Details" link_newtab=True style="line-height: 14px; margin-top: 8px;" %}
+    {% endif %}
 {% endif %}
 {% include "main/widget-back.html" %}
 {% if song.picture %}
@@ -100,14 +104,25 @@
             </div>
             <div style="display: inline-block">
                 <!-- lista de artistas -->
-                {% if song.album.pk %}
-                    <p class="labels">
-                        <strong>Artista{% if song.album.artists.count > 1 %}s{% endif %}:</strong>
-                        {% for artist in song.album.artists.all %}
+                <p class="labels">
+                    <strong>Artista{% if song.artist_count > 1 %}s{% endif %}:</strong>
+                    {% if song.artist is not None %}
+                        <a onclick="melodify.navigate(`{% url 'artist-detail' song.artist.pk %}`)">{{ song.artist.name }}</a>
+                    {% else %}
+                    {% endif %}
+                    {% for artist in song.artists_and.all %}
                         <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
-                        {% endfor %}
-                    </p>
-                {%endif%}
+                    {% endfor %}
+                    {% for artist in song.artists_feat.all %}
+                        <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
+                    {% endfor %}
+                    {% for artist in song.artists_prod.all %}
+                        <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
+                    {% endfor %}
+                    {% for artist in song.artists_vs.all %}
+                        <a onclick="melodify.navigate(`{% url 'artist-detail' artist.pk %}`)">{{ artist.name }}</a>
+                    {% endfor %}
+                </p>
 
                 <!-- Datos de cancion -->
                 {% if song.tags.all.count > 0 %}
