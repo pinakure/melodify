@@ -110,6 +110,7 @@ class Song(models.Model):
         return count+1
       
     def pretty_artist(self):
+        if self.artist is None: return None
         def artist_link(artist):
             return f'<a onclick="melodify.navigate(`/artist/{ artist.pk }/`)">{ artist.name }</a>'
         artist = artist_link(self.artist)
