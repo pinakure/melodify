@@ -25,8 +25,10 @@ class Command(BaseCommand):
         self.language       = 'en'
 
     def echo(self, text):
-        self.stdout.write("\r"+(" "*os.get_terminal_size().columns)+"\r"+self.tabs+text)
-        # self.stdout.write(self.tabs+text)
+        try:
+            self.stdout.write("\r"+(" "*os.get_terminal_size().columns)+"\r"+self.tabs+text)
+        except:
+            self.stdout.write(self.tabs+text)
     
     def add_arguments(self, parser):
         parser.add_argument("scan_path"                                 , nargs="+" , type=str  )
@@ -35,10 +37,13 @@ class Command(BaseCommand):
         parser.add_argument("--verbose"         , '-V', default=False   , nargs="*" , type=bool )
 
     def resolveBasePath(self, BASEPATH):
-        if platform.system() == 'Windows':
-            os.system('cls')
-        else:
-            os.system('clear')
+        try:
+            if platform.system() == 'Windows':
+                os.system('cls')
+            else:
+                os.system('clear')
+        except:
+            pass
         BASEPARTS = BASEPATH.split(':')
         DRIVE = ''
         PATH  = ''
