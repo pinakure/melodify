@@ -81,7 +81,7 @@ class Command(BaseCommand):
         if self.force   : print("SCAN :: Enable Forced Analysis")
         if self.verbose : print("SCAN :: Enable High Verbosity")
         if self.lyrics  : print("SCAN :: Enable Generate Lyrics using AI")
-        self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder ))} songs.")
+        self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder , self.lyrics))} songs.")
 
     def add_song_error(self, song, exception, error=True):
         song.errors = song.errors + str(exception) + ';\n'
@@ -386,26 +386,35 @@ class Command(BaseCommand):
         self.song.picture = None
         picture = self.info.get('picture')[0] if 'picture' in self.info.keys() else None
         if picture is None:
+            debug(f"SCAN :: No picture @ info, looking for '{ self.song.title }.png' in media/songs/")
             try:
-                filename = Path(os.path.join('.', 'media', 'songs', f'{ self.song.title }.mp3'))
+                filename = Path(os.path.join('.', 'media', 'songs', f'{ self.song.title }.png'))
                 if filename.exists():
+                    debug(f"SCAN :: Picture found, reading picture data...")
                     picture = Utils.saferead(str(filename), 'rb')
             except Exception as e:
                 debug(f"SCAN :: Failed to read '{ filename }'")
         
         if picture is not None:
+            debug(f"SCAN :: Picture data is present, hashing image filename...")
             try:
-                if self.song.picture == '':
+                if self.song.picture is None:
                     sha = hashlib.sha512()
                     sha.update(picture)
                     filename = sha.hexdigest()  # 128 caracteres ASCII
                     path = os.path.join('.', "media", "songs", f'{filename}.png')
+                    debug(f"SCAN :: Dumping Picture")
                     Utils.dump_picture(path, picture)
                     self.song.picture = f'/media/songs/{filename}.png'
+                    debug(f"SCAN :: song.picture = '{ self.song.picture }'")
+                    self.song.save()
+                    debug(f"SCAN :: Song Picture Stored")
             except Exception as e:
+                debug(f"SCAN :: Hashing Failed : {str(e)}")
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
             try:
                 if self.song.album is not None:
+                    debug(f"SCAN :: Album picture is present, importing data")
                     if self.song.album.picture is None:
                         filename = Sanitizer.filename(self.song.album.name)
                         path = os.path.join('.', "media", "albums", f'{filename}.png')
@@ -413,6 +422,7 @@ class Command(BaseCommand):
                         self.song.album.picture = f'/media/albums/{filename}.png'
                         self.song.album.save()
             except Exception as e:
+                debug(f"SCAN :: Album Picture import Failed : {str(e)}")
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
 
     def setup_song(self):
@@ -488,11 +498,12 @@ class Command(BaseCommand):
         self.setup_song()
         self.echo(f'· Updated song {filename}')
 
-    def scan(self, folder):        
+    def scan(self, folder, generate_lyrics=False):        
         """Escanea una carpeta recursivamente en busca de archivos MP3."""
         results = []
         self.folder = folder
-        if self.lyrics:
+        if generate_lyrics:
+            self.lyrics = generate_lyrics
             if self.generator is None:
                 self.generator = GenerateLyrics() if self.lyrics else None
                 self.generator.initialize('small')

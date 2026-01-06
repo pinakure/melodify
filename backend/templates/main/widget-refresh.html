@@ -5,7 +5,7 @@
     id      = "refresh-{{ type }}" 
     class   = "input secondary"  
     title   = "{{ info }}" 
-    onclick = "{{ callback }}('{{ parameter }}')"
+    onclick = "melodify.scanSongs([ '{{ parameter }}' ], true);"
     style   = "position:absolute; top: 20px; right: 64px;margin-bottom: 32px;"
 >
 {% fa5_icon 'sync' %}

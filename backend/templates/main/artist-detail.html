@@ -3,7 +3,7 @@
 {% include "main/widget-title.html" with caption=artist.name subcaption="Artista" %}
 {% include "main/widget-admin.html" with object='artist' id=artist.pk %}
 {% include "main/widget-back.html" %}
-{% include "main/widget-refresh.html" with type="artist" callback="melodify.scanArtist" parameter=artist.id info="Forzar reescaneado de artista" %}
+{% include "main/widget-refresh.html" with type="artist" parameter=artist.name info="Forzar reescaneado de artista" %}
 {% if artist.picture.name %}
     {% include "main/background.html" with value="linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))" blend_mode='soft-light' picture=artist.picture.url %}
 {% endif %}

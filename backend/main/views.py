@@ -559,10 +559,10 @@ def scan_artist(request):
             # Leer los datos JSON del cuerpo de la petición
             data = json.loads(request.body)
             artist = data.get('artist', '').strip()
-            
+            lyrics = bool(data.get('generate_lyrics', ''))
             if not artist:
                 return JsonResponse({'status': 'error', 'message': 'artist no puede estar vacío.'}, status=400)
-            songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist))
+            songs = scanner.scan(os.path.join(LIBRARY_ROOT, artist[0].upper(), artist), lyrics)
             return JsonResponse({'status': 'success', 'message': 'Scan OK', 'songs' : songs})
 
         except json.JSONDecodeError:

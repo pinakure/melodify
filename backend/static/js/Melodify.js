@@ -384,10 +384,10 @@ Melodify.prototype = {
         });
         melodify.downloadQueue();
     },
-    scanSongs: function(artist_list){
+    scanSongs: function(artist_list, generate_lyrics=false){
         for(artist in artist_list){
             // melodify.toast(`Scanning ${artist_list[artist]}songs`, 5, 0, "scan-songs");
-            melodify.request('/scan/artist/', { artist : artist_list[artist] }, ()=>{});    
+            melodify.request('/scan/artist/', { artist : artist_list[artist], generate_lyrics : generate_lyrics?1:0 }, ()=>{});    
         }   
     },
     showResults: function(data){

@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-VERSION = '0.25122924'
+VERSION = '0.260106'
 SECRET_KEY = 'django-insecure-x-xr0dk^wcis00z=aal_0@xx0z__+eviot4wt29-*%^uvp!i*8'
 ALLOWED_HOSTS = [
     'melodify.com.82.223.13.41.nip.io',
