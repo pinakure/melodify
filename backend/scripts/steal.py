@@ -144,8 +144,8 @@ def getSong(url):
             letter       = artist_clean[0].upper() if artist_clean else "#"
 
             # 2. Construir rutas seguras
-            dst_dir     = LIBRARY_ROOT / letter / artist_clean / album_clean
-            dest_file   = dst_dir / title_clean
+            dst_dir     = Path(os.path.join(LIBRARY_ROOT, letter, artist_clean, album_clean))
+            dest_file   = Path(os.path.join(dst_dir, title_clean))
 
             if dest_file.exists():
                 debug(f"STEAL :: Skipping: {title_clean} ya existe.")
