@@ -18,6 +18,7 @@ from spotdl         import Spotdl
 debug(f"STEAL :: Imported Spot DL")
 import yt_dlp
 debug(f"STEAL :: Imported YTDLP")
+import requests
 debug(f"STEAL :: Module Initialization Complete")
 debug("-"*80)
 #------------------------------------------------------------------------------
@@ -137,13 +138,20 @@ def getSong(url):
     song_objs = spotdl.search([url])
     for song in song_objs:
         try:
-            # 1. Limpiar metadatos para la ruta de destino
+            cover        = song.cover_url
+            response     = requests.get(cover)
+            if response.status_code == 200:
+                ruta_destino = os.path.join('media', 'songs', f'{clean_path_name(song.name)}.png')
+                with open(ruta_destino, 'wb') as f:
+                    f.write(response.content)
+        except Exception as e:
+            debug(f"STEAL :: Failed to Download Coverart : {str(e)}")
+        try:
             artist_clean = clean_path_name(song.artists[0])
             album_clean  = clean_path_name(song.album_name)
             title_clean  = clean_path_name(song.name) + ".mp3"
             letter       = artist_clean[0].upper() if artist_clean else "#"
 
-            # 2. Construir rutas seguras
             dst_dir     = Path(os.path.join(LIBRARY_ROOT, letter, artist_clean, album_clean))
             dest_file   = Path(os.path.join(dst_dir, title_clean))
 
@@ -151,17 +159,15 @@ def getSong(url):
                 debug(f"STEAL :: Skipping: {title_clean} ya existe.")
                 continue
 
-            # 3. Descargar y obtener la ruta REAL del archivo temporal
-            # spotdl.download_songs devuelve una tupla (song, path_to_file)
             download_results = spotdl.download_songs([song])
-            temp_path_str = download_results[0][1] # Esta es la ruta real en disco
+            temp_path_str = download_results[0][1] # ruta real en disco
 
             if temp_path_str is None:
                 continue
 
             temp_file = Path(temp_path_str)
 
-            # 4. Crear carpetas y mover
+            # Crear carpetas y mover
             dst_dir.mkdir(parents=True, exist_ok=True)
             debug(f"STEAL :: temp_file = '{temp_file}'")
             debug(f"STEAL :: dest_file = '{dest_file}'")
