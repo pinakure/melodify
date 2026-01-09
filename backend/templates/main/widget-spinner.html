@@ -1,0 +1,14 @@
+<!-- main/widget-spinner.html -->
+{% load fontawesome_5 %}
+<div id="{{ id }}-wrapper" style="margin: 4px; height: 40px; align-items: center; display: inline-block;">
+    <label for="{{ id }}" >
+        {% if icon %}
+        {% fa5_icon icon %}
+        &nbsp;
+        {% endif %}
+        <div style="display: inline-block; text-align: right;">
+            {{ caption }}
+        </div>
+    </label>
+    <input id="{{ id }}" type="number" value="{{ value }}" onchange="{{ onchange }}">
+</div>

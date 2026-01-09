@@ -17,6 +17,7 @@ class Command(BaseCommand):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.verbose        = False
+        self.tabs           = ''
         self.lyrics         = False 
         self.force          = False 
         self.generator      = GenerateLyrics() if self.lyrics else None
@@ -24,15 +25,18 @@ class Command(BaseCommand):
         self.music_folder   = ''
         self.language       = 'en'
 
-    def echo(self, text):
+    def echo(self, text, end='\n'):
         try:
+            debug(self.tabs+text, end=end)
             self.stdout.write("\r"+(" "*os.get_terminal_size().columns)+"\r"+self.tabs+text)
         except:
+            debug(self.tabs+text, end=end)
             self.stdout.write(self.tabs+text)
     
     def add_arguments(self, parser):
         parser.add_argument("scan_path"                                 , nargs="+" , type=str  )
         parser.add_argument("--force"           , '-f', default=False   , nargs="*" , type=bool )
+        parser.add_argument("--scrape"          , '-s', default=False   , nargs="*" , type=bool )
         parser.add_argument("--generatelyrics"  , '-g', default=False   , nargs="*" , type=bool )
         parser.add_argument("--verbose"         , '-V', default=False   , nargs="*" , type=bool )
 
@@ -67,20 +71,23 @@ class Command(BaseCommand):
             PATH += p
             PATH += os.path.sep
         MUSIC_FOLDER = os.path.join(f'{ DRIVE }:', os.path.sep, PATH )
-        print(f'SCAN :: self.path = "{PATH}"')
-        print(f'SCAN :: self.music_folder = "{MUSIC_FOLDER}"')
+        self.echo(f'SCAN :: self.path = "{PATH}"')
+        self.echo(f'SCAN :: self.music_folder = "{MUSIC_FOLDER}"')
         self.music_folder   = MUSIC_FOLDER
         self.path           = PATH
 
     def handle(self, *args, **options):
+        self.echo(str(options.keys()))
         self.artistmetadata = GetArtist().initialize()
+        self.scrape         = options['scrape'] or False
         self.force          = options['force'] or False
         self.lyrics         = options['generatelyrics'] or False
         self.verbose        = options['verbose'] or False
         self.resolveBasePath(options["scan_path"][0])
-        if self.force   : print("SCAN :: Enable Forced Analysis")
-        if self.verbose : print("SCAN :: Enable High Verbosity")
-        if self.lyrics  : print("SCAN :: Enable Generate Lyrics using AI")
+        if self.scrape  : self.echo("SCAN :: Scraping missing metadata")
+        if self.force   : self.echo("SCAN :: Enable Forced Analysis")
+        if self.verbose : self.echo("SCAN :: Enable High Verbosity")
+        if self.lyrics  : self.echo("SCAN :: Enable Generate Lyrics using AI")
         self.echo(f"SCAN :: Analyzed {len(self.scan( self.music_folder , self.lyrics))} songs.")
 
     def add_song_error(self, song, exception, error=True):
@@ -172,7 +179,7 @@ class Command(BaseCommand):
                 "duration"      : timedelta(seconds=audio.info.length),
             }
         except Exception as e:
-            print("SCAN :: ID3 Exception : "+str(e))
+            self.echo("SCAN :: ID3 Exception : "+str(e))
             return {
                 "file": filepath,
                 "error": str(e)
@@ -287,7 +294,6 @@ class Command(BaseCommand):
 
     def setup_artist(self):
         self.song.artist = None
-        # self.echo("--------------- SETUP ARTIST ------------------------------------------")
         try:
             artist_name = self.info.get('artist')
             class Payload:
@@ -297,14 +303,6 @@ class Command(BaseCommand):
                 artists_vs   = Sanitizer.artists_vs( artist_name )
                 artists_prod = Sanitizer.artists_prod( artist_name )
                 aliases      = self.get_aliases( artists[0] )
-            # self.echo("--------------- PAYLOAD ------------------------------------------")
-            # print(f'{self.tabs}- ARTISTS', Payload.artists)
-            # print(f'{self.tabs}-     AND', Payload.artists_and)
-            # print(f'{self.tabs}-    FEAT', Payload.artists_feat)
-            # print(f'{self.tabs}-      VS', Payload.artists_vs)
-            # print(f'{self.tabs}-    PROD', Payload.artists_prod)
-            # print(f'{self.tabs}- ALIASES', Payload.aliases)
-            # print(f'{self.tabs}-  ARTIST', Payload.aliases[0])
             self.song.artist = self.get_or_create_artist( Payload.aliases[0], Payload.aliases)
             self.song.save()
             for _and    in Payload.artists_and  : self.song.artists_and.add ( self.get_or_create_artist( _and , type='coauthor') )
@@ -386,35 +384,35 @@ class Command(BaseCommand):
         self.song.picture = None
         picture = self.info.get('picture')[0] if 'picture' in self.info.keys() else None
         if picture is None:
-            debug(f"SCAN :: No picture @ info, looking for '{ self.song.title }.png' in media/songs/")
+            self.echo(f"SCAN :: No picture @ info, looking for '{ self.song.title }.png' in media/songs/")
             try:
                 filename = Path(os.path.join('.', 'media', 'songs', f'{ self.song.title }.png'))
                 if filename.exists():
-                    debug(f"SCAN :: Picture found, reading picture data...")
+                    self.echo(f"SCAN :: Picture found, reading picture data...")
                     picture = Utils.saferead(str(filename), 'rb')
             except Exception as e:
-                debug(f"SCAN :: Failed to read '{ filename }'")
+                self.echo(f"SCAN :: Failed to read '{ filename }'")
         
         if picture is not None:
-            debug(f"SCAN :: Picture data is present, hashing image filename...")
+            self.echo(f"SCAN :: Picture data is present, hashing image filename...")
             try:
                 if self.song.picture is None:
                     sha = hashlib.sha512()
                     sha.update(picture)
                     filename = sha.hexdigest()  # 128 caracteres ASCII
                     path = os.path.join('.', "media", "songs", f'{filename}.png')
-                    debug(f"SCAN :: Dumping Picture")
+                    self.echo(f"SCAN :: Dumping Picture")
                     Utils.dump_picture(path, picture)
                     self.song.picture = f'/media/songs/{filename}.png'
-                    debug(f"SCAN :: song.picture = '{ self.song.picture }'")
+                    self.echo(f"SCAN :: song.picture = '{ self.song.picture }'")
                     self.song.save()
-                    debug(f"SCAN :: Song Picture Stored")
+                    self.echo(f"SCAN :: Song Picture Stored")
             except Exception as e:
-                debug(f"SCAN :: Hashing Failed : {str(e)}")
+                self.echo(f"SCAN :: Hashing Failed : {str(e)}")
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
             try:
                 if self.song.album is not None:
-                    debug(f"SCAN :: Album picture is present, importing data")
+                    self.echo(f"SCAN :: Album picture is present, importing data")
                     if self.song.album.picture is None:
                         filename = Sanitizer.filename(self.song.album.name)
                         path = os.path.join('.', "media", "albums", f'{filename}.png')
@@ -422,7 +420,7 @@ class Command(BaseCommand):
                         self.song.album.picture = f'/media/albums/{filename}.png'
                         self.song.album.save()
             except Exception as e:
-                debug(f"SCAN :: Album Picture import Failed : {str(e)}")
+                self.echo(f"SCAN :: Album Picture import Failed : {str(e)}")
                 self.add_song_error(self.song, f"PICTURE:{str(e)}")
 
     def setup_song(self):
@@ -515,14 +513,14 @@ class Command(BaseCommand):
                 continue
             self.tabs = "  " * len(root.split(folder)[1].split("\\"))
             last = root.split(folder)[1].split("\\")[-1]
-            print(("  "*50)+"\r"+self.tabs+last.lstrip('\\').lstrip('/'))
+            self.echo(("  "*50)+"\r"+self.tabs+last.lstrip('\\').lstrip('/'))
             self.language = 'en'
             for f in files:
                 if f.lower().endswith(".lang"):
                     self.language = f.strip('.lang')
             for f in files:
                 if f.lower().endswith(".mp3"):
-                    print(("  "*50)+"\r"+f, end="\r")
+                    self.echo(("  "*50)+"\r"+f, end="\r")
                     path        = os.path.join(root, f)
                     self.hash   = Utils.get_hash(path)
                     # check whether or not the song object exists

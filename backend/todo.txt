@@ -1,58 +1,51 @@
 ~~~~~~~~~~~~~~~~~
-Script 
-~~~~~~~~~~~~~~~~~
-· Generate and Display Discrepance List
-· Journalkeep scan status, ability restore scanning from last scanned item
-· Change analyzer: save album art pictures with hashed filenames to avoid forbidden chars
-
-
-~~~~~~~~~~~~~~~~~
-Fronted Duties
+ BETA MILESTONES
 ~~~~~~~~~~~~~~~~~
 
-~~~~~~~~~~~~~~~~~
-Data Models
-~~~~~~~~~~~~~~~~~
- .  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/!\  NOTE: Fields tagged with * symbol means those are virtual attributes
-¨¨¨ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Artist:
-	Aliases
-	Name
-	Bio
-	Picture
-	Genres*
-Album:
-	Name
-	Codename
-	Brief
-	Picture
-	Booklet
-	Edition
-	Limited
-	Artists*
-	Genres*
-Song:
-	Title
-	Filename
-	Artists
-	Genre
-	Track Number
-	Lyrics
-	Picture
-	TimesPlayed
-	TimesSkipped
-	Bookmarked
-	Album
-	Codename
-	Tags
-	Timestamp
-	Hash
-	Bpm
-	Tone
-Playlist:
-	Title
-	Songs
-	Artists*
-	Picture*
-	Genres*
+- ADMIN CP:
+	✔ Log View
+	✔ Log autoupdate rate setup
+	✔ Log autoupdate toggle
+	✔ Log Clear view
+ 	~ DB Export / Import
+	~ DB Drop
+	~ Force Re-Scan
+	~ Force Lyric Generation
+	~ Force Get Metadata Missing Items
+	✔ Backoffice access (iframe)
+- GENERAL:
+	- Keyboard input (play-stop, next, prev...)
+	- Ability to navigate to specific section @ landing (to be able to send links to specific albums, artists, etc.)
+	- Replace fixed fonts on Titles, subtitles, sections and paragraphs for var(--fonts)
+	- Implement font override @ settings
+	- Consider collapsing profile and settings pages into profile page
+	- Ability to download spotify lists (not only albums)
+- ALBUM:
+	- Search for Cover Art in discogs
+	- Search for Cover Art in spotify
+- HOME View:
+	- Most listened song list
+- FRIEND model
+- LISTEN model
+- USER PANEL:
+	- Friends list
+	- Token settings
+	- See songs from other users (friends only)
+- SONG / PLAYER:
+	- Download button
+	- Social share link
+- USERS TAB:
+	- Visualize all users, only be able to see profiles from friends, but list all users
+- DEEPSEARCH:
+	- Show download / search progress
+	- Show youtube video preview
+- MEGASEARCH:
+	- Visualize users in search results
+- ALBUM PICTURES:
+	- Standarize album pictures in single widget, make cyclic gradients on missing picture albums
+- PLAYLIST:
+	- Trash button on every entry
+	- Ability to move entries ( up & down buttons will do btm, no need for interact.js)
+- SIDEPANEL:
+	- Download Queue
+	- keep downloading stuff in background

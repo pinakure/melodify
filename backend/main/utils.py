@@ -7,27 +7,85 @@ import hashlib
 import os
 
 def debug(text, **kwargs):
-    return Utils.debug(text, **kwargs)
+    if 'end' in kwargs.keys():
+        end = kwargs.get('end', '\n')
+        del(kwargs['end'])
+    else:
+        end = '\n'
+    return Utils.debug(text, end=end, **kwargs)
 
 class Utils:    
 
     LIBRARY_ROOT = None
+
+    def db_export():
+        debug("ADMIN :: Exporting Database")
+        return "Exported Database"
+
+    def db_import():
+        debug("ADMIN :: Importing Database")
+        return "Imported Database"
+
+    def db_drop():
+        from main.management.commands.drop import Command
+        Command().run()
+        debug("ADMIN :: Dropping Database")
+        return "Dropped Database"
+    
+    def library_scan():
+        from main.management.commands.scan      import Command
+        from main.management.commands.getartist import Command as GetArtist
+        cmd = Command()
+        cmd.resolveBasePath( Utils.library_path() )
+        cmd.artistmetadata = GetArtist().initialize()
+        cmd.verbose = True
+        cmd.force   = True
+        cmd.scrape  = False
+        cmd.lyrics  = False
+        cmd.scan( cmd.music_folder, cmd.lyrics )
+        return "Forcing Library Re-Scanning"
+    
+    def library_lyrics():
+        from main.management.commands.scan      import Command
+        from main.management.commands.getartist import Command as GetArtist
+        cmd = Command()
+        cmd.resolveBasePath( Utils.library_path() )
+        cmd.artistmetadata = GetArtist().initialize()
+        cmd.verbose = True
+        cmd.force   = False
+        cmd.scrape  = False
+        cmd.lyrics  = True
+        cmd.scan( cmd.music_folder, cmd.lyrics )
+        return "Generating Missing Library Lyrics"
+
+    def library_scrape():
+        from main.management.commands.scan      import Command
+        from main.management.commands.getartist import Command as GetArtist
+        cmd = Command()
+        cmd.resolveBasePath( Utils.library_path() )
+        cmd.artistmetadata = GetArtist().initialize()
+        cmd.verbose = True
+        cmd.force   = False
+        cmd.scrape  = True
+        cmd.lyrics  = False
+        cmd.scan( cmd.music_folder, cmd.lyrics )
+        return "Scraping Library"
 
     def library_path(folder=''):
         if Utils.LIBRARY_ROOT: return os.path.join( Utils.LIBRARY_ROOT, folder )
         Utils.LIBRARY_ROOT = Path(Utils.saferead('config/library-root.cfg').strip('\n')).resolve() 
         return os.path.join( Utils.LIBRARY_ROOT, folder )
     
-    def debug(text, **kwargs):
+    def debug(text, end='\n', **kwargs):
         #return
         with open(settings.LOG_FILE, 'a', encoding='utf-8', **kwargs) as f:
-            f.write(text+'\n')
+            f.write(text+end)
 
     def saferead(filename, read_mode='r', **args):
         if settings.ANDROID:
             BASE_DIR = Path(__file__).resolve().parent
             filename = BASE_DIR / filename
-        debug(f"SAFEREAD :: Trying to open '{filename}'")
+        # debug(f"SAFEREAD :: Trying to open '{filename}'")
         with open(filename, read_mode, **args) as f:
             return f.read()
             

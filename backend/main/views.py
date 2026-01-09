@@ -1,10 +1,11 @@
+from django.utils.decorators        import method_decorator
 from django.views.decorators.csrf   import csrf_exempt
 from main.management.commands.scan  import Command as Scan
 from django.contrib.auth.models     import AnonymousUser
 from django.contrib.auth.forms      import AuthenticationForm
 from django.core.paginator          import Paginator, EmptyPage, PageNotAnInteger
 from django.forms.models            import model_to_dict
-from django.views.generic           import ListView, DetailView, TemplateView
+from django.views.generic           import ListView, DetailView, TemplateView, View
 from django.contrib.auth            import authenticate, login, logout, get_user_model
 from django.db.models               import Case, When, Count, Value, Min
 from django.db.models               import Q
@@ -215,6 +216,14 @@ class PlayerView(TemplateView):
             return context        
         context['song']     = get_song( song_id, self.request.user.pk)
         context['artist']   = context['song'].artist
+        return context
+
+class ManagementView(TemplateView):
+    template_name = 'main/management.html'  
+
+    def get_context_data(self, **kwargs):
+        context = get_context(super().get_context_data(**kwargs), self.request.user)
+        context['log'] = Utils.saferead(settings.LOG_FILE, 'r', encoding='utf-8')
         return context
 
 class LandingView(TemplateView):
@@ -605,7 +614,6 @@ def bookmark_song(request):
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
-
 def populate_playlist_ajax(request):
     if isinstance(request.user , AnonymousUser):
         return JsonResponse({ 'status' : 'login'})
@@ -631,6 +639,39 @@ def populate_playlist_ajax(request):
     
     # Si alguien intenta acceder por GET a esta URL, lo ignoramos o redirigimos
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+@csrf_exempt    
+def log_ajax(request):
+    from datetime import datetime
+    if request.user.is_superuser and request.content_type == 'application/json':
+        data  = json.loads(request.body)
+        clear = data.get('clear', False)
+        if clear: 
+            CRLF = '\n'
+            Utils.safewrite(settings.LOG_FILE, f'{"-"*80}{CRLF}Log clearing requested by { request.user.username } @ { datetime.now().strftime('%a %H:%M  %d/%m/%y') }{CRLF}{"-"*80}{CRLF}')        
+        return JsonResponse({"status" : 'success', "response": Utils.saferead(settings.LOG_FILE, 'r', encoding='utf-8')})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
+
+@csrf_exempt    
+def admin_ajax(request):
+    if request.user.is_superuser and request.content_type == 'application/json':
+        data   = json.loads(request.body)
+        action = data.get('action', False)
+        ACTIONS = {
+            'db-export'     : Utils.db_export,
+            'db-import'     : Utils.db_import,
+            'db-drop'       : Utils.db_drop,
+            'library-scan'  : Utils.library_scan,
+            'library-lyrics': Utils.library_lyrics,
+            'library-scrape': Utils.library_scrape,
+        }
+        if action in ACTIONS.keys():
+            response = ACTIONS[ action ]()
+        else: response = "Unknown Action"
+        return JsonResponse({"status" : 'success', "response": response })
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 
 def login_ajax(request):
     if request.method == 'POST':

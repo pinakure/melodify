@@ -1,0 +1,47 @@
+<!-- main/settings.html -->
+{% load utils %}
+{% load fontawesome_5 %}
+{% include "main/widget-title.html" with caption="Panel de Control" %}
+{% include "main/widget-back.html" %}
+{% csrf_token %}
+<style>
+    textarea#log {
+        margin-top  : 8px;
+        min-width   : 100%;
+        max-width   : 100%;
+        width       : 100%;
+        height      : calc( 100% - 470px );
+        max-height  : calc( 100% - 470px );
+        min-height  : calc( 100% - 470px );
+        color       : var(--accent-color); 
+        background  : var(--bg-main);
+        padding     : 8px;
+        font-size   : 10px;
+        border-radius: 7px;
+        border      : none;
+        user-select : all;
+    }
+</style>
+
+<!-- herramientas Django -->
+{% include 'main/widget-section.html' with id="django-section"  caption="Backend"           icon="user-shield"  style="margin-bottom: 8px" %}
+{% include 'main/widget-button.html'  with id="django-admin"    caption="Panel de Admin"    icon="tools"        onclick="window.open('/admin/')" %}
+<!-- herramientas B.D.D -->
+{% include 'main/widget-section.html' with id="db-section"      caption="Base de Datos"     icon="database"     style="margin-bottom: 8px" %}
+{% include 'main/widget-button.html'  with id="db-export"       caption="Exportar"          icon="arrow-left"   onclick="melodify.admin.db.export()" %}
+{% include 'main/widget-button.html'  with id="db-import"       caption="Importar"          icon="arrow-right"  onclick="melodify.admin.db.import()" %}
+{% include 'main/widget-button.html'  with id="db-drop"         caption="Vaciar"            icon="trash"        onclick="melodify.admin.db.drop()" %}
+<!-- Herramientas Libreria -->      
+{% include 'main/widget-section.html' with id="library-section" caption="Librería"          icon="music"        style="margin-bottom: 8px" %}
+{% include 'main/widget-button.html'  with id="library-rescan"  caption="Escanear Librería" icon="search"       onclick="melodify.admin.library.forceScan()" %}
+{% include 'main/widget-button.html'  with id="library-lyrics"  caption="Generar Lyrics"    icon="font"         onclick="melodify.admin.library.generateLyrics()" %}
+{% include 'main/widget-button.html'  with id="library-scrap"   caption="Buscar Metadatos"  icon="search"       onclick="melodify.admin.library.scrapMetadata()" %}
+<!-- registro / log  -->
+{% include 'main/widget-section.html' with id="log-section"     caption="Registro"          icon="scroll"       style="margin-bottom: 8px" %}
+{% include 'main/widget-checkbox.html' with id="log-autoupdate" caption="Auto-Refrescar"    icon=""             value="True" slim=True onclick="melodify.admin.log.setAutoupdate()" %}
+{% include 'main/widget-spinner.html' with id="log-rate"        caption=""                  icon="sync"         value="1" onchange="melodify.admin.log.setRate()" %}
+{% include 'main/widget-button.html'  with id="log-clear"       caption="Limpiar"           icon="broom"        onclick="melodify.admin.log.clear()" %}
+<textarea id="log" lines="50">
+    {{ log }}
+</textarea>
+<script> melodify.admin.init(); </script>

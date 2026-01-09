@@ -1,6 +1,6 @@
 <!-- main/widget-checkbox.html -->
 {% load fontawesome_5 %}
-<div id="{{ id }}-wrapper" style="margin: 4px; width: 100%; height: 40px; align-items: center; display: flex;">
+<div id="{{ id }}-wrapper" style="margin: 4px; {% if not slim %}width: 100%;display: flex;{% else %}display:inline-block;{% endif %} height: 40px; align-items: center; ">
     <label for="{{ id }}" onclick="{{ onclick }}">
         {% if icon %}
         {% fa5_icon icon %}

@@ -12,6 +12,7 @@ function Melodify(user_id=0){
     this.download_queue     = [];
 };
 Melodify.prototype = {
+    admin : null,
     toast: function(message, timeout=5, error=false, id=null){
         id = id ? id : Math.floor(Math.random() * 1000000);
         const fadeDuration = 500;
@@ -75,6 +76,11 @@ Melodify.prototype = {
                 melodify.error(`Cannot enable fullscreen: ${err.message}`);
             }), 3000);
         */
+        try{
+            if( MELODIFY_ADMIN) this.admin = new MelodifyAdmin();
+        } catch {
+            this.admin = null;
+        }
         this.loadState();
         this.node('menu').innerHTML = this.node('navbar-links').innerHTML; //copy entries from normal menu to hover menu
         /* Restore playlist */

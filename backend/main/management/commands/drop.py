@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    def handle(self, *args, **options):
+    def run(self):
         Song.objects.all().delete()
         Artist.objects.all().delete()
         Album.objects.all().delete()
@@ -25,3 +25,6 @@ class Command(BaseCommand):
         empty('artists')
         empty('albums')
         empty('songs')
+
+    def handle(self, *args, **options):
+        self.run()

@@ -80,6 +80,11 @@
 {% include 'main/widget-input.html'     with id="spotify-client-secret" caption="<p class='italic'>Spotify Client Secret</p>" value=spotify_client_secret icon="key" %}
 {% include 'main/widget-input.html'     with id="discogs-api-token"     caption="<p class='italic'>Discogs API Token</p>"     value=discogs_api_token     icon="compact-disc" %}
 
+ {% if user.is_superuser %}
+    {% include 'main/widget-section.html' with caption="Administración" icon="exclamation-triangle" %}
+    <br/>
+    {% include 'main/widget-button.html'  with id="goto-management" caption="Panel de Control" icon="wrench" onclick="melodify.navigate('/management/')"%}
+ {% endif %}
 
 <script>
     colorizer.initialize();

@@ -1,4 +1,5 @@
 ANDROID = False
+LINUX   = False
 from pathlib import Path
 import os
 
@@ -62,7 +63,8 @@ DATABASES = {
     }
 }
 
-LOG_FILE = '/var/log/melodify.log'
+
+LOG_FILE = '/var/log/melodify.log' if LINUX else os.path.join('..', 'melodify.log')
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', 

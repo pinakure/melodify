@@ -10,6 +10,9 @@ from django.views.static import serve # Import the standard file server view
 
 urlpatterns = [
     path(''                         , LandingView.as_view()         , name='tag-list'),
+    path('management/log/'          , views.log_ajax                , name='management-log'),
+    path('management/admin/'        , views.admin_ajax              , name="management-admin"),
+    path('management/'              , ManagementView.as_view()      , name='management'),
     path('admin/'                   , admin.site.urls),
     path('accounts/'                , include('django.contrib.auth.urls')), # Línea clave para incluir las URLs de autenticación
     path('albums/'                  , AlbumTileView.as_view()       , name='album-tiles'),
