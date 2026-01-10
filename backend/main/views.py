@@ -649,7 +649,7 @@ def log_ajax(request):
         if clear: 
             CRLF = '\n'
             Utils.safewrite(settings.LOG_FILE, f'{"-"*80}{CRLF}Log clearing requested by { request.user.username } @ { datetime.now().strftime('%a %H:%M  %d/%m/%y') }{CRLF}{"-"*80}{CRLF}')        
-        return JsonResponse({"status" : 'success', "response": Utils.saferead(settings.LOG_FILE, 'r', encoding='utf-8')})
+        return JsonResponse({"status" : 'success', "response": "\n".join(Utils.saferead(settings.LOG_FILE, 'r', encoding='utf-8').split('\n')[-4096:])})
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)
 

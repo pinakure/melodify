@@ -5,11 +5,11 @@ from django.utils.html  import mark_safe
 #   ARTIST
 # ============
 class Artist(models.Model):
-    name = models.CharField(max_length=200)
-    aliases = models.CharField(max_length=300, blank=True)
-    bio = models.TextField(blank=True)
-    picture = models.ImageField(upload_to="artists/", blank=True, null=True)
-    genres = models.ManyToManyField("Genre", blank=True)
+    name        = models.CharField(max_length=200)
+    aliases     = models.CharField(max_length=300, blank=True)
+    bio         = models.TextField(blank=True)
+    picture     = models.ImageField(upload_to="artists/", blank=True, null=True)
+    genres      = models.ManyToManyField("Genre", blank=True)
 
     def __str__(self):
         return self.name
@@ -18,7 +18,8 @@ class Artist(models.Model):
 #   GENRE
 # ============
 class Genre(models.Model):
-    name = models.CharField(max_length=120, unique=True)
+    name        = models.CharField(max_length=120, unique=True)
+    description = models.TextField(blank=True, default="")
 
     def __str__(self):
         return self.name
@@ -27,7 +28,7 @@ class Genre(models.Model):
 #   TAG
 # ============
 class Tag(models.Model):
-    name = models.CharField(max_length=120, unique=True)
+    name        = models.CharField(max_length=120, unique=True)
 
     def __str__(self):
         return self.name
@@ -36,17 +37,17 @@ class Tag(models.Model):
 #   ALBUM
 # ============
 class Album(models.Model):
-    name    = models.CharField(max_length=200)
-    codename= models.CharField(max_length=200, unique=True, null=True, blank=True)
-    brief   = models.TextField(blank=True)
-    picture = models.CharField(max_length=512, default="", null=True, blank=True)
-    booklet = models.FileField(upload_to="booklets/", blank=True, null=True)
-    edition = models.CharField(max_length=200, blank=True, default="Vanila")
-    limited = models.BooleanField(default=False)
-    release = models.DateField(null=True, blank=True)
+    name        = models.CharField(max_length=200)
+    codename    = models.CharField(max_length=200, unique=True, null=True, blank=True)
+    brief       = models.TextField(blank=True)
+    picture     = models.CharField(max_length=512, default="", null=True, blank=True)
+    booklet     = models.FileField(upload_to="booklets/", blank=True, null=True)
+    edition     = models.CharField(max_length=200, blank=True, default="Vanila")
+    limited     = models.BooleanField(default=False)
+    release     = models.DateField(null=True, blank=True)
 
-    artists = models.ManyToManyField(Artist, blank=True)
-    genres  = models.ManyToManyField(Genre, blank=True)
+    artists     = models.ManyToManyField(Artist, blank=True)
+    genres      = models.ManyToManyField(Genre, blank=True)
 
     def get_artists(self):
         artists = [ x.name for x in self.artists.all()]
@@ -132,11 +133,11 @@ class Song(models.Model):
 #   PLAYLIST
 # ============
 class Playlist(models.Model):
-    title = models.CharField(max_length=200)
-    songs = models.ManyToManyField(Song, blank=True)
+    title   = models.CharField(max_length=200)
+    songs   = models.ManyToManyField(Song, blank=True)
     artists = models.ManyToManyField(Artist, blank=True)
     picture = models.ImageField(upload_to="playlists/", blank=True, null=True)
-    genres = models.ManyToManyField(Genre, blank=True)
+    genres  = models.ManyToManyField(Genre, blank=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def get_artists(self):
@@ -166,6 +167,7 @@ class Bookmark(models.Model):
 # SCHEMES 
 # ===========
 class Scheme(models.Model):
+    from main.utils import Utils
     name                 = models.CharField(primary_key=True, max_length =    128, default = 'default'            )
     bg_main              = models.CharField(max_length =    128, default = '#0A0A0A'          )
     bg_nav               = models.CharField(max_length =    128, default = '#121212'          )
@@ -193,7 +195,7 @@ class Scheme(models.Model):
     player_font          = models.CharField(max_length =     32, default = "'lunchtype-regular'")
     player_font_size     = models.CharField(max_length =     32, default = '24px'               )
     renderer             = models.CharField(max_length =     32, default = 'themed'             )
-
+    library_path         = models.CharField(max_length =    256, default = Utils.library_path() )
 
 # ===========
 # FONTS 
@@ -203,8 +205,7 @@ class Font(models.Model):
     font_weight         = models.CharField(max_length=10, default = 'normal',blank=True)
     font_style          = models.CharField(max_length=32, default = 'normal',blank=True)
     src                 = models.TextField(blank=False, null=False)
-    
-    
+      
 # ===========
 # NOSTR LOGIN 
 # ===========
@@ -214,3 +215,20 @@ class NostrProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.pubkey[:8]}"
+    
+# ============
+# FRIEND MODEL 
+# ============
+class Friend(models.Model):
+    user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_user')
+    friend              = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_friend')
+    since               = models.DateField(auto_now_add=True)
+
+# ==========
+# STAT MODEL 
+# ==========
+class SongStat(models.Model):
+    user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='songstat_user')
+    song                = models.ForeignKey(Song, on_delete=models.CASCADE, related_name='songstat_song')
+    listens             = models.IntegerField(default=0)
+    shares              = models.IntegerField(default=0)

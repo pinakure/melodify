@@ -8,10 +8,10 @@
 	✔ Log autoupdate toggle
 	✔ Log Clear view
  	~ DB Export / Import
-	~ DB Drop
-	~ Force Re-Scan
-	~ Force Lyric Generation
-	~ Force Get Metadata Missing Items
+	✔ DB Drop
+	✔ Force Re-Scan
+	✔ Force Lyric Generation
+	✔ Force Get Metadata Missing Items
 	✔ Backoffice access (iframe)
 - GENERAL:
 	- Keyboard input (play-stop, next, prev...)
@@ -25,9 +25,10 @@
 	- Search for Cover Art in spotify
 - HOME View:
 	- Most listened song list
-- FRIEND model
-- LISTEN model
+✔ FRIEND model
+✔ -L-I-S-T-E-N- SongStat model
 - USER PANEL:
+	- Add as friend button
 	- Friends list
 	- Token settings
 	- See songs from other users (friends only)
