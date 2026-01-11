@@ -1,5 +1,4 @@
 <!-- main/widget-section.html -->
 {% load fontawesome_5 %}
-<h2 class="section" style="{{ style }}">
-    {% fa5_icon icon color="var(--accent-color)" %}&nbsp;{{ caption }}{% if counter_id is not None %} <span class="small">(<span id="{{ counter_id }}">{% if counter_value %}{{ counter_value }}{% else %}0{% endif %}</span>)</span>{% endif %}
+<h2 class="section" style="{{ style }}">{% fa5_icon icon color="var(--accent-color)" %}&nbsp;{{ caption }}{% if counter_id is not None %} <span class="small">(<span id="{{ counter_id }}">{% if counter_value %}{{ counter_value }}{% else %}0{% endif %}</span>)</span>{% endif %}
 </h2>

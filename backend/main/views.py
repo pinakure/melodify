@@ -41,8 +41,9 @@ def get_context( context , user):
             'use_index' : False,
         })
     context['sidebar'] = sidebar
-    context['playlists'] = get_playlists(user)
-    context['favorites'] = get_favorites(user)
+    context['playlists']    = get_playlists(user)
+    context['favorites']    = get_favorites(user)
+    context['toplistened']  = get_toplistened(user)
     context['analyzer_range'] = range(32)
     context['version'] = settings.VERSION
     return context
@@ -52,7 +53,14 @@ def get_favorites(user):
         return Song.objects.filter(bookmark__usuario=user).distinct().annotate(fav=Value(True)) 
     else:  
         return []
-
+    
+def get_toplistened(user):
+    if user.is_authenticated:
+        top_song_ids  = Interaction.objects.filter(user_id=user.id).values_list('song_id', flat=True)
+        return Song.objects.filter(id__in=top_song_ids).distinct().annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=user.id)))
+    else:  
+        return []
+    
 def get_playlists(user):
     if user.is_authenticated:
         return Playlist.objects.filter(usuario=user)
@@ -63,7 +71,6 @@ def get_interaction(song_id, user_id):
     try:
         interaction = Interaction.objects.filter(song_id=song_id, user_id=user_id).get()
     except Exception as e:
-        debug(f"SONG :: {str(e)}")
         interaction = Interaction()
         interaction.song_id = song_id
         interaction.user_id = user_id
@@ -482,7 +489,6 @@ def play_ajax(request, pk):
 
             # interaction 
             interaction = get_interaction(pk, request.user.id)
-            debug(f"SONG :: {interaction.listens}")
             interaction.listens = interaction.listens+1
             interaction.save() 
 

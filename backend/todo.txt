@@ -35,6 +35,7 @@ M;1~~~~~~~~~~~~~~~~~
 - MODELS:
 	✔ FRIEND model
 	✔ Interaction model
+	✔ Interaction Listen computing
 	- Merge BookMark with Interaction and move functionality from Favourites logic to Interacion
 - USER PANEL:
 	- Add as friend button
