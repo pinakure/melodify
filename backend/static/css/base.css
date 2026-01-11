@@ -66,10 +66,12 @@ p, div, span, h1, h2, h3, h4, h5, h6, section, header, article { font-family: 'l
 .display        { font-size: 32px; }
 
 /* Colors */
-.confirm         { background-color: var(--confirm-color) !important; }
-.accent          { background-color: var(--accent-color) !important; }
-.section         { background-color:var(--bg-sidebar) ;padding:4px; border-radius: 4px; margin-top: 16px;}
+.confirm            { background-color: var(--confirm-color) !important; }
+.transparent        { border: none; background-color: transparent; }
+.accent             { background-color: var(--accent-color) !important; }
+.section,.section * { background-color:var(--bg-sidebar) ;padding:4px; border-radius: 4px; margin-top: 16px;}
 /* Generics */
+.no-interact{ user-select: none; pointer-events: none;}
 .shadowed  { text-shadow: 0px 0px 7px #000;}
 .blend-50  { opacity: 0.5; }
 .blend-75  { opacity: 0.75; }

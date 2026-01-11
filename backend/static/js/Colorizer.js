@@ -116,9 +116,7 @@ Colorizer.prototype = {
     setScheme: function(scheme){
         colorizer.clear();
         melodify.loadScheme( scheme ); 
-        melodify.saveState();
         melodify.node('bg-main').click();
-        colorizer.modified = false;
     },
 
     saveScheme: function(){

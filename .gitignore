@@ -3535,3 +3535,4 @@ backend/backend/wsgi_server.py
 */__pycache__
 backend/.cache
 backend/db.sqlite3.bak
+showcase/.$architecture.drawio.bkp

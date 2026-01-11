@@ -17,8 +17,9 @@
 <aside class="sidebar">
     <div class="sidebar-content">
         <ul id="sidebar-categories" class="labels">
-            <li id="section-0" class="tab-selector active" style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=0; melodify.saveState(); showTab(this, 'library');">Tu Biblioteca</li>   
-            <li id="section-1" class="tab-selector"        style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=1; melodify.saveState(); showTab(this, 'playlist');">Reproduciendo</li>   
+            <li id="section-0" class="tab-selector active" style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=0; melodify.saveState(); showTab(this, 'library'  );">Tu Biblioteca</li>   
+            <li id="section-1" class="tab-selector"        style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=1; melodify.saveState(); showTab(this, 'playlist' );">Reproduciendo</li>   
+            <li id="section-2" class="tab-selector"        style="font-size: 16px; font-weight: 800;" onclick="melodify.state.current_section=2; melodify.saveState(); showTab(this, 'queue'    );">Descargas</li>   
         </ul>
         <div class="tabs" >
             <div id="sidebar-inner">
@@ -36,6 +37,11 @@
                     <button type="button" class="input secondary" style="float: right; margin-right: 8px;font-size: 16px; font-weight: 800;" title="Vaciar cola de reproducción" onclick="melodify.emptyQueue()">{% fa5_icon "trash" color="#000" %}</button>   
                     <div class="sidebar-items-wrapper">
                         <div id="list"></div>
+                    </div>
+                </div>
+                <div class="tab hidden" id="queue">
+                    <div class="sidebar-items-wrapper">
+                        <div id="queue-contents"></div>
                     </div>
                 </div>
             </div>

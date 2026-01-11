@@ -1,0 +1,22 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
+  <diagram name="Página-1" id="7r--8OUDpTDxTIxFWfpq">
+    <mxGraphModel dx="1426" dy="859" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dbkgL4azU2HP-jJESb8W-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" value="Melodify&lt;div&gt;js&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="240" x="480" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="dbkgL4azU2HP-jJESb8W-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" value="&lt;span style=&quot;color: rgb(18, 18, 18);&quot;&gt;MelodifyDownloadQueue.&lt;/span&gt;&lt;span style=&quot;color: rgb(18, 18, 18); background-color: transparent;&quot;&gt;js&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="160" x="240" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="dbkgL4azU2HP-jJESb8W-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" value="&lt;font color=&quot;#121212&quot;&gt;MelodifyPlayer.js&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="160" x="240" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="dbkgL4azU2HP-jJESb8W-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" value="&lt;font color=&quot;#121212&quot;&gt;MelodifyAdmin&lt;/font&gt;&lt;span style=&quot;color: rgb(18, 18, 18); background-color: transparent;&quot;&gt;.js&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="160" x="240" y="360" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

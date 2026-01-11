@@ -669,6 +669,7 @@ def admin_ajax(request):
         if action in ACTIONS.keys():
             response = ACTIONS[ action ]()
         else: response = "Unknown Action"
+        if action == 'db-export': return response
         return JsonResponse({"status" : 'success', "response": response })
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=445)

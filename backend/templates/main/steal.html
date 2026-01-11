@@ -38,7 +38,7 @@
     <button 
     id="searchbutton" 
     class="input" 
-    onclick="melodify.loading(); melodify.request('/stealsearch/', { url : melodify.node('searchInput').value}, melodify.showResults)"
+    onclick="melodify.loading(); melodify.request('/stealsearch/', { url : melodify.node('searchInput').value}, melodify.downloader.results)"
     >
         {% fa5_icon "search" %}
     </button>

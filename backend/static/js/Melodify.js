@@ -1,18 +1,24 @@
 // static/js/Melodify.js
 function Melodify(user_id=0){
     /* Restore initial melodify state */
+    this.debug              = true;
     this.user_id            = user_id;    
     this.state              = INITIAL_STATE;
     this.next_page          = 1;
     this.search_timeout     = null;
     this.is_loading         = false;
     this.search_term        = '';
-    this.player             = new MelodifyPlayer();
     this.lyrics_editor      = false;
-    this.download_queue     = [];
+    this.player             = new MelodifyPlayer();
+    this.downloader         = new MelodifyDownloadQueue( this.debug );
 };
 Melodify.prototype = {
     admin : null,
+    echo : function(text){
+        if(melodify.debug){
+            console.log("DOWNLOADER :: ",text);
+        }
+    },
     toast: function(message, timeout=5, error=false, id=null){
         id = id ? id : Math.floor(Math.random() * 1000000);
         const fadeDuration = 500;
@@ -113,6 +119,7 @@ Melodify.prototype = {
 		barFull.style.width = (barWidth * 100) + '%';
 		sliderBtn.style.left = (window.innerWidth * barWidth + window.innerWidth * 0.05 - 25) + 'px';
         melodify.node(`section-${ melodify.state.current_section }`).click();
+        melodify.downloader.update();
     },
     node : function(id){
         return document.getElementById(id);
@@ -271,6 +278,8 @@ Melodify.prototype = {
             const styles = getComputedStyle(document.documentElement);
             const renderer = styles.getPropertyValue('--renderer');
             melodify.node('playbar').setAttribute('renderer', renderer);
+            melodify.saveState();
+            colorizer.modified = false;
         }, true);
     },
     filter: function(type) {
@@ -330,7 +339,7 @@ Melodify.prototype = {
                         html += `<li class="sidebar-entry" onclick="melodify.navigate('${ urls[ category ] }${ item.id }')">
                             <div class="sidebar-entry-picture" style="background-image:url('${ item.picture!='' && item.picture!=null  ? category=='artists' ? 'media/'+item.picture : item.picture : '/static/images/'+ category.substring(0, category.length-1) +'.png' }')"></div>
                             <div class="sidebar-entry-content">
-                                <p class="sidebar-entry-primary">${ item.name ?? item.title }</p>
+                                <p class="sidebar-entry-primary section">${ item.name ?? item.title }</p>
                                 <p class="sidebar-entry-secondary" style="text-transform: capitalize">${ item.artist__name ?? item.artists__name ?? category.substring(0, category.length-1) }</p>
                             </div>
                         </li>`;
@@ -344,51 +353,29 @@ Melodify.prototype = {
     },
     downloadSong: function(index, song_url){
         disable(index); 
-        node.innerHTML = '<i style="font-size: 17px" class="fas fa-spinner spin"></i>'
-        melodify.request(
-            '/stealget/', 
-            { url : `${ song_url }` }, 
-            (data)=>{ 
-                melodify.scanSongs(data.songs); 
-                melodify.node(`download-${index}`).innerHTML = '<i style="font-size: 17px" class="fas fa-check"></i>'
-            }
-        ); 
-    },
-    downloadQueue : function(){
-        if( melodify.download_queue.length ){
-            const song = melodify.download_queue.pop();
-            const node = melodify.node(`download-${ song.id.split('-')[1] }`);
-            node.innerHTML = '<i style="font-size: 17px" class="fas fa-spinner spin"></i>'
-            melodify.toast(`Descargando ${song.artist} - ${song.title}`);
-            melodify.request(
-                '/stealget/', 
-                { url : song.url }, 
-                (data)=>{ 
-                    node.innerHTML = '<i style="font-size: 17px" class="fas fa-check"></i>'
-                    melodify.scanSongs(data.songs);
-                    // melodify.node('song-${}') 
-                    return melodify.downloadQueue();
-                }
-            );                
-        } else {
-            melodify.unlock();
-            melodify.node('download-all').removeAttribute('disabled');
-        }
+        const node = melodify.node(`song-${index}`);
+        melodify.downloader.enqueue([{
+                id      : index,
+                title   : node.getAttribute('title'),
+                artist  : node.getAttribute('artist'),
+                url     : node.getAttribute('url'),
+        }]);
     },
     downloadList: function(){
         melodify.node('download-all').setAttribute('disabled', 'disabled');
+        var list = [];
         document.querySelectorAll('#results ul li').forEach((e)=>{
             const id = e.getAttribute('id');
-            melodify.download_queue[ melodify.download_queue.length ] = {
+            list[ list.length ] = {
                 id      : id,
                 title   : e.getAttribute('title'),
                 artist  : e.getAttribute('artist'),
                 url     : e.getAttribute('url'),
-            }
+            };
             disable(id.split('-')[1]);
             melodify.node(`download-${ id.split('-')[1] }`).innerHTML = '<i style="font-size: 17px" class="fas fa-clock"></i>'
         });
-        melodify.downloadQueue();
+        melodify.downloader.enqueue( list );
     },
     scanSongs: function(artist_list, generate_lyrics=false){
         for(artist in artist_list){

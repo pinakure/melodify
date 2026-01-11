@@ -1,9 +1,11 @@
 from config.forbidden   import FORBIDDEN_CHARACTERS, EMOJI_REPLACEMENT, CODENAME_PREFIXES, FORBIDDEN_FOLDERS, FORBIDDEN_PREFIXES, FORBIDDEN_SUFFIXES, FORBIDDEN_TAGS
 from django.utils       import timezone
 from django.conf        import settings
+from django.db          import models
 from datetime           import datetime
 from pathlib            import Path
 import hashlib
+import json
 import os
 
 def debug(text, **kwargs):
@@ -14,13 +16,62 @@ def debug(text, **kwargs):
         end = '\n'
     return Utils.debug(text, end=end, **kwargs)
 
+def model_to_json(self):
+    payload = {}
+    for field in self._meta.get_fields():
+        # Skip reverse relations
+        if field.one_to_many or field.many_to_many and field.auto_created:
+            continue
+            
+        value = getattr(self, field.name)
+
+        # Handle ManyToMany fields (genres)
+        if field.many_to_many:
+            payload[field.name] = [obj.name for obj in value.all()]
+        
+        # Handle ImageField/FileField
+        elif field.name == "picture" and value:
+            if isinstance(value, str): payload[field.name] = value
+            if isinstance(field, models.ImageField): 
+                if value.name:
+                    payload[field.name] = value.url
+                else:
+                    payload[field.name] = None
+        # Standard fields (name, aliases, bio)
+        else:
+            payload[field.name] = value
+    return payload
+
+import io
+from django.http                    import HttpResponse
+from django.core.management         import call_command
+
 class Utils:    
 
     LIBRARY_ROOT = None
 
     def db_export():
+        from main.models import MODELS
         debug("ADMIN :: Exporting Database")
-        return "Exported Database"
+        # Usamos un buffer en memoria para no crear archivos físicos en el servidor
+        buffer = io.StringIO()
+        
+        try:
+            # Ejecutamos dumpdata
+            # Excluimos contenttypes y permissions para evitar conflictos al re-importar
+            call_command(
+                'dumpdata', 
+                indent=4, 
+                exclude=['contenttypes', 'auth.Permission'], 
+                stdout=buffer
+            )
+            
+            response = HttpResponse(buffer.getvalue(), content_type="application/json")
+            response['Content-Disposition'] = 'attachment; filename="respaldo_db_2026.json"'
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f"Error al exportar: {str(e)}", status=500)
 
     def db_import():
         debug("ADMIN :: Importing Database")
@@ -348,3 +399,4 @@ class Sanitizer:
         for tag in TAGS:
             artist=artist.replace(tag, '|')
         return [ q.lstrip().rstrip().title() for q in artist.split('|')]
+

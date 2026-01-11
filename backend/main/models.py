@@ -13,7 +13,7 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 # ============
 #   GENRE
 # ============
@@ -93,7 +93,7 @@ class Song(models.Model):
     error        = models.BooleanField(default=False)
     errors       = models.TextField(blank=True, null=True)
     duration     = models.DurationField(default=1, null=True, blank=True)
-
+    public       = models.BooleanField(default=False)
     timestamp    = models.DateTimeField(null=True, blank=True)
     hash         = models.CharField(max_length=128, blank=True)
     bpm          = models.FloatField(null=True, blank=True)
@@ -227,8 +227,23 @@ class Friend(models.Model):
 # ==========
 # STAT MODEL 
 # ==========
-class SongStat(models.Model):
+class Interaction(models.Model):
     user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='songstat_user')
     song                = models.ForeignKey(Song, on_delete=models.CASCADE, related_name='songstat_song')
     listens             = models.IntegerField(default=0)
     shares              = models.IntegerField(default=0)
+
+MODELS = {
+    'Artist'        : Artist,
+    'Genre'         : Genre,
+    'Tag'           : Tag,
+    'Album'         : Album, 
+    'Song'          : Song, 
+    'Playlist'      : Playlist, 
+    'Bookmark'      : Bookmark, 
+    'Scheme'        : Scheme, 
+    'Font'          : Font, 
+    'NostrProfile'  : NostrProfile, 
+    'Friend'        : Friend, 
+    'Interaction'   : Interaction,
+}
