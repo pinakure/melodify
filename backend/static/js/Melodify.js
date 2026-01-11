@@ -383,38 +383,6 @@ Melodify.prototype = {
             melodify.request('/scan/artist/', { artist : artist_list[artist], generate_lyrics : generate_lyrics?1:0 }, ()=>{});    
         }   
     },
-    showResults: function(data){
-        container = melodify.node('results');
-        container.innerHTML = '';
-        if( data.songs.length > 1){
-            container.innerHTML += `
-                <div style="font-size: 14px; font-weight: bold; width: 100%; align-items: center; justify-content: right; display: flex;">
-                    <button 
-                        title="Descargar todo" 
-                        class="input" 
-                        id="download-all"
-                        onclick="melodify.downloadList()">
-                        <i class="fas fa-download "></i>&nbsp;Descargar Todo
-                    </button>
-                </div>`;
-        }
-        container.innerHTML += "<ul>";
-        var id=0;
-        ul = document.createElement('ul');
-        for( d in data.songs ){
-            song = data.songs[d];
-            ul.innerHTML += `
-                <li id="song-${id}" url="${song.url}" title="${song.name}" artist="${song.artist}">
-                    <p>${ song.name }</p>
-                    <p>${ song.artist }</p>
-                    <button title="Descargar" id="download-${d}" class="input accent" onclick="melodify.downloadSong(${d}, '${song.url}');">
-                        <i id="download-icon-${d}" class="fas fa-download "></i>
-                    </button>
-                </li>`;
-            id++;
-        }
-        container.appendChild(ul);
-    },
     hidePlaylists : function(){ 
         const div = melodify.node('playlists-window');
         div.style.display = 'none';

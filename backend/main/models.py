@@ -228,7 +228,7 @@ class Friend(models.Model):
 # STAT MODEL 
 # ==========
 class Interaction(models.Model):
-    user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='songstat_user')
+    user                = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='songstat_user')
     song                = models.ForeignKey(Song, on_delete=models.CASCADE, related_name='songstat_song')
     listens             = models.IntegerField(default=0)
     shares              = models.IntegerField(default=0)

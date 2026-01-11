@@ -2,7 +2,11 @@ M;1~~~~~~~~~~~~~~~~~
  BETA MILESTONES
 ~~~~~~~~~~~~~~~~~
 
-- ADMIN CP:
+✔ SIDEPANEL:
+	✔ Move download queue functionality to MelodifyDownloadQueue class
+	✔ Download Queue
+	✔ keep downloading stuff in background
+✔ ADMIN CP:
 	✔ Log View
 	✔ Log autoupdate rate setup
 	✔ Log autoupdate toggle
@@ -52,7 +56,3 @@ M;1~~~~~~~~~~~~~~~~~
 - PLAYLIST:
 	- Trash button on every entry
 	- Ability to move entries ( up & down buttons will do btm, no need for interact.js)
-- SIDEPANEL:
-	✔ Move download queue functionality to MelodifyDownloadQueue class
-	✔ Download Queue
-	✔ keep downloading stuff in background

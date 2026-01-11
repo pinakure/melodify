@@ -59,13 +59,23 @@ def get_playlists(user):
     else:  
         return []
     
+def get_interaction(song_id, user_id):
+    try:
+        interaction = Interaction.objects.filter(song_id=song_id, user_id=user_id).get()
+    except Exception as e:
+        debug(f"SONG :: {str(e)}")
+        interaction = Interaction()
+        interaction.song_id = song_id
+        interaction.user_id = user_id
+        interaction.save() 
+    return interaction
+
 # returns song object with virtual 'fav' field embedded, tuned for given user_id
 def get_song(song_id, user_id):
     song =  Song.objects.filter(id = song_id).annotate(fav=Exists(Bookmark.objects.filter(song_id=OuterRef('pk'),usuario_id=user_id))).get()
     song.pretty_artist = mark_safe(song.pretty_artist()) 
     song.artist_count  = song.get_artist_count() 
     return song
-
 
 class AlbumTileView(ListView):
     model = Album
@@ -469,6 +479,12 @@ def play_ajax(request, pk):
             
             if not song:
                 return JsonResponse({'status': 'error', 'message': 'Missing Song'}, status=400)
+
+            # interaction 
+            interaction = get_interaction(pk, request.user.id)
+            debug(f"SONG :: {interaction.listens}")
+            interaction.listens = interaction.listens+1
+            interaction.save() 
 
             # get song binary data from file 
             song = Song.objects.filter(id=pk).get()
