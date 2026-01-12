@@ -27,9 +27,13 @@
     <ul>
         {% for friend in friends %}
             <li>
+                <button title="Eliminar amigo" class="input transparent" onclick="melodify.social.deleteFriend({{ friend.user.id }})">
+                    <i class="fas fa-user-times" style="color: var(--section-color)"></i>
+                </button >
                 <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
                     {{ friend.friend.username }}
                 </a>
+                
             </li>
         {% empty %}
             No hay amigos.
@@ -40,9 +44,13 @@
         <ul>
             {% for friend in invitations %}
                 <li>
+                    <button title="Aceptar invitación" class="input transparent" onclick="melodify.social.acceptRequest({{ friend.friend.id }})">
+                        <i class="fas fa-user-plus" style="color: var(--section-color)"></i>
+                    </button >
                     <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
                         {{ friend.friend.username }}
                     </a>
+                    
                 </li>
             {% empty %}
                 No hay invitaciones.
@@ -52,9 +60,13 @@
         <ul>
             {% for friend in requests %}
                 <li>
-                    <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
-                        {{ friend.friend.username }}
+                    <button title="Rechazar invitación" class="input transparent" onclick="melodify.social.rejectRequest({{ friend.user.id }})">
+                        <i class="fas fa-user-times" style="color: var(--section-color)"></i>
+                    </button >
+                    <a onclick="melodify.navigate(`/user/{{friend.user.id}}/`)">
+                        {{ friend.user.username }}
                     </a>
+                    
                 </li>
             {% empty %}
                 No hay solicitudes.

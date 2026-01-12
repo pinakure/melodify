@@ -11,6 +11,7 @@ function Melodify(user_id=0){
     this.lyrics_editor      = false;
     this.player             = new MelodifyPlayer();
     this.downloader         = new MelodifyDownloadQueue( this.debug );
+    this.social             = new MelodifySocial();
 };
 Melodify.prototype = {
     admin : null,
