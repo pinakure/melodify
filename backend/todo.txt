@@ -18,6 +18,7 @@ M;1~~~~~~~~~~~~~~~~~
 	✔ Force Get Metadata Missing Items
 	✔ Backoffice access (iframe)
 - GENERAL:
+	✔ Top listened playlist @ home
 	- Collapsible Sidebar
 	- Usable sidebar on responsive design
 	- Keyboard input (play-stop, next, prev...)

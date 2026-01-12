@@ -54,6 +54,41 @@ def get_favorites(user):
     else:  
         return []
     
+def get_friends(user):
+    if user.is_authenticated:
+        # Buscamos los Friends del usuario...
+        friends_of_user = Friend.objects.filter(user_id=user.id)
+        # ...pero solo aquellos cuyo friend_id también aparezca como user_id 
+        # en otra entrada donde el friend_id sea el usuario actual.
+        reciprocal_ids = Friend.objects.filter(friend_id=user.id).values_list('user_id', flat=True)
+        return friends_of_user.filter(friend_id__in=reciprocal_ids)
+    else:  
+        return []
+
+def get_requests(user):
+    if user.is_authenticated:
+        # 1. Obtenemos los IDs de las personas a las que el usuario YA agregó
+        already_added_by_me = Friend.objects.filter(user_id=user.id).values_list('friend_id', flat=True)
+        # 2. Retornamos los objetos Friend donde el usuario es el "friend_id", 
+        # pero el emisor (user_id) NO está en la lista anterior.
+        return Friend.objects.filter(friend_id=user.id).exclude(user_id__in=already_added_by_me)
+    else:  
+        return []
+
+def get_invitations(user):
+    if user.is_authenticated:
+        # Subconsulta: ¿Existe un objeto "b" donde la otra persona me haya agregado?
+        they_added_me = Friend.objects.filter(
+            user_id=OuterRef('friend_id'),
+            friend_id=user.id
+        )
+        # Filtramos mis envíos (user_id=user.id) donde NO se cumple la reciprocidad
+        return Friend.objects.filter(user_id=user.id).annotate(
+            is_accepted=Exists(they_added_me)
+        ).filter(is_accepted=False)
+    else:  
+        return []
+
 def get_toplistened(user):
     if user.is_authenticated:
         top_song_ids  = Interaction.objects.filter(user_id=user.id).values_list('song_id', flat=True)
@@ -276,16 +311,6 @@ class LyricsView(DetailView):
         context = get_context(super().get_context_data(**kwargs), self.request.user)
         return context
 
-class UserView(ListView):
-    model = Song
-    template_name = 'main/home.html'  
-    context_object_name = 'songs'         
-    queryset = Song.objects.order_by('?')[:25]
-
-    def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs), self.request.user)
-        return context
-
 class TagDetailView(DetailView):
     model = Tag
     template_name = 'main/tag-detail.html'
@@ -381,10 +406,17 @@ class UserView(DetailView):
     context_object_name = 'user' 
     
     def get_context_data(self, **kwargs):
-        context = get_context(super().get_context_data(**kwargs), self.request.user)
-        context['playlists' ] = Playlist.objects.filter(usuario__id=self.request.user.id)
-        context['authed'    ] = True if self.request.user.is_authenticated else False
-
+        context = get_context(super().get_context_data(**kwargs), self.object)
+        context['playlists' ] = Playlist.objects.filter(usuario__id=self.object.id)
+        context['authed'    ] = True if self.request.user.is_authenticated and self.object.id == self.request.user.id else False
+        context['is_friend' ] = True \
+                                 if Friend.objects.filter(user_id=self.request.user.id, friend_id=self.object.id).exists() \
+                                and Friend.objects.filter(user_id=self.object.id, friend_id=self.request.user.id).exists() \
+                                else False
+        context['requests']   = get_requests(self.object)
+        context['invitations']= get_invitations(self.object)
+        context['friends']    = get_friends(self.object)
+        context['client']     = self.request.user
         return context
 
 @csrf_exempt

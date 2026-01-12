@@ -13,21 +13,54 @@
     <p class="labels"><strong>Nombre de usuario: </strong>{{ user.username }}</p>
 </div>
 <br/>
-{% if authed %}
-    <form id="logout-form">
-        {% csrf_token %}
-        <button 
-        type    = "submit" 
-        id      = "button-logout" 
-        class   = "input secondary"  
-        title   = "Cerrar sesión" 
-        >
-            {% fa5_icon 'arrow-left' %}&nbsp;Cerrar sesión
-        </button>
-    </form>
-    {% for playlist in playlists %}
-    · {{ playlist.title }}
-    {% endfor %}
+{% if authed or is_friend %}
+    
+    {% include 'main/widget-section.html' with caption="Listas de Reproducción" icon="list"  %}
+    <ul>
+        {% for playlist in playlists %}
+            <li>{{ playlist.title }}</li>
+        {% empty %}
+            No hay listas.
+        {% endfor %}
+    </ul>
+    {% include 'main/widget-section.html' with caption="Amigos" icon="users"  %}
+    <ul>
+        {% for friend in friends %}
+            <li>
+                <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
+                    {{ friend.friend.username }}
+                </a>
+            </li>
+        {% empty %}
+            No hay amigos.
+        {% endfor %}
+    </ul>
+    {% if user == client %}
+        {% include 'main/widget-section.html' with caption="Invitaciones Enviadas" icon="paper-plane"  %}
+        <ul>
+            {% for friend in invitations %}
+                <li>
+                    <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
+                        {{ friend.friend.username }}
+                    </a>
+                </li>
+            {% empty %}
+                No hay invitaciones.
+            {% endfor %}
+        </ul>
+        {% include 'main/widget-section.html' with caption="Solicitudes de Amistad" icon="user-plus"  %}
+        <ul>
+            {% for friend in requests %}
+                <li>
+                    <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
+                        {{ friend.friend.username }}
+                    </a>
+                </li>
+            {% empty %}
+                No hay solicitudes.
+            {% endfor %}
+        </ul>
+    {% endif %}
     <script>
         document.getElementById('logout-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -47,4 +80,16 @@
             }
         };
     </script>
+    <hr class="breathe transparent"/>
+    <form id="logout-form">
+        {% csrf_token %}
+        <button 
+        type    = "submit" 
+        id      = "button-logout" 
+        class   = "input secondary"  
+        title   = "Cerrar sesión" 
+        >
+            {% fa5_icon 'arrow-left' %}&nbsp;Cerrar sesión
+        </button>
+    </form>
 {% endif %}

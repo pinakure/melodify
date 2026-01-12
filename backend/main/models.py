@@ -220,8 +220,8 @@ class NostrProfile(models.Model):
 # FRIEND MODEL 
 # ============
 class Friend(models.Model):
-    user                = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_user')
-    friend              = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_friend')
+    user                = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_user')
+    friend              = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_friend')
     since               = models.DateField(auto_now_add=True)
 
 # ==========

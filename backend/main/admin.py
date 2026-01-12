@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme, Font, Interaction
+from .models import Artist, Genre, Tag, Album, Song, Playlist, Scheme, Font, Interaction, Friend
 
 
 # ============
@@ -106,11 +106,20 @@ class PlaylistAdmin(admin.ModelAdmin):
     filter_horizontal = ("songs", "artists", "genres")
 
 
-# ============
-#   LISTEN
-# ============
+# ==============
+#   INTERACTION
+# ==============
 @admin.register(Interaction)
 class InteractionAdmin(admin.ModelAdmin):
     list_display = ("user","song", "listens", "shares")
+    search_fields = ()
+
+
+# =========
+#   FRIEND
+# =========
+@admin.register(Friend)
+class FriendAdmin(admin.ModelAdmin):
+    list_display = ("user","friend", "since")
     search_fields = ()
 
