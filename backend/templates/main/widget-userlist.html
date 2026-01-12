@@ -1,0 +1,23 @@
+{% include 'main/widget-section.html' with caption=caption icon=icon %}
+<ul>
+    {% for friend in data %}
+        <li>
+            {% if user == client %}
+                <button title="{{ action_caption }}" class="input transparent" onclick="melodify.social.{{ action }}( {{ user.id }}, {{ friend.user.id }})">
+                    <i class="fas fa-{{ action_icon }}" style="color: var(--section-color)"></i>
+                </button >
+            {% endif %}
+            {% if target == 'friend' %}
+                <a onclick="melodify.navigate(`/user/{{ friend.friend.id }}/`)">
+                    {{ friend.friend.username }}
+                </a>
+            {% else %}
+                <a onclick="melodify.navigate(`/user/{{ friend.user.id }}/`)">
+                    {{ friend.user.username }}
+                </a>
+            {% endif %}
+        </li>
+    {% empty %}
+        {{ nothing_message }}
+    {% endfor %}
+</ul>

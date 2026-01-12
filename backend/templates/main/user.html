@@ -6,15 +6,32 @@
 {% include "main/widget-title.html" with caption=user.username.capitalize %}
 {% include "main/widget-back.html" %}
 
-
-
-
 <div class="user-detail-container" >    
     <p class="labels"><strong>Nombre de usuario: </strong>{{ user.username }}</p>
 </div>
-<br/>
-{% if authed or is_friend %}
-    
+{% if user != client and not is_friend %}
+    {% if is_invitation %}
+        <button title="Aceptar Solicitud de Amistad" class="input accent" onclick="melodify.social.sendRequest({{ user.id }}, {{ friend.user.id }})">
+            <i class="fas fa-user-check" ></i>
+        </button >
+        <button title="Rechazar Solicitud de Amistad" class="input accent" onclick="melodify.social.rejectRequest({{ user.id }}, {{ friend.user.id }})">
+            <i class="fas fa-user-times" ></i>
+        </button >
+    {% elif not is_request %}
+        <button title="Enviar Solicitud de Amistad" class="input accent" onclick="melodify.social.sendRequest({{ user.id }}, {{ friend.user.id }})">
+            <i class="fas fa-user-plus" ></i>
+        </button >
+    {% else %}
+        <button title="Cancelar Solicitud" class="input accent" onclick="melodify.social.cancelRequest({{ user.id }}, {{ friend.user.id }})">
+            <i class="fas fa-times" ></i>
+        </button >
+    {% endif %}
+{% elif authed or is_friend %}    
+    {% if user != client %}
+        <button title="Eliminar Amigo" class="input accent" onclick="melodify.social.deleteFriend({{ user.id }}, {{ friend.user.id }})">
+            <i class="fas fa-user-times" ></i>
+        </button >
+    {% endif %}
     {% include 'main/widget-section.html' with caption="Listas de Reproducción" icon="list"  %}
     <ul>
         {% for playlist in playlists %}
@@ -23,85 +40,42 @@
             No hay listas.
         {% endfor %}
     </ul>
-    {% include 'main/widget-section.html' with caption="Amigos" icon="users"  %}
-    <ul>
-        {% for friend in friends %}
-            <li>
-                <button title="Eliminar amigo" class="input transparent" onclick="melodify.social.deleteFriend({{ friend.user.id }})">
-                    <i class="fas fa-user-times" style="color: var(--section-color)"></i>
-                </button >
-                <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
-                    {{ friend.friend.username }}
-                </a>
-                
-            </li>
-        {% empty %}
-            No hay amigos.
-        {% endfor %}
-    </ul>
+    {% include 'main/widget-userlist.html' with caption="Amigos"                icon="users"        data=friends        action_caption="Eliminar Amigo"      action="deleteFriend"   action_icon="user-times"    target='friend' %}
     {% if user == client %}
-        {% include 'main/widget-section.html' with caption="Invitaciones Enviadas" icon="paper-plane"  %}
-        <ul>
-            {% for friend in invitations %}
-                <li>
-                    <button title="Aceptar invitación" class="input transparent" onclick="melodify.social.acceptRequest({{ friend.friend.id }})">
-                        <i class="fas fa-user-plus" style="color: var(--section-color)"></i>
-                    </button >
-                    <a onclick="melodify.navigate(`/user/{{friend.friend.id}}/`)">
-                        {{ friend.friend.username }}
-                    </a>
-                    
-                </li>
-            {% empty %}
-                No hay invitaciones.
-            {% endfor %}
-        </ul>
-        {% include 'main/widget-section.html' with caption="Solicitudes de Amistad" icon="user-plus"  %}
-        <ul>
-            {% for friend in requests %}
-                <li>
-                    <button title="Rechazar invitación" class="input transparent" onclick="melodify.social.rejectRequest({{ friend.user.id }})">
-                        <i class="fas fa-user-times" style="color: var(--section-color)"></i>
-                    </button >
-                    <a onclick="melodify.navigate(`/user/{{friend.user.id}}/`)">
-                        {{ friend.user.username }}
-                    </a>
-                    
-                </li>
-            {% empty %}
-                No hay solicitudes.
-            {% endfor %}
-        </ul>
+        {% include 'main/widget-userlist.html' with caption="Invitaciones"    icon="paper-plane"  data=invitations    action_caption="Aceptar Invitación"  action="acceptRequest"  action_icon="user-plus"     target='friend' %}
+        {% include 'main/widget-userlist.html' with caption="Solicitudes"    icon="user-plus"   data=requests       action_caption="Rechazar Invitación" action="rejectRequest"  action_icon="user-times"    target='user'   %}
     {% endif %}
-    <script>
-        document.getElementById('logout-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            
-            const response = await fetch("{% url 'logout_ajax' %}", {
-                method: 'POST',
-                body: formData,
-                headers: { "X-CSRFToken": formData.get('csrfmiddlewaretoken') }
-            });
+    {% if user == client %}
+        <script>
+            document.getElementById('logout-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                const response = await fetch("{% url 'logout_ajax' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: { "X-CSRFToken": formData.get('csrfmiddlewaretoken') }
+                });
 
-            const data = await response.json();
-            if (data.success) {
-                window.location.reload(); // Recarga para mostrar al usuario logueado
-            } else {
-                melodify.toast("Error logging out", 5, true);
-            }
-        };
-    </script>
-    <hr class="breathe transparent"/>
-    <form id="logout-form">
-        {% csrf_token %}
-        <button 
-        type    = "submit" 
-        id      = "button-logout" 
-        class   = "input secondary"  
-        title   = "Cerrar sesión" 
-        >
-            {% fa5_icon 'arrow-left' %}&nbsp;Cerrar sesión
-        </button>
-    </form>
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload(); // Recarga para mostrar al usuario logueado
+                } else {
+                    melodify.toast("Error logging out", 5, true);
+                }
+            };
+        </script>
+        <hr class="breathe transparent"/>
+        <form id="logout-form">
+            {% csrf_token %}
+            <button 
+            type    = "submit" 
+            id      = "button-logout" 
+            class   = "input secondary"  
+            title   = "Cerrar sesión" 
+            >
+                {% fa5_icon 'arrow-left' %}&nbsp;Cerrar sesión
+            </button>
+        </form>
+    {% endif %}
 {% endif %}

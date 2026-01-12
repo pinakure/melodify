@@ -413,6 +413,14 @@ class UserView(DetailView):
                                  if Friend.objects.filter(user_id=self.request.user.id, friend_id=self.object.id).exists() \
                                 and Friend.objects.filter(user_id=self.object.id, friend_id=self.request.user.id).exists() \
                                 else False
+        context['is_request'] = True \
+                                 if     Friend.objects.filter(user_id=self.request.user.id, friend_id=self.object.id).exists() \
+                                and not Friend.objects.filter(user_id=self.object.id, friend_id=self.request.user.id).exists() \
+                                else False
+        context['is_invitation'] = True \
+                                 if not Friend.objects.filter(user_id=self.request.user.id, friend_id=self.object.id).exists() \
+                                and     Friend.objects.filter(user_id=self.object.id, friend_id=self.request.user.id).exists() \
+                                else False
         context['requests']   = get_requests(self.object)
         context['invitations']= get_invitations(self.object)
         context['friends']    = get_friends(self.object)
